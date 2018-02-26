@@ -1,0 +1,4 @@
+mo brems 15 3e23 brems 15 1e20 0.1 10 ga 6.5 0.1 250
+output partial 0.1 10.0 0.005
+inst xmm pn thin
+go 0.5 asca sis

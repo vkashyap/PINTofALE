@@ -1,0 +1,144 @@
+;+
+;chandra_hetg_ao5.par
+;	generate an ACIS-S/HETG spectrum for a source using a specified DEM
+;
+;calling sequence
+;	.run initale
+;	@chandra_hetg_ao5.par
+;
+;(LL;Mar03) 
+;-
+
+;--------------------------------------------------------------------------
+;	control variables
+;--------------------------------------------------------------------------
+;	environment
+ !LDBDIR = '$CHIANTI'		;'$CHIANTI','$SPEX','$APED','/path/to/dir'
+;	source parameters
+ !NH           = 3e20			; H column density [cm^-2]
+ !EDENS        = 1e10			; electron number density [cm^-3]
+ !ABUND        = getabund('grevesse')   ; elemental abundances (SEE:getabund.pro)
+ T_components  = [6.3,6.4,7.4]		; log(T[K]) components in the EM
+ EM_components = [6.1d12,6.1d12,7.1e12]	; Emission Measure [cm^-3]
+ 
+;	observation parameters
+ EXPTIME       = 50.			 ; nominal exposure time [ks]
+ file_GRMF     = 'aciss_meg1_cy05.grmf'	 ; full path name to grating RMF
+ file_ARFp     = 'aciss_meg1_cy05.garf'  ; full path name to +ve order grating ARF or 'none'
+ file_ARFn     = 'aciss_meg-1_cy05.garf' ; full path name to -ve order grating ARF or 'none'
+
+;       analysis parameters
+ !WMIN         = 2.0                    ; minimum wavelength for output spectrum [ang]
+ !WMAX         = 30.0                   ; maximum wavelength for output spectrum [ang] 
+ nwbin         = 16384L			; number of bins in theoretical spectrum
+
+;--------------------------------------------------------------------------
+;	do not edit anything below unless you know what you are doing
+;--------------------------------------------------------------------------
+
+;	make the DEM
+!DEM=mk_dem('delta',logT=!LOGT,pardem=T_components,indem=EM_components)
+
+;	make input theoretical spectrum grid
+nwbin=16384L & dwvl=float((!WMAX-!WMIN)/nwbin) & wgrid=findgen(nwbin+1L)*dwvl+!WMIN
+
+;	read in gARFs
+if strlowcase(file_ARFp) ne 'none' then $
+	effar_p=rdarf(file_ARFp,ARSTRp) else $
+	effar_p=fltarr(nwbin)
+if strlowcase(file_ARFn) ne 'none' then $
+	effar_n=rdarf(file_ARFn,ARSTRn) else $
+	effar_n=fltarr(nwbin)
+if n_tags(ARSTRp) gt 0 then $
+	wvlar_p=!fundae.KEVANG/(0.5*(ARSTRp.ELO+ARSTRp.EHI)) else $
+	wvlar_p=0.5*(wgrid[1:*]+wgrid)
+if n_tags(ARSTRn) gt 0 then $
+	wvlar_n=!fundae.KEVANG/(0.5*(ARSTRn.ELO+ARSTRn.EHI)) else $
+	wvlar_n=0.5*(wgrid[1:*]+wgrid)
+
+;	read in line emissivities
+lconf=rd_line(atom,n_e=!EDENS,wrange=[!WMIN,!WMAX],$
+  dbdir=!LDBDIR,verbose=!VERBOSE,$
+  wvl=LWVL,logT=LLOGT,Z=Z,ion=ION,jon=JON,fstr=lstr)
+
+;	include ion balance
+lconf=fold_ioneq(lconf,Z,JON,chidir=!CHIDIR,$
+  logT=LLOGT,eqfile=!IONEQF,verbose=!VERBOSE)
+lstr.LINE_INT = lconf
+
+;	read in continuum database
+cconf=rd_cont(!CEROOT,n_e=!EDENS,wrange=[!WMIN,!WMAX],$
+  dbdir=!CDBDIR,abund=!ABUND,verbose=!VERBOSE,$
+  wvl=CWW,logT=ClogT)
+
+;	calculate line intensities
+linint=lineflx(lconf,!LOGT,LWVL,Z,DEM=!DEM,abund=!ABUND) ;[ph/s]
+
+;	calculate continuum intensities
+CWVL=0.5*(CWW[1:*]+CWW) & CDW=CWW[1:*]-CWW
+;	hack to avoid annoying saw-toothed CDW
+CWB=mid2bound(CWVL) & CDW=CWB[1:*]-CWB
+conint=lineflx(cconf,!LOGT,CWVL,DEM=!DEM)*CDW	;[ph/s/Ang]*[Ang]
+
+;	derive ISM absorptions
+ltau=ismtau(LWVL,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+	Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+ctau=ismtau(CWW,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+	Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+ltrans=exp(-ltau) & ctrans=exp(-ctau)
+
+;	derive theoretical line fluxes
+linflx = linint * ltrans	;[ph/s/cm^2]
+
+;	derive theoretical continuum fluxes
+conflx = conint * ctrans	;[ph/s/cm^2]
+
+;	rebin to form theoretical line spectrum
+linspc = hastogram(abs(LWVL),wgrid,wts=linflx)	;[ph/s/cm^2/bin]
+
+;	rebin to form theoretical continuum spectrum
+conspc = rebinw(conflx,CWVL,wgrid,/perbin)	;[ph/s/cm^2/bin]
+
+;	derive predicted flux spectrum
+WVLS=0.5*(WGRID[1:*]+WGRID)
+newEffArP=(interpol(EFFAR_p,WVLAR_p,WVLS) > 0) < (max(EFFAR_p))
+newEffArN=(interpol(EFFAR_N,WVLAR_n,WVLS) > 0) < (max(EFFAR_n))
+
+;	[ct/s/bin] (if DEM is [cm^-5]: [ct/s/cm^2/bin])
+flxspcP = (linspc + conspc) * newEffArP
+flxspcN = (linspc + conspc) * newEffArN
+
+;	derive predicted counts spectrum
+flxspcP=flxspcP*EXPTIME*1e3		;[ct/bin]
+flxspcN=flxspcN*EXPTIME*1e3		;[ct/bin]
+
+EGRID=!fundae.KEVANG/WGRID
+conv_rmf,EGRID,flxspcP,CHANP,CTSPCP,file_gRMF,rmfstr=grmf
+conv_rmf,EGRID,flxspcN,CHANN,CTSPCN,grmf
+CHAN=CHANP
+
+;	obtain simulated spectrum
+nbin=n_elements(ctspcP)
+sim_spec=intarr(nbin)
+
+ctspc=ctspcP+ctspcN
+for i=0L,nbin-1L do $
+  if ctspc[i] gt 0 then sim_spec[i]=randomu(seed,poisson=ctspc[i])
+
+;	plot
+plot, !fundae.kevang/CHANP,CTSPC,xtitle='[Ang]',ytitle='[ct]',$
+  xr=[!WMIN,!WMAX],yr=[0,1.1*max(ctspc)],thick=2
+oplot,!fundae.kevang/CHANP,sim_spec,psym=10,color=3
+stample
+
+;	report
+print,'' & print,'' & print,''
+print,'The redistributed counts spectra are in: '
+print,'		CTSPC(chan) = ctspcP(chanP) + ctspcN(chanN) [ct/bin]'
+print,'The idealized flux spectra are in: '
+print,'		flxspcP(wgrid) and flxspcN(wgrid) [ct/bin]'
+print,'The theoretical line fluxes are in: '
+print,'		linspc(wvls) [ph/s[/cm^2]]'
+print,'The theoretical continuum fluxes are in: '
+print,'		conspc(wvls) [ph/s[/cm^2]]'
+print,'' & print,'' & print,''

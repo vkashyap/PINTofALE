@@ -1,0 +1,50 @@
+setenv SPEX /soft/spex
+
+cd /data/fubar/SCAR/SPEX
+ln -s $SPEX/data .
+mkdir code
+
+cd /data/fubar/SCAR/SPEX/code
+cp $SPEX/code/spexinit.f .
+cp $SPEX/code/getnam.f .
+cp $SPEX/code/spexopen.f .
+cp $SPEX/code/spexclose.f .
+cp $SPEX/code/refil.f .
+cp $SPEX/code/sys_user.f .
+cp $SPEX/code/spexread.f .
+cp $SPEX/code/sys_getenv.f .
+cp $SPEX/code/ioncon.f .
+cp $SPEX/code/linem.f .
+cp $SPEX/code/gline.f .
+ln -s $SPEX/code/spexdef.inc .
+ln -s $SPEX/code/laag.inc .
+ln -s $SPEX/code/atomic.inc .
+ln -s $SPEX/code/spex.inc .
+ln -s $SPEX/code/spexplot.inc .
+ln -s $SPEX/code/menus.inc .
+
+f77 -o line_spex -e -O line_spex.f spexinit.f getnam.f spexopen.f \
+	spexclose.f refil.f sys_user.f spexread.f sys_getenv.f ioncon.f \
+	linem.f gline.f
+
+line_spex
+ln -s /data/fubar/SCAR/pro/mkemis/line_spex.pro .
+idl
+.run ./line_spex
+line_spex,outdir='/data/fubar/SCAR/emissivity/emisspex'
+exit
+
+rm *.o atno.?? desc.?? ions.?? wavl.?? ?prs.?? ?flx.?? ?lev.?? *.pro
+
+f77 -o line_spexD -e -O line_spexD.f spexinit.f getnam.f spexopen.f \
+	spexclose.f refil.f sys_user.f spexread.f sys_getenv.f ioncon.f \
+	linem.f gline.f
+
+line_spexD
+ln -s /data/fubar/SCAR/pro/mkemis/line_spexD.pro .
+idl
+.run ./line_spexD
+line_spexD,outdir='/data/fubar/SCAR/emissivity/emisspexD'
+exit
+
+rm *.o atno.?? desc.?? ions.?? wavl.?? ?den.?? ?flx.?? ?lev.?? *.pro

@@ -1,0 +1,33 @@
+;+
+;MCMC_stellar.demo
+;	set up call to MCMC_DEM to generate DEM for AU Mic
+;	data using the line ratios method
+;
+;usage
+;	@MCMC_stellar.demo
+;
+;requires
+;	!ARDB/MCMC_AUMIC.demo.save
+;
+;side-effects
+;	writes out save file MCMC_stellar_demo.save in $cwd
+;
+;history
+;LL 4/10/05 from AUMIC MEG analysis 
+;-
+
+defsysv,'!ARDB',exists=iPoA
+if iPoA eq 0 then message,'requires that INITALE be run first'
+
+savfil=filepath('MCMC_AUMIC.demo.save',root_dir=!ARDB)
+if keyword_set(savfil) then restore,savfil
+
+odem=mcmc_dem(wvl,flx,emis,z=z,logt=logt,abund=abund,fsigma=fsigma,$
+	onlyrat=onlyrat,smoot=smoot,smooscl=smooscl,nsim=500,$
+	savfil='MCMC_stellar_demo.save',verbose=5)
+
+ymax=max(emis)
+window,1
+plot,logt,0*logt,yr=ymax*[1e-5,1],/xs,$
+	xtitle='logT',ytitle='emissivities'
+for i=0,n_elements(wvl)-1 do oplot,logt,emis[*,i]

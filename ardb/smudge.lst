@@ -1,0 +1,663 @@
+# input file for SMUDGE.PRO
+# LOCATION <tab> UNIT <tab> LABEL <tab> KEYWORDS
+# NOTE: This file is also readable by RDB.PRO
+%LOC	UNITS	LABEL	KEYWORDS
+%N	S	S	S
+
+# examples
+0.511	MeV	electron mass	example
+21.0	cm	HI radio line	example
+0.94	meter	DI version of 21cm HI line	example
+44.28	Ang	C edge	example
+
+#	the following from Table 8.2 of Chandra AXAF proposers' guide
+2.089	keV	Ir M-edge	Chandra AXAF ACIS HRMA HRC edges
+2.156	keV	Ir M-edge	Chandra AXAF ACIS HRMA HRC edges
+2.550	keV	Ir M-edge	Chandra AXAF ACIS HRMA HRC edges
+2.909	keV	Ir M-edge	Chandra AXAF ACIS HRMA HRC edges
+0.496	keV	Ir N-edge	Chandra AXAF ACIS HRMA HRC edges
+2.206	keV	Au M-edge	Chandra AXAF ACIS LETG HETG HEG MEG edges
+2.291	keV	Au M-edge	Chandra AXAF ACIS LETG HETG HEG MEG edges
+2.743	keV	Au M-edge	Chandra AXAF ACIS LETG HETG HEG MEG edges
+3.148	keV	Au M-edge	Chandra AXAF ACIS LETG HETG HEG MEG edges
+3.425	keV	Au M-edge	Chandra AXAF ACIS LETG HETG HEG MEG edges
+5.012	keV	Cs L-edge	Chandra AXAF HRC edges
+5.359	keV	Cs L-edge	Chandra AXAF HRC edges
+5.714	keV	Cs L-edge	Chandra AXAF HRC edges
+0.7266	keV	Cs M-edge	Chandra AXAF HRC edges
+0.7405	keV	Cs M-edge	Chandra AXAF HRC edges
+1.003	keV	Cs M-edge	Chandra AXAF HRC edges
+1.071	keV	Cs M-edge	Chandra AXAF HRC edges
+1.211	keV	Cs M-edge	Chandra AXAF HRC edges
+4.577	keV	I L-edge	Chandra AXAF HRC edges
+4.852	keV	I L-edge	Chandra AXAF HRC edges
+5.188	keV	I L-edge	Chandra AXAF HRC edges
+0.6193	keV	I M-edge	Chandra AXAF HRC edges
+0.6308	keV	I M-edge	Chandra AXAF HRC edges
+0.875	keV	I M-edge	Chandra AXAF HRC edges
+0.931	keV	I M-edge	Chandra AXAF HRC edges
+1.072	keV	I M-edge	Chandra AXAF HRC edges
+1.559	keV	Al K-edge	Chandra AXAF HRC ACIS edges
+0.2842	keV	C K-edge	Chandra AXAF HETG HEG MEG HRC ACIS edges
+0.4099	keV	N K-edge	Chandra AXAF HETG HEG MEG HRC ACIS edges
+0.5431	keV	O K-edge	Chandra AXAF HETG HEG MEG HRC ACIS edges
+
+#	the following from Table 8.3 of Chandra AXAF proposers' guide
+0.690	keV	UVIS Inner T	Chandra AXAF UV Ion Shield HRC
+18.0	Ang	UVIS Inner T	Chandra AXAF UV Ion Shield HRC
+0.235	keV	HRC -ve side gap	Chandra AXAF LETG HRC-S plate gaps
+0.225	keV	HRC -ve side gap	Chandra AXAF LETG HRC-S plate gaps
+0.200	keV	HRC +ve side gap	Chandra AXAF LETG HRC-S plate gaps
+0.193	keV	HRC +ve side gap	Chandra AXAF LETG HRC-S plate gaps
+
+#	the following from Table 8.4 of Chandra AXAF proposers' guide
+0.133	keV	S0 LEG gap	Chandra AXAF ACIS-S LETGS S0 offset=0 gaps
+0.191	keV	S0-S1 LEG gap	Chandra AXAF ACIS-S LETGS S0-S1 offset=0 gaps
+0.193	keV	S0-S1 LEG gap	Chandra AXAF ACIS-S LETGS S0-S1 offset=0 gaps
+0.343	keV	S1-S2 LEG gap	Chandra AXAF ACIS-S LETGS S1-S2 offset=0 gaps
+0.348	keV	S1-S2 LEG gap	Chandra AXAF ACIS-S LETGS S1-S2 offset=0 gaps
+1.669	keV	S2-S3 LEG gap	Chandra AXAF ACIS-S LETGS S2-S3 offset=0 gaps
+1.788	keV	S2-S3 LEG gap	Chandra AXAF ACIS-S LETGS S2-S3 offset=0 gaps
+0.583	keV	S3-S4 LEG gap	Chandra AXAF ACIS-S LETGS S3-S4 offset=0 gaps
+0.569	keV	S3-S4 LEG gap	Chandra AXAF ACIS-S LETGS S3-S4 offset=0 gaps
+0.248	keV	S4-S5 LEG gap	Chandra AXAF ACIS-S LETGS S4-S5 offset=0 gaps
+0.246	keV	S4-S5 LEG gap	Chandra AXAF ACIS-S LETGS S4-S5 offset=0 gaps
+0.158	keV	S5 LEG gap	Chandra AXAF ACIS-S LETGS S5 offset=0 gaps
+
+#	the following from Table 7.2 of Chandra AXAF proposers' guide
+0.329	keV	S0 MEG gap	Chandra AXAF ACIS-S HETGS MEG S0 offset=0 gaps
+0.657	keV	S0 HEG gap	Chandra AXAF ACIS-S HETGS HEG S0 offset=0 gaps
+0.472	keV	S0-S1 MEG gap	Chandra AXAF ACIS-S HETGS MEG S0 S1 offset=0 gaps
+0.476	keV	S0-S1 MEG gap	Chandra AXAF ACIS-S HETGS MEG S0 S1 offset=0 gaps
+0.943	keV	S0-S1 HEG gap	Chandra AXAF ACIS-S HETGS HEG S0 S1 offset=0 gaps
+0.951	keV	S0-S1 HEG gap	Chandra AXAF ACIS-S HETGS HEG S0 S1 offset=0 gaps
+0.847	keV	S1-S2 MEG gap	Chandra AXAF ACIS-S HETGS MEG S1 S2 offset=0 gaps
+0.859	keV	S1-S2 MEG gap	Chandra AXAF ACIS-S HETGS MEG S1 S2 offset=0 gaps
+1.693	keV	S1-S2 HEG gap	Chandra AXAF ACIS-S HETGS HEG S1 S2 offset=0 gaps
+1.716	keV	S1-S2 HEG gap	Chandra AXAF ACIS-S HETGS HEG S1 S2 offset=0 gaps
+4.121	keV	S2-S3 MEG gap	Chandra AXAF ACIS-S HETGS MEG S2 S3 offset=0 gaps
+4.414	keV	S2-S3 MEG gap	Chandra AXAF ACIS-S HETGS MEG S2 S3 offset=0 gaps
+8.235	keV	S2-S3 HEG gap	Chandra AXAF ACIS-S HETGS HEG S2 S3 offset=0 gaps
+8.821	keV	S2-S3 HEG gap	Chandra AXAF ACIS-S HETGS HEG S2 S3 offset=0 gaps
+1.438	keV	S3-S4 MEG gap	Chandra AXAF ACIS-S HETGS MEG S3 S4 offset=0 gaps
+1.406	keV	S3-S4 MEG gap	Chandra AXAF ACIS-S HETGS MEG S3 S4 offset=0 gaps
+2.874	keV	S3-S4 HEG gap	Chandra AXAF ACIS-S HETGS HEG S3 S4 offset=0 gaps
+2.809	keV	S3-S4 HEG gap	Chandra AXAF ACIS-S HETGS HEG S3 S4 offset=0 gaps
+0.612	keV	S4-S5 MEG gap	Chandra AXAF ACIS-S HETGS MEG S4 S5 offset=0 gaps
+0.606	keV	S4-S5 MEG gap	Chandra AXAF ACIS-S HETGS MEG S4 S5 offset=0 gaps
+1.224	keV	S4-S5 HEG gap	Chandra AXAF ACIS-S HETGS HEG S4 S5 offset=0 gaps
+1.212	keV	S4-S5 HEG gap	Chandra AXAF ACIS-S HETGS HEG S4 S5 offset=0 gaps
+0.389	keV	S5 MEG gap	Chandra AXAF ACIS-S HETGS MEG S0 offset=0 gaps
+0.777	keV	S5 HEG gap	Chandra AXAF ACIS-S HETGS HEG S0 offset=0 gaps
+
+#	the following from HEASARC's EDGEENERGY table
+#	http://heasarc.gsfc.nasa.gov/W3Browse/physics-data/edgeenergy.html
+10.66	keV	Ni XXVIII K	Ni XXVIII K-edge edgeenergy
+10.19	keV	Ni XXVII K	Ni XXVII K-edge edgeenergy
+10.05	keV	Ni XXVI  K	Ni XXVI  K-edge edgeenergy
+9.902	keV	Ni XXV   K	Ni XXV   K-edge edgeenergy
+9.741	keV	Ni XXIV  K	Ni XXIV  K-edge edgeenergy
+9.583	keV	Ni XXIII K	Ni XXIII K-edge edgeenergy
+9.428	keV	Ni XXII  K	Ni XXII  K-edge edgeenergy
+9.279	keV	Ni XXI   K	Ni XXI   K-edge edgeenergy
+9.278	keV	Fe XXVI  K	Fe XXVI  K-edge edgeenergy
+9.134	keV	Ni XX    K	Ni XX    K-edge edgeenergy
+8.992	keV	Ni XIX   K	Ni XIX   K-edge edgeenergy
+8.937	keV	Ni XVIII K	Ni XVIII K-edge edgeenergy
+8.883	keV	Ni XVII  K	Ni XVII  K-edge edgeenergy
+8.829	keV	Ni XVI   K	Ni XVI   K-edge edgeenergy
+8.775	keV	Ni XV    K	Ni XV    K-edge edgeenergy
+8.755	keV	Fe XXV   K	Fe XXV   K-edge edgeenergy
+8.724	keV	Ni XIV   K	Ni XIV   K-edge edgeenergy
+8.675	keV	Ni XIII  K	Ni XIII  K-edge edgeenergy
+8.628	keV	Ni XII   K	Ni XII   K-edge edgeenergy
+8.621	keV	Fe XXIV  K	Fe XXIV  K-edge edgeenergy
+8.582	keV	Ni XI    K	Ni XI    K-edge edgeenergy
+8.541	keV	Ni X     K	Ni X     K-edge edgeenergy
+8.503	keV	Ni IX    K	Ni IX    K-edge edgeenergy
+8.482	keV	Fe XXIII K	Fe XXIII K-edge edgeenergy
+8.468	keV	Ni VIII  K	Ni VIII  K-edge edgeenergy
+8.435	keV	Ni VII   K	Ni VII   K-edge edgeenergy
+8.404	keV	Ni VI    K	Ni VI    K-edge edgeenergy
+8.384	keV	Fe XXII  K	Fe XXII  K-edge edgeenergy
+8.377	keV	Ni V     K	Ni V     K-edge edgeenergy
+8.353	keV	Ni IV    K	Ni IV    K-edge edgeenergy
+8.332	keV	Ni III   K	Ni III   K-edge edgeenergy
+8.315	keV	Ni II    K	Ni II    K-edge edgeenergy
+8.313	keV	Ni I     K	Ni I     K-edge edgeenergy
+8.286	keV	Fe XXI   K	Fe XXI   K-edge edgeenergy
+8.187	keV	Fe XX    K	Fe XX    K-edge edgeenergy
+8.088	keV	Fe XIX   K	Fe XIX   K-edge edgeenergy
+7.989	keV	Fe XVIII K	Fe XVIII K-edge edgeenergy
+7.891	keV	Fe XVII  K	Fe XVII  K-edge edgeenergy
+7.838	keV	Fe XVI   K	Fe XVI   K-edge edgeenergy
+7.788	keV	Fe XV    K	Fe XV    K-edge edgeenergy
+7.737	keV	Fe XIV   K	Fe XIV   K-edge edgeenergy
+7.686	keV	Fe XIII  K	Fe XIII  K-edge edgeenergy
+7.636	keV	Fe XII   K	Fe XII   K-edge edgeenergy
+7.585	keV	Fe XI    K	Fe XI    K-edge edgeenergy
+7.535	keV	Fe X     K	Fe X     K-edge edgeenergy
+7.486	keV	Fe IX    K	Fe IX    K-edge edgeenergy
+7.44	keV	Fe VIII  K	Fe VIII  K-edge edgeenergy
+7.394	keV	Fe VII   K	Fe VII   K-edge edgeenergy
+7.348	keV	Fe VI    K	Fe VI    K-edge edgeenergy
+7.301	keV	Fe V     K	Fe V     K-edge edgeenergy
+7.256	keV	Fe IV    K	Fe IV    K-edge edgeenergy
+7.21	keV	Fe III   K	Fe III   K-edge edgeenergy
+7.164	keV	Fe II    K	Fe II    K-edge edgeenergy
+7.117	keV	Fe I     K	Fe I     K-edge edgeenergy
+5.47	keV	Ca XX    K	Ca XX    K-edge edgeenergy
+5.129	keV	Ca XIX   K	Ca XIX   K-edge edgeenergy
+5.003	keV	Ca XVIII K	Ca XVIII K-edge edgeenergy
+4.904	keV	Ca XVII  K	Ca XVII  K-edge edgeenergy
+4.793	keV	Ca XVI   K	Ca XVI   K-edge edgeenergy
+4.686	keV	Ca XV    K	Ca XV    K-edge edgeenergy
+4.582	keV	Ca XIV   K	Ca XIV   K-edge edgeenergy
+4.486	keV	Ca XIII  K	Ca XIII  K-edge edgeenergy
+4.406	keV	Ar XVIII K	Ar XVIII K-edge edgeenergy
+4.39	keV	Ca XII   K	Ca XII   K-edge edgeenergy
+4.301	keV	Ca XI    K	Ca XI    K-edge edgeenergy
+4.267	keV	Ca X     K	Ca X     K-edge edgeenergy
+4.235	keV	Ca IX    K	Ca IX    K-edge edgeenergy
+4.204	keV	Ca VIII  K	Ca VIII  K-edge edgeenergy
+4.174	keV	Ca VII   K	Ca VII   K-edge edgeenergy
+4.147	keV	Ca VI    K	Ca VI    K-edge edgeenergy
+4.122	keV	Ca V     K	Ca V     K-edge edgeenergy
+4.105	keV	Ar XVII  K	Ar XVII  K-edge edgeenergy
+4.099	keV	Ca IV    K	Ca IV    K-edge edgeenergy
+4.078	keV	Ca III   K	Ca III   K-edge edgeenergy
+4.069	keV	Ca I     K	Ca I     K-edge edgeenergy
+4.069	keV	Ca II    K	Ca II    K-edge edgeenergy
+4.014	keV	Ar XVI   K	Ar XVI   K-edge edgeenergy
+3.926	keV	Ar XV    K	Ar XV    K-edge edgeenergy
+3.828	keV	Ar XIV   K	Ar XIV   K-edge edgeenergy
+3.733	keV	Ar XIII  K	Ar XIII  K-edge edgeenergy
+3.643	keV	Ar XII   K	Ar XII   K-edge edgeenergy
+3.558	keV	Ar XI    K	Ar XI    K-edge edgeenergy
+3.494	keV	S XVI    K	S XVI    K-edge edgeenergy
+3.477	keV	Ar X     K	Ar X     K-edge edgeenergy
+3.4	keV	Ar IX    K	Ar IX    K-edge edgeenergy
+3.372	keV	Ar VIII  K	Ar VIII  K-edge edgeenergy
+3.345	keV	Ar VII   K	Ar VII   K-edge edgeenergy
+3.32	keV	Ar VI    K	Ar VI    K-edge edgeenergy
+3.297	keV	Ar V     K	Ar V     K-edge edgeenergy
+3.276	keV	Ar IV    K	Ar IV    K-edge edgeenergy
+3.257	keV	Ar III   K	Ar III   K-edge edgeenergy
+3.24	keV	Ar II    K	Ar II    K-edge edgeenergy
+3.226	keV	Ar I     K	Ar I     K-edge edgeenergy
+3.214	keV	S XV     K	S XV     K-edge edgeenergy
+3.134	keV	S XIV    K	S XIV    K-edge edgeenergy
+3.057	keV	S XIII   K	S XIII   K-edge edgeenergy
+2.971	keV	S XII    K	S XII    K-edge edgeenergy
+2.889	keV	S XI     K	S XI     K-edge edgeenergy
+2.812	keV	S X      K	S X      K-edge edgeenergy
+2.74	keV	S IX     K	S IX     K-edge edgeenergy
+2.673	keV	Si XIV   K	Si XIV   K-edge edgeenergy
+2.672	keV	S VIII   K	S VIII   K-edge edgeenergy
+2.608	keV	S VII    K	S VII    K-edge edgeenergy
+2.585	keV	S VI     K	S VI     K-edge edgeenergy
+2.564	keV	S V      K	S V      K-edge edgeenergy
+2.545	keV	S IV     K	S IV     K-edge edgeenergy
+2.529	keV	S III    K	S III    K-edge edgeenergy
+2.514	keV	S II     K	S II     K-edge edgeenergy
+2.502	keV	S I      K	S I      K-edge edgeenergy
+2.432	keV	Si XIII  K	Si XIII  K-edge edgeenergy
+2.399	keV	Ni XXVI  LS	Ni XXVI  LS-edge edgeenergy
+2.363	keV	Si XII   K	Si XII   K-edge edgeenergy
+2.296	keV	Si XI    K	Si XI    K-edge edgeenergy
+2.295	keV	Ni XXV   LS	Ni XXV   LS-edge edgeenergy
+2.224	keV	Si X     K	Si X     K-edge edgeenergy
+2.184	keV	Ni XXIV  LS	Ni XXIV  LS-edge edgeenergy
+2.155	keV	Si IX    K	Si IX    K-edge edgeenergy
+2.131	keV	Ni XXIV  LP	Ni XXIV  LP-edge edgeenergy
+2.09	keV	Si VIII  K	Si VIII  K-edge edgeenergy
+2.077	keV	Ni XXIII LS	Ni XXIII LS-edge edgeenergy
+2.046	keV	Fe XXIV  LS	Fe XXIV  LS-edge edgeenergy
+2.031	keV	Si VII   K	Si VII   K-edge edgeenergy
+2.011	keV	Ni XXIII LP	Ni XXIII LP-edge edgeenergy
+1.976	keV	Si VI    K	Si VI    K-edge edgeenergy
+1.965	keV	Ni XXII  LS	Ni XXII  LS-edge edgeenergy
+1.963	keV	Mg XII   K	Mg XII   K-edge edgeenergy
+1.95	keV	Fe XXIII LS	Fe XXIII LS-edge edgeenergy
+1.926	keV	Si V     K	Si V     K-edge edgeenergy
+1.909	keV	Si IV    K	Si IV    K-edge edgeenergy
+1.894	keV	Ni XXII  LP	Ni XXII  LP-edge edgeenergy
+1.893	keV	Si III   K	Si III   K-edge edgeenergy
+1.881	keV	Si II    K	Si II    K-edge edgeenergy
+1.871	keV	Si I     K	Si I     K-edge edgeenergy
+1.87	keV	Ni XXI   LS	Ni XXI   LS-edge edgeenergy
+1.847	keV	Fe XXII  LS	Fe XXII  LS-edge edgeenergy
+1.799	keV	Fe XXII  LP	Fe XXII  LP-edge edgeenergy
+1.762	keV	Mg XI    K	Mg XI    K-edge edgeenergy
+1.76	keV	Ni XX    LS	Ni XX    LS-edge edgeenergy
+1.756	keV	Ni XXI   LP	Ni XXI   LP-edge edgeenergy
+1.745	keV	Fe XXI   LS	Fe XXI   LS-edge edgeenergy
+1.701	keV	Mg X     K	Mg X     K-edge edgeenergy
+1.689	keV	Fe XXI   LP	Fe XXI   LP-edge edgeenergy
+1.669	keV	Ni XIX   LS	Ni XIX   LS-edge edgeenergy
+1.648	keV	Fe XX    LS	Fe XX    LS-edge edgeenergy
+1.648	keV	Ni XX    LP	Ni XX    LP-edge edgeenergy
+1.646	keV	Mg IX    K	Mg IX    K-edge edgeenergy
+1.618	keV	Ni XVIII LS	Ni XVIII LS-edge edgeenergy
+1.586	keV	Mg VIII  K	Mg VIII  K-edge edgeenergy
+1.582	keV	Fe XX    LP	Fe XX    LP-edge edgeenergy
+1.569	keV	Ni XVII  LS	Ni XVII  LS-edge edgeenergy
+1.559	keV	Fe XIX   LS	Fe XIX   LS-edge edgeenergy
+1.541	keV	Ni XIX   LP	Ni XIX   LP-edge edgeenergy
+1.519	keV	Ni XVI   LS	Ni XVI   LS-edge edgeenergy
+1.506	keV	Ni XVIII LP	Ni XVIII LP-edge edgeenergy
+1.5	keV	Mg VII   K	Mg VII   K-edge edgeenergy
+1.478	keV	Mg VI    K	Mg VI    K-edge edgeenergy
+1.471	keV	Ni XV    LS	Ni XV    LS-edge edgeenergy
+1.46	keV	Fe XVIII LS	Fe XVIII LS-edge edgeenergy
+1.456	keV	Fe XIX   LP	Fe XIX   LP-edge edgeenergy
+1.456	keV	Ni XVII  LP	Ni XVII  LP-edge edgeenergy
+1.432	keV	Mg V     K	Mg V     K-edge edgeenergy
+1.419	keV	Ni XIV   LS	Ni XIV   LS-edge edgeenergy
+1.405	keV	Ni XVI   LP	Ni XVI   LP-edge edgeenergy
+1.391	keV	Mg IV    K	Mg IV    K-edge edgeenergy
+1.379	keV	Ni XIII  LS	Ni XIII  LS-edge edgeenergy
+1.375	keV	Fe XVII  LS	Fe XVII  LS-edge edgeenergy
+1.362	keV	Ne X     K	Ne X     K-edge edgeenergy
+1.358	keV	Fe XVIII LP	Fe XVIII LP-edge edgeenergy
+1.356	keV	Ni XV    LP	Ni XV    LP-edge edgeenergy
+1.354	keV	Mg III   K	Mg III   K-edge edgeenergy
+1.343	keV	Mg II    K	Mg II    K-edge edgeenergy
+1.334	keV	Mg I     K	Mg I     K-edge edgeenergy
+1.329	keV	Fe XVI   LS	Fe XVI   LS-edge edgeenergy
+1.328	keV	Ni XII   LS	Ni XII   LS-edge edgeenergy
+1.299	keV	Ni XIV   LP	Ni XIV   LP-edge edgeenergy
+1.293	keV	Ni XI    LS	Ni XI    LS-edge edgeenergy
+1.287	keV	Fe XV    LS	Fe XV    LS-edge edgeenergy
+1.262	keV	Fe XVII  LP	Fe XVII  LP-edge edgeenergy
+1.262	keV	Ni XIII  LP	Ni XIII  LP-edge edgeenergy
+1.251	keV	Ni X     LS	Ni X     LS-edge edgeenergy
+1.24	keV	Fe XIV   LS	Fe XIV   LS-edge edgeenergy
+1.216	keV	Fe XVI   LP	Fe XVI   LP-edge edgeenergy
+1.211	keV	Ni IX    LS	Ni IX    LS-edge edgeenergy
+1.207	keV	Ni XII   LP	Ni XII   LP-edge edgeenergy
+1.197	keV	Fe XIII  LS	Fe XIII  LS-edge edgeenergy
+1.196	keV	Ne IX    K	Ne IX    K-edge edgeenergy
+1.181	keV	Fe XV    LP	Fe XV    LP-edge edgeenergy
+1.174	keV	Ni VIII  LS	Ni VIII  LS-edge edgeenergy
+1.174	keV	Ni XI    LP	Ni XI    LP-edge edgeenergy
+1.157	keV	Ca XVIII LS	Ca XVIII LS-edge edgeenergy
+1.155	keV	Fe XII   LS	Fe XII   LS-edge edgeenergy
+1.139	keV	Ni VII   LS	Ni VII   LS-edge edgeenergy
+1.132	keV	Ni X     LP	Ni X     LP-edge edgeenergy
+1.125	keV	Ne VIII  K	Ne VIII  K-edge edgeenergy
+1.125	keV	Fe XIV   LP	Fe XIV   LP-edge edgeenergy
+1.115	keV	Fe XI    LS	Fe XI    LS-edge edgeenergy
+1.112	keV	Ni VI    LS	Ni VI    LS-edge edgeenergy
+1.092	keV	Ni IX    LP	Ni IX    LP-edge edgeenergy
+1.087	keV	Ca XVII  LS	Ca XVII  LS-edge edgeenergy
+1.081	keV	Fe XIII  LP	Fe XIII  LP-edge edgeenergy
+1.078	keV	Ne VII   K	Ne VII   K-edge edgeenergy
+1.077	keV	Ni V     LS	Ni V     LS-edge edgeenergy
+1.076	keV	Fe X     LS	Fe X     LS-edge edgeenergy
+1.059	keV	Ni IV    LS	Ni IV    LS-edge edgeenergy
+1.051	keV	Ni VIII  LP	Ni VIII  LP-edge edgeenergy
+1.039	keV	Fe IX    LS	Fe IX    LS-edge edgeenergy
+1.039	keV	Fe XII   LP	Fe XII   LP-edge edgeenergy
+1.031	keV	Ne VI    K	Ne VI    K-edge edgeenergy
+1.028	keV	Ni III   LS	Ni III   LS-edge edgeenergy
+1.024	keV	Ni I     LS	Ni I     LS-edge edgeenergy
+1.019	keV	Ni VII   LP	Ni VII   LP-edge edgeenergy
+1.009	keV	Ni II    LS	Ni II    LS-edge edgeenergy
+1.008	keV	Ca XVI   LS	Ca XVI   LS-edge edgeenergy
+1.003	keV	Fe VIII  LS	Fe VIII  LS-edge edgeenergy
+0.9983	keV	Fe XI    LP	Fe XI    LP-edge edgeenergy
+0.9886	keV	Ni VI    LP	Ni VI    LP-edge edgeenergy
+0.9873	keV	Ne V     K	Ne V     K-edge edgeenergy
+0.9745	keV	Ca XVI   LP	Ca XVI   LP-edge edgeenergy
+0.9693	keV	Fe VII   LS	Fe VII   LS-edge edgeenergy
+0.959	keV	Fe X     LP	Fe X     LP-edge edgeenergy
+0.9576	keV	Ni V     LP	Ni V     LP-edge edgeenergy
+0.948	keV	Ne IV    K	Ne IV    K-edge edgeenergy
+0.9383	keV	Fe VI    LS	Fe VI    LS-edge edgeenergy
+0.9358	keV	Ni IV    LP	Ni IV    LP-edge edgeenergy
+0.9357	keV	Ca XV    LS	Ca XV    LS-edge edgeenergy
+0.9211	keV	Fe IX    LP	Fe IX    LP-edge edgeenergy
+0.918	keV	Ar XVI   LS	Ar XVI   LS-edge edgeenergy
+0.9131	keV	Ne III   K	Ne III   K-edge edgeenergy
+0.9101	keV	Fe V     LS	Fe V     LS-edge edgeenergy
+0.9084	keV	Ni III   LP	Ni III   LP-edge edgeenergy
+0.8946	keV	Ca XV    LP	Ca XV    LP-edge edgeenergy
+0.8849	keV	Fe IV    LS	Fe IV    LS-edge edgeenergy
+0.8849	keV	Fe VIII  LP	Fe VIII  LP-edge edgeenergy
+0.8831	keV	Ne II    K	Ne II    K-edge edgeenergy
+0.876	keV	Ni I     LP	Ni I     LP-edge edgeenergy
+0.8753	keV	Ni II    LP	Ni II    LP-edge edgeenergy
+0.8714	keV	O VIII   K	O VIII   K-edge edgeenergy
+0.8701	keV	Ne I     K	Ne I     K-edge edgeenergy
+0.8642	keV	Ca XIV   LS	Ca XIV   LS-edge edgeenergy
+0.8631	keV	Fe III   LS	Fe III   LS-edge edgeenergy
+0.857	keV	Fe I     LS	Fe I     LS-edge edgeenergy
+0.8548	keV	Ar XV    LS	Ar XV    LS-edge edgeenergy
+0.8521	keV	Fe II    LS	Fe II    LS-edge edgeenergy
+0.8512	keV	Fe VII   LP	Fe VII   LP-edge edgeenergy
+0.8202	keV	Fe VI    LP	Fe VI    LP-edge edgeenergy
+0.8177	keV	Ca XIV   LP	Ca XIV   LP-edge edgeenergy
+0.7968	keV	Ca XIII  LS	Ca XIII  LS-edge edgeenergy
+0.792	keV	Fe V     LP	Fe V     LP-edge edgeenergy
+0.7856	keV	Ar XIV   LS	Ar XIV   LS-edge edgeenergy
+0.7669	keV	Fe IV    LP	Fe IV    LP-edge edgeenergy
+0.7558	keV	Ar XIV   LP	Ar XIV   LP-edge edgeenergy
+0.7451	keV	Fe III   LP	Fe III   LP-edge edgeenergy
+0.7393	keV	O VII    K	O VII    K-edge edgeenergy
+0.7341	keV	Fe II    LP	Fe II    LP-edge edgeenergy
+0.7287	keV	Ca XII   LS	Ca XII   LS-edge edgeenergy
+0.7267	keV	Ca XIII  LP	Ca XIII  LP-edge edgeenergy
+0.724	keV	Fe I     LP	Fe I     LP-edge edgeenergy
+0.7217	keV	Ar XIII  LS	Ar XIII  LS-edge edgeenergy
+0.7072	keV	S XIV    LS	S XIV    LS-edge edgeenergy
+0.6861	keV	Ar XIII  LP	Ar XIII  LP-edge edgeenergy
+0.6837	keV	O VI     K	O VI     K-edge edgeenergy
+0.6671	keV	N VII    K	N VII    K-edge edgeenergy
+0.6649	keV	Ca XI    LS	Ca XI    LS-edge edgeenergy
+0.6584	keV	Ar XII   LS	Ar XII   LS-edge edgeenergy
+0.6572	keV	Ca XII   LP	Ca XII   LP-edge edgeenergy
+0.6517	keV	S XIII   LS	S XIII   LS-edge edgeenergy
+0.6491	keV	O V      K	O V      K-edge edgeenergy
+0.6326	keV	Ca X     LS	Ca X     LS-edge edgeenergy
+0.6183	keV	Ar XII   LP	Ar XII   LP-edge edgeenergy
+0.6144	keV	O IV     K	O IV     K-edge edgeenergy
+0.6071	keV	Ni XVIII MS	Ni XVIII MS-edge edgeenergy
+0.6018	keV	Ca IX    LS	Ca IX    LS-edge edgeenergy
+0.5992	keV	Ar XI    LS	Ar XI    LS-edge edgeenergy
+0.5919	keV	Ca XI    LP	Ca XI    LP-edge edgeenergy
+0.5906	keV	S XII    LS	S XII    LS-edge edgeenergy
+0.584	keV	O III    K	O III    K-edge edgeenergy
+0.5732	keV	Ca VIII  LS	Ca VIII  LS-edge edgeenergy
+0.5713	keV	Ni XVII  MS	Ni XVII  MS-edge edgeenergy
+0.5647	keV	S XII    LP	S XII    LP-edge edgeenergy
+0.5581	keV	O II     K	O II     K-edge edgeenergy
+0.5569	keV	Ca X     LP	Ca X     LP-edge edgeenergy
+0.5521	keV	N VI     K	N VI     K-edge edgeenergy
+0.5455	keV	Ca VII   LS	Ca VII   LS-edge edgeenergy
+0.5403	keV	Ar X     LS	Ar X     LS-edge edgeenergy
+0.539	keV	Ar XI    LP	Ar XI    LP-edge edgeenergy
+0.538	keV	O I      K	O I      K-edge edgeenergy
+0.5347	keV	Ni XVI   MS	Ni XVI   MS-edge edgeenergy
+0.5346	keV	S XI     LS	S XI     LS-edge edgeenergy
+0.527	keV	Ca IX    LP	Ca IX    LP-edge edgeenergy
+0.5235	keV	Si XII   LS	Si XII   LS-edge edgeenergy
+0.5193	keV	Ca VI    LS	Ca VI    LS-edge edgeenergy
+0.5048	keV	S XI     LP	S XI     LP-edge edgeenergy
+0.5043	keV	N V      K	N V      K-edge edgeenergy
+0.4988	keV	Ni XV    MS	Ni XV    MS-edge edgeenergy
+0.4984	keV	Ni XVI   MP	Ni XVI   MP-edge edgeenergy
+0.4967	keV	Ca VIII  LP	Ca VIII  LP-edge edgeenergy
+0.4948	keV	Ca V     LS	Ca V     LS-edge edgeenergy
+0.49	keV	C VI     K	C VI     K-edge edgeenergy
+0.4893	keV	Fe XVI   MS	Fe XVI   MS-edge edgeenergy
+0.4845	keV	Ar IX    LS	Ar IX    LS-edge edgeenergy
+0.4804	keV	S X      LS	S X      LS-edge edgeenergy
+0.4787	keV	Ar X     LP	Ar X     LP-edge edgeenergy
+0.4761	keV	Si XI    LS	Si XI    LS-edge edgeenergy
+0.4753	keV	N IV     K	N IV     K-edge edgeenergy
+0.4719	keV	Ca IV    LS	Ca IV    LS-edge edgeenergy
+0.4687	keV	Ca VII   LP	Ca VII   LP-edge edgeenergy
+0.4637	keV	Ni XV    MP	Ni XV    MP-edge edgeenergy
+0.462	keV	Ni XIV   MS	Ni XIV   MS-edge edgeenergy
+0.457	keV	Ar VIII  LS	Ar VIII  LS-edge edgeenergy
+0.457	keV	Fe XV    MS	Fe XV    MS-edge edgeenergy
+0.4507	keV	Ca III   LS	Ca III   LS-edge edgeenergy
+0.4473	keV	N III    K	N III    K-edge edgeenergy
+0.4471	keV	S X      LP	S X      LP-edge edgeenergy
+0.4425	keV	Ca I     LS	Ca I     LS-edge edgeenergy
+0.4423	keV	Ca VI    LP	Ca VI    LP-edge edgeenergy
+0.4415	keV	Ca II    LS	Ca II    LS-edge edgeenergy
+0.4314	keV	Ar VII   LS	Ar VII   LS-edge edgeenergy
+0.4302	keV	Ni XIV   MP	Ni XIV   MP-edge edgeenergy
+0.4296	keV	S IX     LS	S IX     LS-edge edgeenergy
+0.4291	keV	Ni XIII  MS	Ni XIII  MS-edge edgeenergy
+0.4238	keV	Fe XIV   MS	Fe XIV   MS-edge edgeenergy
+0.4236	keV	N II     K	N II     K-edge edgeenergy
+0.4234	keV	Si X     LS	Si X     LS-edge edgeenergy
+0.4225	keV	Ar IX    LP	Ar IX    LP-edge edgeenergy
+0.4175	keV	Ca V     LP	Ca V     LP-edge edgeenergy
+0.4076	keV	Ar VI    LS	Ar VI    LS-edge edgeenergy
+0.4048	keV	N I      K	N I      K-edge edgeenergy
+0.4014	keV	Si X     LP	Si X     LP-edge edgeenergy
+0.3944	keV	Ca IV    LP	Ca IV    LP-edge edgeenergy
+0.3933	keV	Ni XII   MS	Ni XII   MS-edge edgeenergy
+0.3925	keV	Ar VIII  LP	Ar VIII  LP-edge edgeenergy
+0.3922	keV	Fe XIV   MP	Fe XIV   MP-edge edgeenergy
+0.3921	keV	C V      K	C V      K-edge edgeenergy
+0.3916	keV	Fe XIII  MS	Fe XIII  MS-edge edgeenergy
+0.3852	keV	Ar V     LS	Ar V     LS-edge edgeenergy
+0.384	keV	Ni XIII  MP	Ni XIII  MP-edge edgeenergy
+0.3797	keV	S VIII   LS	S VIII   LS-edge edgeenergy
+0.3791	keV	S IX     LP	S IX     LP-edge edgeenergy
+0.3756	keV	Si IX    LS	Si IX    LS-edge edgeenergy
+0.3731	keV	Ca III   LP	Ca III   LP-edge edgeenergy
+0.3675	keV	Mg X     LS	Mg X     LS-edge edgeenergy
+0.3667	keV	Ar VII   LP	Ar VII   LP-edge edgeenergy
+0.3642	keV	Ar IV    LS	Ar IV    LS-edge edgeenergy
+0.3638	keV	Ca II    LP	Ca II    LP-edge edgeenergy
+0.362	keV	Ni XI    MS	Ni XI    MS-edge edgeenergy
+0.361	keV	Fe XIII  MP	Fe XIII  MP-edge edgeenergy
+0.36	keV	Fe XII   MS	Fe XII   MS-edge edgeenergy
+0.3523	keV	Ca I     LP	Ca I     LP-edge edgeenergy
+0.3522	keV	C IV     K	C IV     K-edge edgeenergy
+0.3521	keV	Ni XII   MP	Ni XII   MP-edge edgeenergy
+0.3511	keV	Si IX    LP	Si IX    LP-edge edgeenergy
+0.3455	keV	Ar III   LS	Ar III   LS-edge edgeenergy
+0.3426	keV	Ar VI    LP	Ar VI    LP-edge edgeenergy
+0.3321	keV	S VII    LS	S VII    LS-edge edgeenergy
+0.3317	keV	Ar II    LS	Ar II    LS-edge edgeenergy
+0.331	keV	Si VIII  LS	Si VIII  LS-edge edgeenergy
+0.3308	keV	Fe XII   MP	Fe XII   MP-edge edgeenergy
+0.3292	keV	Fe XI    MS	Fe XI    MS-edge edgeenergy
+0.329	keV	Ni X     MS	Ni X     MS-edge edgeenergy
+0.3289	keV	C III    K	C III    K-edge edgeenergy
+0.3282	keV	Mg IX    LS	Mg IX    LS-edge edgeenergy
+0.3282	keV	S VIII   LP	S VIII   LP-edge edgeenergy
+0.326	keV	Ar I     LS	Ar I     LS-edge edgeenergy
+0.321	keV	Ni XI    MP	Ni XI    MP-edge edgeenergy
+0.32	keV	Ar V     LP	Ar V     LP-edge edgeenergy
+0.3094	keV	S VI     LS	S VI     LS-edge edgeenergy
+0.3076	keV	C II     K	C II     K-edge edgeenergy
+0.3032	keV	Si VIII  LP	Si VIII  LP-edge edgeenergy
+0.299	keV	Fe X     MS	Fe X     MS-edge edgeenergy
+0.2987	keV	Ar IV    LP	Ar IV    LP-edge edgeenergy
+0.2972	keV	Ni IX    MS	Ni IX    MS-edge edgeenergy
+0.291	keV	C I      K	C I      K-edge edgeenergy
+0.2902	keV	Fe XI    MP	Fe XI    MP-edge edgeenergy
+0.2888	keV	S V      LS	S V      LS-edge edgeenergy
+0.2877	keV	Ni X     MP	Ni X     MP-edge edgeenergy
+0.2872	keV	Si VII   LS	Si VII   LS-edge edgeenergy
+0.2839	keV	Mg VIII  LS	Mg VIII  LS-edge edgeenergy
+0.2809	keV	S VII    LP	S VII    LP-edge edgeenergy
+0.2801	keV	Ar III   LP	Ar III   LP-edge edgeenergy
+0.2703	keV	S IV     LS	S IV     LS-edge edgeenergy
+0.2696	keV	Fe IX    MS	Fe IX    MS-edge edgeenergy
+0.2682	keV	Ni VIII  MS	Ni VIII  MS-edge edgeenergy
+0.2662	keV	Ar II    LP	Ar II    LP-edge edgeenergy
+0.266	keV	Mg VIII  LP	Mg VIII  LP-edge edgeenergy
+0.2621	keV	Fe X     MP	Fe X     MP-edge edgeenergy
+0.2561	keV	Ni IX    MP	Ni IX    MP-edge edgeenergy
+0.2557	keV	S VI     LP	S VI     LP-edge edgeenergy
+0.2536	keV	S III    LS	S III    LS-edge edgeenergy
+0.2492	keV	Ar I     LP	Ar I     LP-edge edgeenergy
+0.2468	keV	Si VI    LS	Si VI    LS-edge edgeenergy
+0.2465	keV	Si VII   LP	Si VII   LP-edge edgeenergy
+0.2444	keV	Mg VII   LS	Mg VII   LS-edge edgeenergy
+0.2409	keV	Fe VIII  MS	Fe VIII  MS-edge edgeenergy
+0.2391	keV	Ne VIII  LS	Ne VIII  LS-edge edgeenergy
+0.2387	keV	S II     LS	S II     LS-edge edgeenergy
+0.2378	keV	Ni VII   MS	Ni VII   MS-edge edgeenergy
+0.235	keV	S I      LS	S I      LS-edge edgeenergy
+0.235	keV	S V      LP	S V      LP-edge edgeenergy
+0.2336	keV	Fe IX    MP	Fe IX    MP-edge edgeenergy
+0.2266	keV	Ni VIII  MP	Ni VIII  MP-edge edgeenergy
+0.2249	keV	Mg VII   LP	Mg VII   LP-edge edgeenergy
+0.2246	keV	Ni X     MD	Ni X     MD-edge edgeenergy
+0.2164	keV	S IV     LP	S IV     LP-edge edgeenergy
+0.2135	keV	Fe VII   MS	Fe VII   MS-edge edgeenergy
+0.2119	keV	Ni VI    MS	Ni VI    MS-edge edgeenergy
+0.2113	keV	Ca X     MS	Ca X     MS-edge edgeenergy
+0.2076	keV	Mg VI    LS	Mg VI    LS-edge edgeenergy
+0.2076	keV	Si V     LS	Si V     LS-edge edgeenergy
+0.2073	keV	Ne VII   LS	Ne VII   LS-edge edgeenergy
+0.2055	keV	Fe VIII  MP	Fe VIII  MP-edge edgeenergy
+0.2051	keV	Si VI    LP	Si VI    LP-edge edgeenergy
+0.1995	keV	S III    LP	S III    LP-edge edgeenergy
+0.1971	keV	Ni VII   MP	Ni VII   MP-edge edgeenergy
+0.193	keV	Ni IX    MD	Ni IX    MD-edge edgeenergy
+0.1899	keV	Si IV    LS	Si IV    LS-edge edgeenergy
+0.1883	keV	Ca IX    MS	Ca IX    MS-edge edgeenergy
+0.1876	keV	Fe VI    MS	Fe VI    MS-edge edgeenergy
+0.1865	keV	Mg VI    LP	Mg VI    LP-edge edgeenergy
+0.1849	keV	Ni V     MS	Ni V     MS-edge edgeenergy
+0.1846	keV	S II     LP	S II     LP-edge edgeenergy
+0.1783	keV	Fe VII   MP	Fe VII   MP-edge edgeenergy
+0.1744	keV	Si III   LS	Si III   LS-edge edgeenergy
+0.1735	keV	Mg V     LS	Mg V     LS-edge edgeenergy
+0.1719	keV	Ne VI    LS	Ne VI    LS-edge edgeenergy
+0.1709	keV	Ni VI    MP	Ni VI    MP-edge edgeenergy
+0.17	keV	S I      LP	S I      LP-edge edgeenergy
+0.1668	keV	Si V     LP	Si V     LP-edge edgeenergy
+0.1664	keV	Ca VIII  MS	Ca VIII  MS-edge edgeenergy
+0.1633	keV	Fe V     MS	Fe V     MS-edge edgeenergy
+0.162	keV	Ni VIII  MD	Ni VIII  MD-edge edgeenergy
+0.1619	keV	Si II    LS	Si II    LS-edge edgeenergy
+0.1597	keV	Ni IV    MS	Ni IV    MS-edge edgeenergy
+0.1579	keV	Ne VI    LP	Ne VI    LP-edge edgeenergy
+0.156	keV	Si I     LS	Si I     LS-edge edgeenergy
+0.1527	keV	Fe VI    MP	Fe VI    MP-edge edgeenergy
+0.1511	keV	Fe VIII  MD	Fe VIII  MD-edge edgeenergy
+0.1472	keV	Ca VIII  MP	Ca VIII  MP-edge edgeenergy
+0.1466	keV	Si IV    LP	Si IV    LP-edge edgeenergy
+0.1452	keV	Ca VII   MS	Ca VII   MS-edge edgeenergy
+0.1447	keV	Ni V     MP	Ni V     MP-edge edgeenergy
+0.1435	keV	Ar VIII  MS	Ar VIII  MS-edge edgeenergy
+0.1415	keV	Ne V     LS	Ne V     LS-edge edgeenergy
+0.1413	keV	Mg V     LP	Mg V     LP-edge edgeenergy
+0.1411	keV	Mg IV    LS	Mg IV    LS-edge edgeenergy
+0.1411	keV	Fe IV    MS	Fe IV    MS-edge edgeenergy
+0.1401	keV	Ni III   MS	Ni III   MS-edge edgeenergy
+0.1381	keV	O VI     LS	O VI     LS-edge edgeenergy
+0.133	keV	Ni VII   MD	Ni VII   MD-edge edgeenergy
+0.1311	keV	Si III   LP	Si III   LP-edge edgeenergy
+0.1288	keV	Fe V     MP	Fe V     MP-edge edgeenergy
+0.1272	keV	Ca VII   MP	Ca VII   MP-edge edgeenergy
+0.1262	keV	Ne V     LP	Ne V     LP-edge edgeenergy
+0.125	keV	Fe VII   MD	Fe VII   MD-edge edgeenergy
+0.125	keV	Ni I     MS	Ni I     MS-edge edgeenergy
+0.1249	keV	Ca VI    MS	Ca VI    MS-edge edgeenergy
+0.1243	keV	Ar VII   MS	Ar VII   MS-edge edgeenergy
+0.1219	keV	Ni II    MS	Ni II    MS-edge edgeenergy
+0.1211	keV	Fe III   MS	Fe III   MS-edge edgeenergy
+0.1201	keV	Ni IV    MP	Ni IV    MP-edge edgeenergy
+0.1186	keV	Si II    LP	Si II    LP-edge edgeenergy
+0.1139	keV	O V      LS	O V      LS-edge edgeenergy
+0.1132	keV	Ne IV    LS	Ne IV    LS-edge edgeenergy
+0.1111	keV	Mg III   LS	Mg III   LS-edge edgeenergy
+0.1102	keV	Fe II    MS	Fe II    MS-edge edgeenergy
+0.1093	keV	Mg IV    LP	Mg IV    LP-edge edgeenergy
+0.1088	keV	Ca VI    MP	Ca VI    MP-edge edgeenergy
+0.108	keV	Ni VI    MD	Ni VI    MD-edge edgeenergy
+0.1067	keV	Fe IV    MP	Fe IV    MP-edge edgeenergy
+0.106	keV	Si I     LP	Si I     LP-edge edgeenergy
+0.1056	keV	Ar VI    MS	Ar VI    MS-edge edgeenergy
+0.1054	keV	Ca V     MS	Ca V     MS-edge edgeenergy
+0.104	keV	Fe I     MS	Fe I     MS-edge edgeenergy
+0.1003	keV	Ni III   MP	Ni III   MP-edge edgeenergy
+0.09906	keV	Fe VI    MD	Fe VI    MD-edge edgeenergy
+0.09881	keV	Mg II    LS	Mg II    LS-edge edgeenergy
+0.09789	keV	N V      LS	N V      LS-edge edgeenergy
+0.09712	keV	Ne IV    LP	Ne IV    LP-edge edgeenergy
+0.094	keV	Mg I     LS	Mg I     LS-edge edgeenergy
+0.09101	keV	Ar VI    MP	Ar VI    MP-edge edgeenergy
+0.08828	keV	Ar V     MS	Ar V     MS-edge edgeenergy
+0.08805	keV	S VI     MS	S VI     MS-edge edgeenergy
+0.08737	keV	O IV     LS	O IV     LS-edge edgeenergy
+0.08721	keV	Ne III   LS	Ne III   LS-edge edgeenergy
+0.08705	keV	Fe III   MP	Fe III   MP-edge edgeenergy
+0.0868	keV	Ca IV    MS	Ca IV    MS-edge edgeenergy
+0.08451	keV	Ca V     MP	Ca V     MP-edge edgeenergy
+0.08232	keV	Ni II    MP	Ni II    MP-edge edgeenergy
+0.082	keV	Ni I     MP	Ni I     MP-edge edgeenergy
+0.08014	keV	Mg III   LP	Mg III   LP-edge edgeenergy
+0.07747	keV	N IV     LS	N IV     LS-edge edgeenergy
+0.07741	keV	O IV     LP	O IV     LP-edge edgeenergy
+0.07617	keV	Fe II    MP	Fe II    MP-edge edgeenergy
+0.0761	keV	Ni V     MD	Ni V     MD-edge edgeenergy
+0.07502	keV	Ar V     MP	Ar V     MP-edge edgeenergy
+0.07501	keV	Fe V     MD	Fe V     MD-edge edgeenergy
+0.07268	keV	S V      MS	S V      MS-edge edgeenergy
+0.07174	keV	Ar IV    MS	Ar IV    MS-edge edgeenergy
+0.0692	keV	Ca III   MS	Ca III   MS-edge edgeenergy
+0.06727	keV	Ca IV    MP	Ca IV    MP-edge edgeenergy
+0.066	keV	Fe I     MP	Fe I     MP-edge edgeenergy
+0.06569	keV	Mg II    LP	Mg II    LP-edge edgeenergy
+0.06551	keV	O III    LS	O III    LS-edge edgeenergy
+0.06449	keV	C IV     LS	C IV     LS-edge edgeenergy
+0.06374	keV	Ne II    LS	Ne II    LS-edge edgeenergy
+0.06346	keV	Ne III   LP	Ne III   LP-edge edgeenergy
+0.06037	keV	Ca II    MS	Ca II    MS-edge edgeenergy
+0.05981	keV	Ar IV    MP	Ar IV    MP-edge edgeenergy
+0.0575	keV	S IV     MS	S IV     MS-edge edgeenergy
+0.05637	keV	Ar III   MS	Ar III   MS-edge edgeenergy
+0.05545	keV	N III    LS	N III    LS-edge edgeenergy
+0.05494	keV	O III    LP	O III    LP-edge edgeenergy
+0.0549	keV	Mg I     LP	Mg I     LP-edge edgeenergy
+0.0549	keV	Ni IV    MD	Ni IV    MD-edge edgeenergy
+0.0548	keV	Fe IV    MD	Fe IV    MD-edge edgeenergy
+0.05442	keV	He II    K	He II    K-edge edgeenergy
+0.05091	keV	Ca III   MP	Ca III   MP-edge edgeenergy
+0.04847	keV	Ne I     LS	Ne I     LS-edge edgeenergy
+0.0483	keV	Ca I     MS	Ca I     MS-edge edgeenergy
+0.04789	keV	C III    LS	C III    LS-edge edgeenergy
+0.04745	keV	N III    LP	N III    LP-edge edgeenergy
+0.04731	keV	S IV     MP	S IV     MP-edge edgeenergy
+0.04599	keV	O II     LS	O II     LS-edge edgeenergy
+0.04514	keV	Si IV    MS	Si IV    MS-edge edgeenergy
+0.04415	keV	S III    MS	S III    MS-edge edgeenergy
+0.04198	keV	Ar II    MS	Ar II    MS-edge edgeenergy
+0.04096	keV	Ne II    LP	Ne II    LP-edge edgeenergy
+0.0409	keV	Ca II    MP	Ca II    MP-edge edgeenergy
+0.04074	keV	Ar III   MP	Ar III   MP-edge edgeenergy
+0.03796	keV	N II     LS	N II     LS-edge edgeenergy
+0.03532	keV	Ni III   MD	Ni III   MD-edge edgeenergy
+0.03512	keV	O II     LP	O II     LP-edge edgeenergy
+0.03483	keV	S III    MP	S III    MP-edge edgeenergy
+0.03443	keV	Ca I     MP	Ca I     MP-edge edgeenergy
+0.03349	keV	Si III   MS	Si III   MS-edge edgeenergy
+0.0319	keV	S II     MS	S II     MS-edge edgeenergy
+0.03065	keV	Fe III   MD	Fe III   MD-edge edgeenergy
+0.03047	keV	C II     LS	C II     LS-edge edgeenergy
+0.0296	keV	N II     LP	N II     LP-edge edgeenergy
+0.02892	keV	Ar I     MS	Ar I     MS-edge edgeenergy
+0.02848	keV	O I      LS	O I      LS-edge edgeenergy
+0.02763	keV	Ar II    MP	Ar II    MP-edge edgeenergy
+0.02541	keV	N I      LS	N I      LS-edge edgeenergy
+0.02459	keV	He I     K	He I     K-edge edgeenergy
+0.02438	keV	C II     LP	C II     LP-edge edgeenergy
+0.02333	keV	S II     MP	S II     MP-edge edgeenergy
+0.0224	keV	Si II    MS	Si II    MS-edge edgeenergy
+0.02193	keV	Fe II    MD	Fe II    MD-edge edgeenergy
+0.02156	keV	Ne I     LP	Ne I     LP-edge edgeenergy
+0.0213	keV	S I      MS	S I      MS-edge edgeenergy
+0.01939	keV	C I      LS	C I      LS-edge edgeenergy
+0.01817	keV	Ni II    MD	Ni II    MD-edge edgeenergy
+0.017	keV	Ni I     MD	Ni I     MD-edge edgeenergy
+0.01635	keV	Si II    MP	Si II    MP-edge edgeenergy
+0.01619	keV	Fe II    N	Fe II    N-edge edgeenergy
+0.01576	keV	Ar I     MP	Ar I     MP-edge edgeenergy
+0.01517	keV	Si I     MS	Si I     MS-edge edgeenergy
+0.01504	keV	Mg II    MS	Mg II    MS-edge edgeenergy
+0.0147	keV	Fe I     MD	Fe I     MD-edge edgeenergy
+0.01453	keV	N I      LP	N I      LP-edge edgeenergy
+0.01362	keV	O I      LP	O I      LP-edge edgeenergy
+0.0136	keV	H I      K	H I      K-edge edgeenergy
+0.01187	keV	Ca II    MP	Ca II    MP-edge edgeenergy
+0.01126	keV	C I      LP	C I      LP-edge edgeenergy
+0.01036	keV	S I      MP	S I      MP-edge edgeenergy
+0.008152	keV	Si I     MP	Si I     MP-edge edgeenergy
+0.007902	keV	Fe I     N	Fe I     N-edge edgeenergy
+0.007646	keV	Mg I     MS	Mg I     MS-edge edgeenergy
+0.007637	keV	Ni I     N	Ni I     N-edge edgeenergy
+0.006113	keV	Ca I     MP	Ca I     MP-edge edgeenergy

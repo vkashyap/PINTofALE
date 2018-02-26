@@ -1,0 +1,14 @@
+;	(JJD, JanMMI) (added in_noph; VK NovMMXV)
+message,'using LINEFLX() for continuum fluxes; requires RD_CONT() output',/info
+if n_elements(in_noph) then in_noph=0	;0=output in [ph], 1=[erg]
+contflx_flx = lineflx( $
+  rd_cont_conemis ,$		;output of RD_CONT()
+  rd_cont_LOGT ,$		;output of RD_CONT()
+  rd_cont_constr.MIDWVL ,$	;output of RD_CONT()
+  DEM    = !DEM ,$
+  temp   = 0 ,$
+  noph   = in_noph ,$
+  effar  = effar ,$
+  wvlar  = wvlar ,$
+  ikeV   = 0 ,$
+  regrid = 0 ) 

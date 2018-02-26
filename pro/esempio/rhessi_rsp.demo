@@ -1,0 +1,58 @@
+;+
+;rhessi_rsp.demo
+;	read in the RHESSI RSP, set up the spectrum grid, and display
+;
+;usage
+;	@rhessi_rsp.demo
+;
+;requires
+;	!ARDB/hsi_srm_20030426_022500_det4.fits
+;
+;vinay kashyap (Apr2005)
+;-
+
+;	RMF
+;hsi_rmfile='hsi_qsrm_20030426_024500.fits'
+hsi_rmfile=filepath('hsi_srm_20030426_022500_det4.fits',root_dir=!ARDB)
+
+;	read in RMF
+hsi_rmf=rd_ogip_rmf(hsi_rmfile,effar=hsi_effar)
+
+;	set up spectrum grid for future considerations
+hsi_elo=hsi_rmf.elo & hsi_ehi=hsi_rmf.ehi
+hsi_whi=12.3985/hsi_elo & hsi_wlo=12.3985/hsi_ehi
+os=sort(hsi_wlo) & hsi_wgrid=[hsi_wlo[os],max(hsi_whi)]
+
+;	plot effective area
+peasecolr & loadct,3
+window,0
+plot,hsi_rmf.elo,hsi_effar,/xlog,chars=1.8,thick=3,$
+  xtitle='Energy [keV]',ytitle='Effective area [cm^2]',title=hsi_rmfile
+
+;	plot RMF
+window,2
+ochn=where(hsi_rmf.emn le 20,mochn)
+onrg=where(hsi_rmf.elo le 20,monrg)
+tmp=fltarr(mochn,monrg)
+for i=0L,monrg-1L do tmp[*,i]=(hsi_rmf.matrix)[ochn,onrg[i]]
+x=findgen(mochn)+hsi_rmf.FIRSTCHAN
+y=0.5*((hsi_rmf.elo)[onrg]+(hsi_rmf.ehi)[onrg])
+;
+contour,[[0,0],[1,1]],/nodata,xstyle=4,ystyle=4
+px = !x.window * !d.x_vsize
+py = !y.window * !d.y_vsize
+swx = px[1]-px[0] & swy = py[1]-py[0]
+sz=size(tmp) & six=float(sz[1]) & siy=float(sz[2])
+aspi = six / siy & aspw = swx / swy & f = aspi / aspw
+tv,poly_2d(bytscl(alog10(tmp+1e-5)),$
+	[[0,0],[six/swx,0]], [[0,siy/swy],[0,0]],$
+	keyword_set(interp),swx,swy),$
+	px[0],py[0]
+contour,tmp,levels=[1e-4,0.001,0.01,0.1],$
+	/noerase,/xst,/yst,pos=[px[0],py[0],px[0]+swx,py[0]+swy],/dev,$
+	xtitle='out',ytitle='in',title=hsi_rmfile
+
+window,1
+surface,tmp,x,y,$
+	xtitle='Channels',ytitle='Energy [keV]',title=hsi_rmfile,$
+	chars=2,xrange=[0,mochn+1],yrange=[3,20],ax=80,/xs,/ys

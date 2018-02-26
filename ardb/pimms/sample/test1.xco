@@ -1,0 +1,7 @@
+log test
+from rosat pspc open
+mo brems 10 3e20
+inst asca sis
+go 0.1
+inst chandra acis-s
+go 0.1

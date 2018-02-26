@@ -1,0 +1,8 @@
+;	(JJD JanMMI)
+; update the ID structure according to the output from fitlines.par
+updateid_idstr=updatid( $
+  lineid_idstr ,$
+  fitlines_flx ,$
+  fitlines_pos ,$
+  flxerr = fitlines_flxerr )
+help,cat_id(updateid_idstr)

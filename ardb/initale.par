@@ -1,0 +1,13 @@
+;	this is a template file for the kind of variables that are set by initale.pro
+;	copy this to $HOME/.pintofale (unix) or pintofale.par (windows) and edit as
+;	needed to suit your environment.
+;	NOTE: initale.pro used to process this file, but does not as of Sep 11, 2015.
+yCHIANTI = 1
+yATOMDB = 1
+!CDBDIR = 'emissivity/cont'
+!CHIDIR = '/data/astrostat/soft/CHIANTI/dbase/'
+!IONEQF = 'ioneq/chianti.ioneq'
+!ATOMDB = '/data/astrostat/soft/atomdb/atomdb_v2.0.2/'
+!APECDIR = '/data/astrostat/soft/atomdb/atomdb_idl-2.00/'
+!VERBOSE = 10
+!CALDB = '/soft/ciao/CALDB/data/chandra/'

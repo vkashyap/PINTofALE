@@ -1,0 +1,9 @@
+XINTI is the merged SPEX+CHIANTI line database.
+
+see MERGE_LINE.PRO for merging rules, which are obviously not guaranteed
+to be perfect.
+
+to make, use:-
+
+idl>
+IDL> .run mrg_spexianti

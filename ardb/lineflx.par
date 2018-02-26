@@ -1,0 +1,20 @@
+;	(JJD, JanMMI)
+;	(updated to include NHNE and NOABUND, VK NovMMXV)
+
+message,'LINEFLX(); requires FOLD_IONEQ(RD_LINE()) output',/informational
+if n_elements(in_noph) eq 0 then in_noph=0	;0=output in [ph], 1=[erg]
+lineflx_flx = lineflx( $
+  rd_line_linstr.LINE_INT ,$	;output of FOLD_IONEQ(RD_LINE())
+  rd_line_linstr.LOGT ,$	;output of RD_LINE() -- identical to !LOGT
+  rd_line_linstr.WVL ,$		;output of RD_LINE()
+  rd_line_linstr.Z ,$		;output of RD_LINE()
+  DEM    = !DEM ,$
+  temp   = 0 ,$
+  abund  = !ABUND ,$
+  noph   = in_noph ,$
+  nhne   = 1,$
+  effar  = effar ,$
+  wvlar  = wvlar ,$
+  ikeV   = 0 ,$
+  noabund= 0 ,$
+  regrid = 0 ) 

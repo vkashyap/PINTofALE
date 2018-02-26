@@ -1,0 +1,13 @@
+;	(JJD JanMMI)
+smudge,$
+  smudge_loc ,$
+  smudge_label ,$
+  keys = in_keys ,$
+  only = in_only ,$
+  nisi = in_nisi ,$
+  range = [!WMIN,!WMAX] ,$
+  infile = !ARDB+'/smudge.lst' ,$
+  sep = '	' ,$
+  prefix = in_prefix ,$
+  ikeV = 0 ,$
+  help = 0

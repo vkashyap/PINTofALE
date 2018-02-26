@@ -1,0 +1,13 @@
+;to make AIA effective areas save file, do this in SSWIDL
+
+aiaea_dn_full=aia_get_response(/area,/dn,/full)
+aiaea_ph_full=aia_get_response(/area,/phot,/full)
+.run initale
+save,file=filepath('aia_eff.sav',root_dir=!ARDB),aiaea_dn_full,aiaea_ph_full
+
+;to make Hi-C effective areas save file, do this in SSWIDL
+
+hicea_dn=hic_get_response(/area,/dn)
+hicea_ph=hic_get_response(/area,/phot)
+.run initale
+save,file=filepath('hic_eff.sav',root_dir=!ARDB),hicea_dn,hicea_ph

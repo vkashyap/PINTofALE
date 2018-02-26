@@ -1,0 +1,6 @@
+the CHIANTI distribution is in /data/fubar/SCAR/CHIANTI/
+
+to build up the emissivities,
+idl
+IDL> .run initale
+IDL> .run mk_lcool_chianti

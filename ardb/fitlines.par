@@ -1,0 +1,27 @@
+;	(JJD, JanMMI)
+message,'Running FITLINES()',/info
+fitlines_fitstr = fitlines( $
+  data_wvl ,$
+  data_spec ,$
+  ysig    = data_spec_err ,$
+  pos     = fitlines_pos ,$
+  perrp   = fitlines_perrp ,$
+  perrm   = fitlines_perrm ,$
+  perrc   = fitlines_perrc ,$
+  flx     = fitlines_flx ,$
+  ferrp   = fitlines_ferrp ,$
+  ferrm   = fitlines_ferrm ,$
+  ferrc   = fitlines_ferrc,$
+  wdt     = fitlines_wdt ,$
+  werrp   = fitlines_werrp ,$
+  werrm   = fitlines_werrm ,$
+  werrc   = fitlines_werrc,$
+  thaw    = fitlines_thaw ,$
+  type    = fitlines_type ,$
+  epithet = fitlines_epithet ,$
+  ties    = fitlines_ties ,$
+  conlev  = fitlines_conlev ,$
+  consig  = fitlines_consig ,$
+  dumb    = 1 ,$
+  verbose = !verbose )
+fitlines_flxerr = 0.5*(fitlines_fitstr.ferrp+fitlines_fitstr.ferrm)

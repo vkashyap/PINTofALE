@@ -1,0 +1,48 @@
+if not keyword_set(vfunct) then vfunct='beta'
+if not keyword_set(rfunct) then rfunct='exp'
+if n_elements(latrng) eq 0 then latrng=[-90.,90.]
+if n_elements(lonrng) eq 0 then lonrng=[0.,360.]
+if n_elements(rrng) eq 0 then rrng=[inrad,maxrad]
+if not keyword_set(dlat) then dlat=1.
+if not keyword_set(vinf) then vinf=1e3
+if not keyword_set(vpeg) then vpeg=0.
+if not keyword_set(vbeta) then vbeta=2.
+if not keyword_set(rpeg) then rpeg=1.
+if not keyword_set(npeg) then npeg=1e9
+if not keyword_set(rscl) then rscl=1.
+if not keyword_set(verbose) then verbose=1
+if not keyword_set(inrad) then inrad=1.
+if not keyword_set(maxrad) then maxrad=20.
+if not keyword_set(rdel) then rdel=0.1
+if n_elements(opaq) eq 0 then opaq=1
+if not keyword_set(theta0) then theta0=0.
+if not keyword_set(phi0) then phi0=0.
+
+vstr=vradprofile($
+	vfunct,$		;how the radial velocity changes with R
+	rfunct,$		;how the density changes with R
+	latrng=latrng,$		;range of latitudes
+	lonrng=lonrng,$		;range of longitudes
+	dlat=dlat,$		;step size in latitude (longitudes automatically adjusted)
+	vinf=vinf,$		;velocity at R=\infty
+	vpeg=vpeg,$		;velocity at R=RPEG
+	vbeta=vbeta,$		;index for velocity beta profile
+	rpeg=rpeg,$		;reference R for velocity profile
+	npeg=npeg,$		;density at reference distance
+	rscl=rscl,$		;length scale for density profile
+	dvel=dvel,$		;velocity bin width
+	vmin=vmin,$		;minimum in velocity to consider in profile
+	vmax=vmax,$ 		;maximum in velocity to consider in profile
+	uvfunct=uvfunct,$	;user defined velocity profile
+	urfunct=urfunct,$	;user defined density profile
+	verbose=verbose,$	;controls chatter
+	inrad=inrad,$		;inner radius of sphere at which to start
+	maxrad=maxrad,$		;maximum distance to go
+	rrng=rrng,$		;range of radii to consider in integration
+	rdel=rdel,$		;step size in distance
+	opaq=opaq,$		;/opaq for opaque inner sphere, 0 for transparent, set opacity to exp(-OPAQ) if -ve
+	arcone=arcone,$		;area of cone at RPEG -- in principle this should be derivable from DLAT
+	theta0=theta0,$		;tilt
+	phi0=phi0)		;twist
+
+plot,vstr.VGRID,vstr.VPROFILE,xtitle='velocity',ytitle='density*volume',/xstyle

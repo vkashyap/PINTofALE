@@ -1,0 +1,61 @@
+;+
+;MCMC_solar.demo
+;  set up and compute the DEM for the June 12 1998 FOOTPOINT in AR 8232 
+;
+;usage
+;	@MCMC_solar.demo
+;
+;requires
+;	!ARDB/sxt.al.1.prep.despike.fexptim.fspac.sav
+;	!ARDB/trace.171b.indat.align.ftim.fspac.sav
+;	!ARDB/s11425r00.MG_IX.fit.fit_levmar.gt0.dspike.crop.save
+;	!ARDB/MCMC_solar.demo.save
+;
+;history
+;  based on:/home/llin/solar/mcmc/cosar.v5/GOES_SXT_TRACE_CDS.pro
+;LL 4/8/05
+;-
+
+defsysv,'!ARDB',exists=iPoA
+if iPoA eq 0 then message,'requires that INITALE be run first'
+
+;        display SXT Al1 image 
+;        /home/llin/solar/dSXT/cds.COSAR.v2/
+
+restore,filepath('sxt.al.1.prep.despike.fexptim.fspac.sav',root_dir=!ARDB)
+dataal1 = data1
+sxtim =  mzoom(bytscl(alog10(smooth(data1.img[*,*,0]>1,2))) , factor = 15)
+sz = size(sxtim) & window, 2, xsize=sz(1), ysize = sz(2)
+loadct, 1 & tv, sxtim
+
+;        display TRACE 171 image
+;        /home/llin/solar/dTRACE/cds.COSAR.v5/
+
+restore,filepath('trace.171b.indat.align.ftim.fspac.sav',root_dir=!ARDB)
+adata=adata.img  
+trim =  mzoom(bytscl((adata[*,*,167])),factor = 3) 
+sz = size(trim) & window, 3, xsize=sz(1), ysize = sz(2)
+loadct, 8 & tv, trim
+
+;        display CDS Mg9 image 
+;        /home/llin/solar/dCDS/fit_levmar.gt0.v7/
+
+restore,filepath('s11425r00.MG_IX.fit.fit_levmar.gt0.dspike.crop.save',$
+	root_dir=!ARDB)
+window, 4 
+cdsim = mzoom(bytscl(struct.ints), factor = 8)
+sz = size(cdsim) & window, 4, xsize = sz(1), ysize = sz(2) 
+loadct, 3 & tv, cdsim
+
+window,1 & window,0
+restore,filepath('MCMC_solar.demo.save',root_dir=!ARDB)
+dem = mcmc_dem(wvls,flxs,emisr,fsigma=fsigma,z=z,logt=logt,$
+	smoot=double(1.0),savfil='v3.save',diffem=fltarr(26)+1d23,$
+	ne_nh=double(1.0),/noph,nsim=500,sampenv=sampenv,demrng=demrng,$
+	version_comment=version_comment) 
+
+ymax=max(emisr)
+window,5
+plot,logt,0*logt,yr=ymax*[1e-5,1],/xs,$
+	xtitle='logT',ytitle='emissivities'
+for i=0,n_elements(wvls)-1 do oplot,logt,emis[*,i]

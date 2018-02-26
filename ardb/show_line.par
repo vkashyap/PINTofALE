@@ -1,0 +1,36 @@
+;	(VK; JanMMI)
+message,'calling SHOW_LINE',/info
+show_line, $
+    in_x ,$
+    in_y ,$
+    Z      = in_Z ,$
+    ion    = in_ion ,$
+    lambda = data_wvl ,$
+    spec   = data_spec ,$
+    wmark  = smudge_loc ,$
+    lmark  = smudge_label ,$
+    fmark  = in_fmark ,$
+    cmark  = 150 ,$
+    markc  = 222 ,$
+    xo     = pickrange_xo ,$
+    yo     = pickrange_yo ,$
+    oxr    = pickrange_oxr ,$
+    oyr    = pickrange_oyr ,$
+    order  = '1,2,3' ,$
+    sep    = ',' ,$
+    squish = 1 ,$
+    dynrng = 3 ,$
+    markp  = 1 ,$
+    marks  = 1 ,$
+    marko  = 90 ,$
+    quiet  = (not keyword_set(!VERBOSE)) > 0 ,$
+    xtitle = xtitle ,$
+    ytitle = ytitle ,$
+    nuthin = 0 ,$
+    noday  = 0 ,$
+    notime = 0 ,$
+    nouser = 0 ,$
+    nopack = 0 ,$
+    stacol = !D.N_COLORS-10 > 1 ,$
+    stasiz = 1 ,$
+    stathk = 1

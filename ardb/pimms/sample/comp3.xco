@@ -1,0 +1,4 @@
+mo pl 1.7 3e23 ga 6.4 0.2 150 plasma 1.2 1.0 0.0 1.0 2.5 z 0.01 8e19
+output agn_sb 0.1 10.0 0.01
+inst chandra acis-s
+go 1e-11

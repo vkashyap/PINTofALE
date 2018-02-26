@@ -1,0 +1,418 @@
+;+
+; chandra_letg_ao9.par
+; 
+; calling sequence
+;	@!ARDB/chandra_letg_ao9.par
+; 
+; description
+;   This thread uses PINTofALE to generate simulated Chandra Low-Energy Transmission Grating
+;   Spectrometer (LETGS) spectra.  In particular, we will examine the emission of a hot
+;   corona along with the contribution to the X-ray emission from an accreting component.
+; 
+;   The Chandra gRSP files used here were obtained from the LETG Observer Information page,
+;	http://cxc.harvard.edu/cal/Links/Letg/User/Hrc_QE/ea_index.html
+;	
+;   The Chandra Proposal Information page also contains gARFs and gRMFs for various orders
+;   and those may also be used.  However, note that the formatting of the data in some of
+;   those files has been found to be incompatible with IDL's mrdfits() routine, and care
+;   must be taken to ensure that the arrays read in correspond to that given in Figure 9.17
+;   of the Proposers' Observatory Guide.
+; 
+;   We use the gRSP files and set the gARFs to "none" in this thread.  If gARF files are
+;   used, please ensure that the gRMF files are read in and not the gRSP files, which
+;   already include the gARFs.
+;
+; history
+;   Marco Matranga (Feb 2007)
+;   modified by VK (Feb 2007)
+;-
+
+;############################################
+
+;   1. Initialize some variables
+
+;############################################
+
+;	NOTE: this script uses some system variables defined via the script INITALE
+;	so initialize PINTofALE with
+;		.run initale
+;	if it hasn't been done already
+
+;	Because some variables will be used repeatedly in the course of this
+;	thread, it might be useful to initiate them now. Nailing down these
+;	variables now will also allow for something of a checklist for some
+;	important quantities/files needed for the task at hand:
+
+;	Source We will characterize our model source by the following:
+ !NH           = 3e20			 ; H column density [cm^-2]
+ EDENS_c       = 1e10			 ; electron number density [cm^-3]
+ EDENS_a       = 1e12			 ; electron number density [cm^-3]
+ !ABUND        = getabund('grevesse')    ; elemental abundances (SEE: getabund())
+ T_c  	       = [6.5, 7.3]	    	 ; log(T[K]) components in the EM for the corona
+ EM_c          = [6.6, 2.2]*1d12	 ; Emission Measure [cm^-3] for the corona
+ T_a  	       = [6.3]	    	    	 ; log(T[K]) components in the EM for the accret.
+ EM_a          = [3.3]*1d12	    	 ; Emission Measure [cm^-3] for the accret.
+
+;	Observation The observation can be described by:
+
+ EXPTIME   	= 50.			 ; nominal exposure time [ks]
+ file_gRMFp	= '/pool14/kashyap/hrcsleg_0411_p1t6.rsp'	; full path name to +ve order grating RMF (or RSP)
+ file_gRMFn	= '/pool14/kashyap/hrcsleg_0411_m1t6.rsp'	; full path name to -ve order grating RMF (or RSP)
+ file_gARFp	= 'none'	; full path name to +ve order grating ARF (not needed if file_gRMFp includes ARF)
+ file_gARFn	= 'none'	; full path name to -ve order grating ARF (not needed if file_gRMFn includes ARF)
+
+ ;	NOTE: we use the 1 thru 6 orders responses combined, and therefore
+ ;	do not require the gARFs.  If the gRMFs are downloaded from the
+ ;	Chandra PProposal Information page, then the corresponding gARFs
+ ;	are necessary.
+
+;	Atomic Database  We have '$CHIANTI','$SPEX','$APED' to choose from:
+
+ !LDBDIR = '$CHIANTI'
+
+ !WMIN         = 1.2           ; minimum wavelength for output spectrum [ang]
+ !WMAX         = 45            ; maximum wavelength for output spectrum [ang]
+ nwbin         = 400L		; number of bins in theoretical spectrum
+
+;############################################
+
+;   	    2. Define a DEM
+
+;############################################
+
+;	A Differential Emission Measure (DEM) is required for both components 
+;         to estimate the
+;	amount of emission at various temperatures. Typically, a 2-temperature
+;	model is used. Here we will use PINTofALE's mk_dem(), which constructs
+;	a DEM array given a temperature grid and emission measure components.
+;	We use as the temperature grid !LOGT. The emission measure components
+;	are T_c and EM_c for the corona and T_a and EM_a for the accreting comp.
+;       as defined above. We choose 'delta'
+;	to treat the EM components as delta functions (see mk_dem() or the
+;	Chandra/ACIS example for more options)
+
+DEM_c=mk_dem('delta', logT = !LOGT, pardem=T_c, indem=EM_c)
+
+DEM_a=mk_dem('delta', logT = !LOGT, pardem=T_a, indem=EM_a)
+
+; plot the DEMs for illustration
+plot,!LOGT,DEM_c,psym=10,xtitle='log!d10!n(T [K])',ytitle='DEM [cm!u-5!n/logK]'
+oplot,!LOGT,DEM_a,psym=10,color=2
+
+;################################################
+
+;   3. Rescale to DEM to match ROSAT count rate
+
+;################################################
+
+;	We will assume that a ROSAT/PSPC count rate is available,
+;	and that the simulation will match this rate.  We will assume
+;	a count rate of 1 ct/s .  Data from other missions such
+;	as ASCA, BeppoSAX, etc. can be dealt with in the same manner.
+
+;	We will first read in the instrument effective area,
+;	then the atomic emissivities from the PINTofALE database,
+;	then calculate the predicted PSPC flux for the appropriate
+;	DEM and NH, and rescale the input EMs accordingly.
+
+;	First find and read in the ROSAT/PSPC effective area.
+;	You will need to know where your local PIMMS installation
+;	is to do this.
+
+pimmsdir='/soft/ciao/config/pimms/data'
+rosat_pspc_open=get_pimms_file('ROSAT','PSPC','OPEN',pdir=pimmsdir)
+rd_pimms_file, rosat_pspc_open, pspc_effar, pspc_wvlar, /wave
+
+;	Make sure that the wavelengths are sorted in increasing order
+
+ae=sort(pspc_wvlar) & pspc_wvlar=pspc_wvlar[ae] & pspc_effar=pspc_effar[ae]
+
+;	The following is similar to the process described in the detailed
+;	example thread (see Section 1 and Section 2).
+;	For a scripted example with less details, see the companion thread
+;	on the low-resolution spectrum generation.
+
+;  Read in line cooling emissivities and calculate line intensities
+
+        ;Read line cooling emissivities from the atomic database.
+
+	; To avoid multiple reads, read in the database over the largest
+	; necessary wavelength range
+	minwave=min(pspc_wvlar)<!WMIN
+	maxwave=max(pspc_wvlar)>!WMAX
+
+	; first for the density of the coronal component...
+	!EDENS=EDENS_c
+        lconf_c=rd_line(atom,n_e=!EDENS,wrange=[MINwave,MAXwave],$
+	              dbdir=!LDBDIR,verbose=!VERBOSE,wvl=LWVL,logT=LLOGT,Z=Z,$
+                      ion=ION,jon=JON,fstr=lstr_c)
+
+	; ... and next for the density of the accreting component
+	!EDENS=EDENS_a
+        lconf_a=rd_line(atom,n_e=!EDENS,wrange=[MINwave,MAXwave],$
+	              dbdir=!LDBDIR,verbose=!VERBOSE,wvl=LWVL,logT=LLOGT,Z=Z,$
+                      ion=ION,jon=JON,fstr=lstr_a)
+
+        ;The output of rd_line() will only include level population,
+        ;and not ion balances. We will use fold_ioneq() to fold ion balances.
+
+        ; NOTE: This step should not be performed if !LDBDIR is set to APED,
+	; which already includes ion balances and abundances.
+
+	if strpos(strlowcase(!LDBDIR),'aped',0) lt 0 then lconf_c=$
+	   fold_ioneq(lstr_c.LINE_INT,lstr_c.Z,lstr_c.JON,chidir=!CHIDIR,$
+	   logT=lstr_c.LOGT,eqfile=!IONEQF,verbose=!VERBOSE)
+
+	if strpos(strlowcase(!LDBDIR),'aped',0) lt 0 then lconf_a=$
+	   fold_ioneq(lstr_a.LINE_INT,lstr_a.Z,lstr_a.JON,chidir=!CHIDIR,$
+	   logT=lstr_a.LOGT,eqfile=!IONEQF,verbose=!VERBOSE)
+
+	; NOTE: If !LDBDIR is set to APED, Anders & Grevesse abundances
+	; are already included in the emissivities.  The following removes
+	; the abundance from the emissivities in such cases.
+
+        if strpos(strlowcase(!LDBDIR),'aped',0) ge 0 then apedance,lconf_c
+        if strpos(strlowcase(!LDBDIR),'aped',0) ge 0 then apedance,lconf_a
+        
+	; and now calculate line intensities using lineflx().
+
+        linint_c=lineflx(lconf_c,!LOGT,abs(lstr_c.WVL),lstr_c.Z,DEM=DEM_c,abund=!ABUND) ;[ph/s]
+        linint_a=lineflx(lconf_a,!LOGT,abs(lstr_a.WVL),lstr_a.Z,DEM=DEM_a,abund=!ABUND) ;[ph/s]
+
+;  Read in continuum emissivities and calculate continuum intensities
+
+        ;We can read in continuum emissivities using rd_cont().
+        ;It is important to note that the output emissivities of rd_cont()
+        ;are in [1e-23 erg cm^3/s/Ang] and not [1e-23 erg cm^3/s] as with rd_line()
+
+	; first for the density of the coronal component...
+	!EDENS=EDENS_c
+        cconf_c=rd_cont(!CEROOT,n_e=!EDENS,wrange=[minwave,maxwave],$
+                      dbdir=!CDBDIR,abund=!ABUND,verbose=!VERBOSE,$
+                      wvl=CWW,logT=ClogT,fcstr=cstr_c)
+
+	; ... and next for the density of the accreting component
+	!EDENS=EDENS_a
+        cconf_a=rd_cont(!CEROOT,n_e=!EDENS,wrange=[minwave,maxwave],$
+                      dbdir=!CDBDIR,abund=!ABUND,verbose=!VERBOSE,$
+                      wvl=CWW,logT=ClogT,fcstr=cstr_a)
+
+        ;The continuum intensities per angstrom can be calculated again using
+	;lineflx(). Note that cstr.WVL contains the wavelength bin boundaries
+	;for the emissivity array.
+
+        conint_c=lineflx(cconf_c,!LOGT,cstr_c.midWVL,DEM=DEM_c)   ;[ph/s/Ang]
+        conint_a=lineflx(cconf_a,!LOGT,cstr_a.midWVL,DEM=DEM_a)   ;[ph/s/Ang]
+
+        ;Now to get just continuum intensity, we must multiply by an array
+	;containing the bin widths. If we define this array simply with
+	;CDW=cstr.WVL[1:*]-cstr.WVL, we will get an ugly 'saw-toothed' figure
+	;due to numerical issues having to do with subtracting regularly spaced
+	;floating point numbers.  To work around this, we use the mid-bin values
+	;cstr.midWVL, and mid2bound(), which gives intelligent bin-boundary
+	;values given the mid-bin values:
+
+	CWB=mid2bound(cstr_c.midWVL) & CDW=CWB[1:*]-CWB
+	conint_c=conint_c*CDW	;[ph/s/Ang]*[Ang]
+	CWB=mid2bound(cstr_a.midWVL) & CDW=CWB[1:*]-CWB
+	conint_a=conint_a*CDW	;[ph/s/Ang]*[Ang]
+
+;  Correct for inter-stellar absorption
+
+        ;Derive ISM absorptions using ismtau()
+	ltau=ismtau(abs(lstr_c.WVL),NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+	            Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+	ctau=ismtau(cstr_c.midWVL,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+	            Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+	ltrans=exp(-ltau) & ctrans=exp(-ctau)
+	; NOTE: lstr_c.WVL and lstr_a.WVL are identical, so there is no
+	; need to repeat these calculations for both components
+
+        ;Derive theoretical line fluxes
+	linflx_c = linint_c * ltrans	;[ph/s/cm^2]
+	linflx_a = linint_a * ltrans	;[ph/s/cm^2]
+
+        ;Derive theoretical continuum fluxes
+	conflx_c = conint_c * ctrans	;[ph/s/cm^2]
+	conflx_a = conint_a * ctrans	;[ph/s/cm^2]
+
+;  Bin spectra and fold in effective area
+
+        ;make input theoretical spectrum grid
+        dwvl=float((MAX(pspc_wvlar)-MIN(pspc_wvlar))/nwbin)
+	wgrid=findgen(nwbin+1L)*dwvl+MIN(pspc_wvlar)
+
+        ;Rebin to form theoretical line spectrum using hastrogram()
+	linspc_c = hastogram(abs(lstr_c.WVL),wgrid,wts=linflx_c)	;[ph/s/cm^2/bin]
+	linspc_a = hastogram(abs(lstr_a.WVL),wgrid,wts=linflx_a)	;[ph/s/cm^2/bin]
+
+        ;Rebin to form theoretical continuum spectrum using rebinw()
+	conspc_c = rebinw(conflx_c,cstr_c.WVL,wgrid,/perbin)	;[ph/s/cm^2/bin]
+	conspc_a = rebinw(conflx_a,cstr_a.WVL,wgrid,/perbin)	;[ph/s/cm^2/bin]
+
+        ;Derive predicted flux spectrum.
+	WVLS=0.5*(WGRID[1:*]+WGRID)
+	newEffAr=(interpol(pspc_effar,pspc_wvlar,WVLS) > 0) < (max(pspc_effar))
+	flxspc_c = (linspc_c + conspc_c) * newEffAr
+	flxspc_a = (linspc_a + conspc_a) * newEffAr
+
+        ;Derive predicted counts spectrum by combining contributions from both
+	;the coronal and the accretion components
+	flxspc=(flxspc_c+flxspc_a)*EXPTIME*1e3		;[ct/bin]
+
+	;plot the predicted ROSAT/PSPC spectrum for illustration
+	;(note that the RMF blurring has not been applied to this)
+	plot,wvls,flxspc/dwvl,psym=10,xtitle='!4k!X ['+!AA+']',ytitle='[counts/'+!AA+']'
+
+;	Now get the total count rate and renormalize the DEM to the
+;	observed rate of 1.0 ct/s.
+
+obs_rate = 1.0                             ;[ct/s]
+pred_rate = total(flxspc/EXPTIME/1e3)       ;[ct/s]
+print,'normalization factor: ',obs_rate/pred_rate
+;normalization factor:      0.032057941
+DEM_c = DEM_c * obs_rate/pred_rate
+DEM_a = DEM_a * obs_rate/pred_rate
+
+
+;################################################
+
+;   	    4. Construct the Spectra
+
+;################################################
+
+;	The construction of the simulated spectra is largely a
+;	repetition of the steps carried out to rescale the DEM.
+;	It is in fact different only in three aspects: we will use
+;	Chandra's instrumental response files and account for
+;	differences in plus/minus orders.  Also, we will convolve
+;	the resulting spectrum with an RMF (for the DEM normalization,
+;	only the total counts was important). 
+
+;	NOTE: We have already read in the line and continuum emissivities
+;	in section 3 above.  We will use these to compute the corresponding
+;	line and continuum intensities for the accreting and the coronal
+;	components.
+
+	;first for the accreting comp.
+
+        linint_accret=lineflx(lconf_a,!LOGT,abs(lstr_a.WVL),lstr_a.Z,DEM=DEM_a,abund=!ABUND) ;[ph/s]
+        conint_accret=lineflx(cconf_a,!LOGT,cstr_a.midWVL,DEM=DEM_a)       ;[ph/s/Ang]
+        CWB=mid2bound(cstr_a.WVL) & CDW=CWB[1:*]-CWB
+        conint_accret=conint_accret*CDW	;[ph/s/Ang]*[Ang]
+
+        ;now for the corona
+
+        linint_corona=lineflx(lconf_c,!LOGT,abs(lstr_c.WVL),lstr_c.Z,DEM=DEM_c,abund=!ABUND) ;[ph/s]
+        conint_corona=lineflx(cconf_c,!LOGT,cstr_c.midWVL,DEM=DEM_c)       ;[ph/s/Ang]
+        CWB=mid2bound(cstr_a.WVL) & CDW=CWB[1:*]-CWB
+        conint_corona=conint_corona*CDW	;[ph/s/Ang]*[Ang]
+
+; Correct for inter-stellar absorption
+
+;	NOTE: the ISM transmission factors have been calculated in
+;	section 3 above and we reuse those here.
+
+	linflx_accret = linint_accret * ltrans	                ;[ph/s/cm^2]
+	conflx_accret = conint_accret * ctrans  		  ;[ph/s/cm^2]
+	linflx_corona = linint_corona * ltrans	                ;[ph/s/cm^2]
+	conflx_corona = conint_corona * ctrans	                ;[ph/s/cm^2]
+
+; Bin spectra
+
+        dwvl=float((!WMAX-!WMIN)/nwbin) & wgrid=findgen(nwbin+1L)*dwvl+!WMIN & WVLS=0.5*(WGRID[1:*]+WGRID)
+        linspc_accret = hastogram(abs(lstr_a.WVL),wgrid,wts=linflx_accret) ;[ph/s/cm^2/bin]
+	conspc_accret = rebinw(conflx_accret,cstr_a.WVL,wgrid,/perbin)     ;[ph/s/cm^2/bin]
+        linspc_corona = hastogram(abs(lstr_c.WVL),wgrid,wts=linflx_corona) ;[ph/s/cm^2/bin]
+	conspc_corona = rebinw(conflx_corona,cstr_c.WVL,wgrid,/perbin)     ;[ph/s/cm^2/bin]
+
+; read in the effective areas if given and the wavelength grid over which
+; they are defined (use the RSPs if the ARFs are not defined)
+
+	; for the +ve order
+	if strpos(strlowcase(file_gARFp),'none') ge 0 then begin & $
+		grsp_p=rd_ogip_rmf(file_gRMFp,effar=effar_p,verbose=!VERBOSE) & $
+		wvlar_p = !fundae.KEVANG/(0.5*(grsp_p.ELO+grsp_p.EHI)) & $
+		newEffArP=0.*WVLS+1. & $
+	endif else begin & $
+		effar_p=rdarf(file_ARFp,ARSTRp) & $
+		wvlar_p=!fundae.KEVANG/(0.5*(ARSTRp.ELO+ARSTRp.EHI)) & $
+		newEffArP=(interpol(EFFAR_p,WVLAR_p,WVLS) > 0) < (max(EFFAR_p)) & $
+	endelse
+
+	; for the -ve order
+	if strpos(strlowcase(file_gARFn),'none') ge 0 then begin & $
+		grsp_n=rd_ogip_rmf(file_gRMFn,effar=effar_n,verbose=!VERBOSE) & $
+		wvlar_n = !fundae.KEVANG/(0.5*(grsp_n.ELO+grsp_n.EHI)) & $
+		newEffArN=0.*WVLS+1. & $
+	endif else begin & $
+		effar_n=rdarf(file_ARFn,ARSTRm) & $
+		wvlar_n=!fundae.KEVANG/(0.5*(ARSTRn.ELO+ARSTRn.EHI)) & $
+		newEffArN=(interpol(EFFAR_N,WVLAR_n,WVLS) > 0) < (max(EFFAR_n)) & $
+	endelse
+
+        ;[ct/s/bin] (if DEM is [cm-5]: [ct/s/cm2/bin])
+	flxspcP_accret = (linspc_accret + conspc_accret) * newEffArP
+	flxspcN_accret = (linspc_accret + conspc_accret) * newEffArN
+	flxspcP_corona = (linspc_corona + conspc_corona) * newEffArP
+	flxspcN_corona = (linspc_corona + conspc_corona) * newEffArN
+
+        ;Derive predicted counts spectrum for +ve and -ve orders
+	flxspcP_accret=flxspcP_accret*EXPTIME*1e3	         ;[ct/bin]
+	flxspcN_accret=flxspcN_accret*EXPTIME*1e3	         ;[ct/bin]
+	flxspcP_corona=flxspcP_corona*EXPTIME*1e3	         ;[ct/bin]
+	flxspcN_corona=flxspcN_corona*EXPTIME*1e3	         ;[ct/bin]
+	EGRID=!fundae.KEVANG/WGRID
+
+; Convolve with RMF or RSP
+
+	conv_rmf,EGRID,flxspcP_accret,CHANP,CTSPCP_accret,file_gRMFp,rmfstr=grsp_p
+	conv_rmf,EGRID,flxspcN_accret,CHANN,CTSPCN_accret,file_gRMFn,rmfstr=grsp_n
+	conv_rmf,EGRID,flxspcP_corona,CHANP,CTSPCP_corona,grsp_p
+	conv_rmf,EGRID,flxspcN_corona,CHANN,CTSPCN_corona,grsp_n
+
+;	Combine the positive and negative orders to get a co-added spectrum.
+
+CHAN_accret=CHANP                            ;[keV]
+cts_accret=ctspcP_accret+ctspcN_accret         ;[ct/bin]
+CHAN_corona=CHANP                            ;[keV]
+cts_corona=ctspcP_corona+ctspcN_corona         ;[ct/bin]
+
+;	combine the components to get the total spectrum
+
+CHAN=CHANP			;[keV]
+cts = cts_corona + cts_accret	;[ct/bin]
+
+;	Note that the output energy grid of the spectra will be
+;	the energy grid defined by the RMF.  However, the spectrum
+;	will only show lines and continuum between the selected
+;	wavelength range [!WMIN,!WMAX]
+
+;################################################
+
+;   	5. Obtain Poisson deviates and plot
+
+;################################################
+
+
+;	The final step is a simulation of counts based on the spectrum
+;	predicted above
+
+nbin = n_elements(cts_accret)
+CTSIM_accret=intarr(nbin) & CTSIM_corona=intarr(nbin)
+for i=0L,nbin-1L do if cts_accret[i] gt 0 then $
+    CTSIM_accret[i]=randomu(seed,poisson=cts_accret[i])
+for i=0L,nbin-1L do if cts_corona[i] gt 0 then $
+    CTSIM_corona[i]=randomu(seed,poisson=cts_corona[i])
+
+;	here is an example plot showing the effects of the different
+;	components for, e.g., the O VII triplet.
+
+plot, !fundae.KEVANG/CHAN, CTSIM_corona+CTSIM_accret, psym=10, xrange=[21.5,22.4],$
+	xtitle='!4k!X ['+!AA+']',ytitle='[counts/bin]',title='LETGS+HRC-S spectrum'
+oplot, !fundae.KEVANG/CHAN, CTSIM_corona, psym=10, color=2
+oplot, !fundae.KEVANG/CHAN, CTSIM_accret, psym=10, color=3
+xyouts, !x.CRANGE[1], !y.CRANGE[1]-0.1*(!y.CRANGE[1]-!y.CRANGE[0]), 'TOTAL',align=1.1
+xyouts, !x.CRANGE[1], !y.CRANGE[1]-0.2*(!y.CRANGE[1]-!y.CRANGE[0]), 'CORONAL',align=1.1,color=2
+xyouts, !x.CRANGE[1], !y.CRANGE[1]-0.3*(!y.CRANGE[1]-!y.CRANGE[0]), 'ACCRETION',align=1.1,color=3
+stample

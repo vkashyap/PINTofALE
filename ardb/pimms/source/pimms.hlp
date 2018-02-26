@@ -1,0 +1,1021 @@
+1 MODEL
+Command syntax: MODEL <name> <par> <nh> [<name> <par> <nh> <ratio> <refe>...]
+             or MODEL PL <par1> <par2> <par3> <nh>
+             or MODEL <filename> [<nh>]
+             or MODEL ?
+Minimum abbreviation: M
+Examples: "MO PL 1.7 3e21" "MO mymodel.dat"
+
+Model specifies the spectral shape to be folded  with the effective area curve
+of the instrument.  Starting with version 3.0, up to 8 model components can be
+added together to represent multi-temperature plasma,  power law plus Gaussian
+emission line, partial-covering absorber etc.   Only a limited combinations of
+models have been rigorously tested;   users of complicated models are urged to 
+check the composite model by using the OUTPUT command.
+
+As components, PIMMS recognizes  BLACKBODY, POWERLAW, BREMSSTRAHLUNG, GAUSSIAN
+and PLASMA.  If the model name string does  not match these, PIMMS will try to
+interpret the string  as a file name containing  a precalculated  model
+containing energy, photon flux pairs (see EXTERNAL_MODELS; MODELS_DIRECTORY).
+Nh, the equivalent neutral hydrogen column density  (using Morrison & McCammon
+model) is expected for each component, except for GAUSSIAN and external files.
+Nh should be specified in full with an appropriate exponent (e.g., 2.5e21), or
+as a small non-zero number less than 30.0, to be intepreted as log10(Nh).
+
+Model normalization for the built-in models do not necessarily correspond to
+physical quantities.  Instead, PIMMS is designed to allow users to compare 2
+observable quantities (count rates through specific instruments, or fluxes in
+specific energy bands) without having to know the model normalization.
+
+Optionally,  all components may be redshifted using a common z (in which case,
+all component Nh are interpreted as intrinsic absorber, with the same z)  with
+an optional Galactic NH.
+2 Syntax
+The Model commands takes 1-8 blocks of component specification, and a final
+optional block of redshift specification.  Each block starts with a valid
+name of a component (including a valid file name), followed by a set of
+numerical parameters.  As a special case, the plasma model takes an
+optional string ('logt' or 'kev', the latter being the default) specifying
+the unit of temperature, immediately after the numerical parameter for the
+temperature (in keV or in logT as appropriate).  For 2nd through 8th
+component blocks, additional parameter(s) specifying the ratio of that
+component to component 1, and the reference energy at which this is to
+be evaluated, must also be given (NB the reference energy for Gaussian
+is always its central energy).
+2 ?
+MODEL command  with a question mark  (or no  parameters) will return a short
+listing of available models.
+2 BLACKBODY
+Can be abbreviated to "BL.." or "BB".  Parameter is temperature in keV.
+2 BREMSSTRAHLUNG
+Can be abbreviated to "BR.." or "TB" (short for Thermal Bremsstrahlung); the
+model include the Gaunt factor.  Parameter is temperature in keV.
+2 POWER_LAW
+Can be  abbreviated to "PO.." or "PL".   Parameter is photon index  (flux in
+photon/cm/cm/s is E**-(index)). This version allows power laws that increase
+with increasing energy --- enter negative 'index'.
+
+A power law with high energy cutoff E**-(index)*exp[(Ecut-E)/Eefold] can be
+specified by typing "model pl 1.5 13.5 20.0 1e22" for example --- this will
+result in an index of 1.5, cut-off energy of 13.5 and e-folding energy
+of 20 keV, with an Nh of 1E22.
+2 PLASMA
+Can be abbreviated to "PLA..".  PIMMS relies on grids of pre-calculated
+files, using the APEC (default), mekal, and Raymond-Smith codes.  Since
+v4.0, PIMMS has been distributed with APEC and Raymond-Smith models at 59
+temperature (logT of 5.60 to 8.50 in an increment of 0.05) times 5 abundance
+(0.2 to 1.0 in an increment of 0.2), while mekal has a narrower temperature
+range starting with logT of 6.0 (51 tempertures to logT=8.50).  The syntax is
+"model plasma <kT> <abun> <nh>" (e.g., "model plasma 3.5 0.8 3e20").
+The temperature can be specified in logT as adding the word "logt" after
+the first numerical parameter, which is then taken to be logT. Starting in
+V4.7, APEC model files calculated using ATOMDB version 2.0.2 in XSPEC
+version 12.8.1g on 2013 Dec 9-11, assuming the solar abundances due to
+Asplund M et al. 2009, ARAA, 47, 481, are included. Between V4.0 and V4.6b,
+APEC files generated using ATOMDB 1.3.1 assuming Anders & Grevesse were
+included. Current mekal model files also assume Anders & Grevesse solar
+abundances, while the solar standard for the Raymond-Smith grid has become
+unclear due to passage of time.  PIMMS will select the nearest temperature
+and abundance that is supported by the grid in use.
+
+At start-up, the plasma model in use is APEC.  The alternatives can be
+selected by issuing the PLASMA command.
+2 GAUSSIAN
+Can be abbreviated to "G".  This model takes the central energy and physical
+width (in keV) as parameters, and optionally also Nh.  A physical width of 0
+is allowed, which is interpreted as a delta function (integrations of delta
+function is treated appropriately, although it may look incorrect in the
+differential form, which is what is saved by the OUTPUT command).
+
+Gaussian is primarily intended as second (etc.) component in addition to a
+continuum model, with the same Nh as the primary component.  In such cases,
+specify the equivalent width in eV rather than the 'relative strength'.
+2 External_models
+Other, perhaps more complex, models can be  imported in the form of an Ascii
+file containing energy  (keV)-photon flux (photons/cm/cm/s/keV) pairs.    Nh
+correction is  optional  (i.e., interstellar absorption can be included when
+producing the file or done within PIMMS). If the full directory/file name is
+not specified, user's current default directory is assumed first, and if not
+the models directory (see help item under that name) is searched.
+2 Models_directory
+Some external models (see help item under that name) may be kept under the
+MODELS subdirectory.   If the file names  and a short description  is also
+included in the MODEL.IDX file,  then PIMMS users will be able to see what
+is available.
+2 Importing_from_XSPEC
+To import a model from XSPEC, start XSPEC and read, e.g., a template ASCA
+SIS pha file (which specifies the SIS response matrix which specifies the
+PHA channel  boundary etc.).    Create your model.   Then use IPLOT MODEL
+command to plot  the model,  then from within plot  use the WD <filename>
+command to output the model into an Ascii file.  The program XSING within
+the MODELS directory  should be used  to convert the  XSPEC output into a
+form readable by PIMMS.
+1 PLASMA
+Command syntax: PLASMA apec/mekal/rs
+Minimum abbreviation: P
+Example: "PLASMA MEKAL"
+
+This command specifies the grid to use when the plasma model is specified.
+The default, chosen at start-up, is APEC.  If a plasma model is currently
+in use (including as a component of a compound model), the grid is switched
+on the fly if at all possible.  If none is being use, this command serves
+as a preliminary step for the next MODEL command that does include a plasma
+component.
+
+Note that the mekal grid does not extend to below logT of 6.00; for the
+lowest temperature plasmas, use APEC or Raymond-Smith, both of which
+extend down to logT=5.6.
+1 FROM
+Command syntax: FROM <mission> [<det> [<filt>]] [<lo>-<hi>]
+             or FROM FLUX <unit> <lo>-<hi> [UNABSORBED] [ANGSTROMS]
+             or FROM DENSITY <unit> <energy> [UNABSORBED] [ANGSTROMS]
+             or FROM NORMALIZATION
+Minimum abbreviation: F
+Examples: "FROM EINSTEIN IPC" "FROM FLUX PHOTONS 0.5-10"
+
+This command specifies the default "instrument" that the conversion is to take
+place from.   This default will be used in  GO (in count rate simulation mode)
+or POINT (in image simulation mode) command if not explicitly specified.   See
+Missions for details of the available instruments, or try DIRECTORY. Initially
+the default is 2.0-10.0 flux in ergs/cm/cm/s.
+1 INSTRUMENT
+Command syntax: INSTRUMENT <mssn> [<det> [<filt>]] [<lo>-<hi>]
+             or INSTRUMENT FLUX <unit> <lo>-<hi> [UNABSORBED] [ANGSTROMS]
+             or INSTRUMENT DENSITY <unit> <energy> [UNABSORBED] [ANGSTROMS]
+Minimum abbreviation: I
+Examples: "INST EXOSAT LE LX3" "INST FLUX ERGS 1-10 U"
+
+This command specifies the  "instrument"  that the conversion is to take place
+to.   See Missions for details of the available instruments, or try DIRECTORY.
+1 GO
+Command syntax: GO <input_rate> [<mission> [<det> [<filt>]]] [<lo>-<hi>]
+             or GO <input_rate> [FLUX <unit> <lo>-<hi> [UNABSORBED]]
+Examples: "G 1.0" "GO 3.4 EINSTEIN IPC"
+
+This command actually tells PIMMS to execute the simulation.
+
+Given a source spectrum in the form specified with MODEL,  which produces an
+input rate (count rate in the specified instruments or flux) of <input_rate>
+it GO predicts what the rate  would be for the instrument specified with the
+INSTRUMENT command.   Unit of input rate can be specified here,  or else the
+default is used (see FROM).
+1 OUTPUT
+Command syntax: OUTPUT <filename> <loE> <hiE> <deltaE>
+Example: "OUT compoite 0.1 10.0 0.005"
+
+This command produces an Ascii file containing the current spectral model,
+and is intended primarily as a debugging tool for complicated multi-component
+models.  Each row consists of energy, total model flux, and flux of each
+component if there are more than one.  The energy grid should be specified
+using the minimum and maximum values and the increment.
+
+PIMMS currently forces output file names to be all lowercase.
+1 SHOW
+Command syntax: SHOW
+Minimum abbreviation: SH
+
+Presents a summary of the current defaults on the screen.
+1 DIRECTORY
+Command syntax: DIRECTORY [<mission> [<detector>]]
+Minimum abbreviation: D
+Examples: "DIR" "DIRE EXOSAT"
+
+This command prints, on your screen, the full listing of missions that PIMMS
+recognizes.  For explanations and comments, see "Missions" in this help.
+1 LOG
+Command syntax: LOG <log-file-name>
+             or LOG close
+Minimum abbreviation: L
+Example: "LOG crab"
+
+When this command is issued, PIMMS opens a log file (default extension
+.log).  Thereafter, screen outputs from PIMMS (except for questions/prompts)
+will be copied to the log file.  LOG CLOSE will close the current log file;
+the purpose of this command would be to send further output to a separate
+log file.  This command will indicate error if (1) a log file is already
+open; (2) (on UNIX systems) the specified file already exists; (3) (on
+VMS systems) when the specified "log file name" is also a DCL Logical;
+and (4) PIMMS failed to open the file for the usual reasons, including
+a lack of disk space and file system protection.
+
+PIMMS currently forces log file names to be all lowercase.
+1 Basics
+The name PIMMS stands for Portable, Interactive, Multi-Mission Simulator.
+
+The features are:
+  * Portable --- PIMMS works on Linux and Mac OSX and several legacy systems.
+    However, recent versions have been tested almost exclusively on Linux
+    machines.
+  * Interactive --- PIMMS is an interactive, command-driven program.
+  * Multi-mission --- PIMMS enables you to convert count rates and fluxes to
+    and from various missions.
+
+  * For several instruments (ASCA, XTE, and SAX), PIMMS will print further
+    instrument-specific information to help you plan your proposal and/or
+    observation.
+
+1 Bugs_and_Caveats
+ * Calibration files used  by PIMMS are adequate for  simulation purposes, but
+   are either pre-flight best guesses or post-flight "typical" ones.
+1 Missions
+PIMMS reads the list of missions from a file called "pms_mssn.lst" in the data
+directory.     It then looks, for each mission (i.e., satellite), detector and
+filter combination, the  appropriate calibration files for the effective area,
+values used for image simulation etc.    Since this is a run-time process, the
+following items may not exactly correspond to what you see.   For a listing of
+what is currently available, use the DIRECTORY command.
+
+For active and near-future missions, we provide the latest effective area
+curves with PIMMS for proposal preparation purposes.  If the effective area
+changes in-orbit, count rate to flux conversion factor for actual observations
+is time-dependent, which PIMMS is currently not well equipped to handle.
+2 ASCA
+The the Japanese X-ray satellite, ASCA, had 4 co-aligned telescopes, each
+having an effective area  of ~250 cm^2 at 1 keV; there were two GIS and
+two SIS detectors.
+3 GIS
+GIS was a imaging gas scintillation proportional counter. Count rate is per 1
+GIS, not per pair of GIS's.
+3 SIS
+SIS (Solid-state Imaging Spectrometer) was a CCD-based instrument. Count rate
+is per 1 SIS< not per pair of SIS's.
+2 ASTROH
+ASTRO-H is the next Japanese X-ray astronomy satellite with a substantial
+US contribution, scheduled for launch in early 2016.  PIMMS v4.8 contains
+effective area curves for the 4 instruments based on preliminary calibration
+available as of 2015 July.
+3 SXS
+Soft X-ray Spectrometer (SXS) is an X-ray microcalorimeter based instrument
+located at the focus of an imaging soft X-ray telescope (SXT-S).  We provide
+four files corresponding to the current set of science filters (open, 25
+micron Be, and 50 micron Be, as well as the optical blocking filter, OBF).
+These files are appropriate for point sources on-axis, adding counts in all
+pixels of the 6x6 array.  For the detector, a spectral resoulution of 5 eV
+and the baseline set of XRS filters are assumed.  For bright sources, SXS
+suffers from a photon pile-up effect: the fraction of events that can be
+detected at the full resolution will decrease for higher count rate source.
+The current version provides a preliminary estimate of this effect, the
+accuracy of which is under investigation.
+3 SXI
+Soft X-ray Imager (SXI) is an CCD based instrument located at the focus of
+a soft X-ray telescope (SXT-I).  The effective area curve is appropriate for
+a point source observed on-axis, analyzed with a 1.8 arcmin radius extraction
+region.
+3 HXI
+Hard X-ray Imager (HXI) is a CdTe imaging detector behind 4 Si layers.
+There are two units, each located at the focus of an imaging, multi-layer,
+hard X-ray telescope (HXT).  The effective area curves are for one HXI
+unit for an on-axis point source with 1.8 arcmin extraction region.
+Two choices are offered for top layer only and and for all layers.
+3 SGD
+Soft Gamma-ray Detector (SGD) is a narrow field-of-view Compton telescope
+operating in the 10-600 keV range.  Its sensitivity at 300 keV is 10 times
+better than that of the Suzaku HXD.  The current version provides preliminary
+estimates of the exposure times necessary for 3 and 5 sigma detections with
+SGD, the accuracy of which is under investigation.
+2 BBXRT
+BBXRT was flown on the Shuttle with the ASTRO payload in December 1990.  The
+effective area curve  is that for pixel A0.
+2 CGRO
+The effective area curves for the Compton Gamma Ray Observatory OSSE
+instrument is included, primarily as an aid in Integral observation planning.
+2 Chandra
+Chandra X-ray Observatory was formerly known as AXAF.
+
+This version of PIMMS includes the Chandra instrument effective area curves
+appropriate for Cycle 18 proposers, as provided by the Chandra X-ray
+Observatory Center (http://chandra.harvard.edu/), where the details of the
+instruments can be found.  Older versions of effective area curves are
+available by request.
+
+All effective areas assume an on-axis observation.
+3 ACIS-I
+The 4 CCDs of the AXAF CCD Imaging Spectrometer Imaging array cover ~17
+by 17 arcmin of sky with ~0.5 arcsec square pixels.  PIMMS calculates the
+on-axis count rate uncorrected for pile-up.  See also PILEUP.
+3 ACIS-S-BI
+Two of the 6 ACIS-S CCDs are back-illuminated (BI), to improve the low
+energy effective areas. For imaging with ACIS-S, the observer will thus
+have the choice of FI/BI.  Since the FI chips have a performance identical
+to that of the ACIS-I chips, only the BI chip option is separately available
+in PIMMS.  See also PILEUP.
+3 HRC
+High Resolution Camera covers a larger area of the sky with smaller pixels.
+3 HETG
+ACIS-S will be the normal readout instrument for HETG spectra. The curves
+use the flight instrument chip layout of 4 FI and 2 BI chips. PIMMS will
+provide count rates for both grating subsets (MEG and HEG) separately, or
+for the combination. A single observation provides both spectra
+simultaneously in a cross-shaped orientation. Since the energy response and
+spectral resolution of the two grating assemblies differ, separation of the
+output may be important for some users. In all cases the output is for
+isolated first order. The energy resolution of the ACIS instrument will
+allow the user to separate this from the higher order light. See the Proposers'
+Observatory Guide for more information.  Count rate in the zeroth order
+image can also be calculated (see also PILEUP).
+3 LETG
+HRC-S is the normal readout instrument for LETG spectra. PIMMS currently
+allows determination of the count rates in the 0th order image; 1st order
+spectrum; and the higher orders; through the "normal" part of the UV/Ion
+shield.  NOTE in practice, due to the lack of energy resolution of the HRC,
+isolation of the first order signal will require a combination of "normal"
+and "low-energy reject" mode observations which are likely to take roughly
+twice as long as the estimate provided by PIMMS. An alternative is to use
+the High Energy Suppression Filter (HESF) which effectively isolates first
+order from 0.05-0.44 keV.
+
+LETG data can also be read out with the ACIS-S detectors; 0th and 1st order
+count rates for this combination can also be estimated with PIMMS (see
+also PILEUP).
+3 PILEUP
+Observations of bright sources with ACIS are limited by photon pileups
+(see Proposers' Observatory Guide).  This version of PIMMS includes a pileup
+estimate (based on the separate 'pileup' tool written at CXC).
+This feature, when turned on (by uncompressing the 'special' files in the
+data directory), will provide you with an estimate of the degree of pile-
+up for ACIS-I, ACIS-S, HETG-ACIS-I ORDER0, HETG-ACIS-S ORDER0, LETG-ACIS-I
+ORDER0, and LETG-ACIS-S ORDER0 observations.
+
+Note that this is valid only for point source observations on-axis.
+
+Pile-up effect can be mitigated by placing the source off-axis --- the
+inferior PSF will spread the photons over many pixels.  Quantitative
+analysis of this is not yet available in PIMMS.   The other principal
+method of altering the frame time can be evaluated by PIMMS.  For this
+purpose, the 'go' command of PIMMS for ACIS-I and ACIS-S allows an
+optional numerical parameter.  If given, it will be taken as the frame
+time (allowed range: 0.2-3.3 s), and gives the pile-up fraction
+accordingly.  If absent, PIMMS will attempt to estimate the frame time
+at which the pile-up fraction is 10% (which is the rule-of-thumb number
+above which you will have a severe problem).  For the two 0th order
+images, the default frame time of 3.2 s is assumed.
+2 EINSTEIN
+Currently PIMMS have IPC, HRI and MPC effective area curves.
+2 EUVE
+PIMMS currently has the effective area curves for the three channels of  the
+spectrometer, which is used by GOs for pointed observations.
+3 SW
+Covers ~70-190A (60-180eV). 
+3 MW
+Covers ~140-380A (33-90eV).
+3 LW
+Covers ~280-750A (16-44eV).
+2 EXOSAT
+EXOSAT is the European X-ray satellite.
+3 LE
+Only the LE1/CMA effective area data are kept within PIMMS. Specify filter
+OPEN, LX3, LX4, ALP, or BRN.
+3 ME
+The effective area is for half-array.
+3 GSPC
+GSPC effective area is also available.
+2 Ginga
+Ginga is the 3rd Japanese X-ray astronomy satellite, which carried the LAC
+(Large Area Counter) array with an effective area of ~4000 cm^2.  Count
+rate can be calculated for TOP layer of the detector only or BOTH.
+2 HEAO1
+Currently, only the A4 LED is supported.
+
+The PIMMS set-up for the A4 LED instrument is meant to make it straightforward
+to use the Levine et al (1984, ApJS 54, 281) catalog for XTE proposals.  As an
+input, use the A+B+C combined count rate; as an output, A+B+C rate as well
+as the individual rate in the four bands (A through D) are given.  One
+suggested use is to specify HEAO1 A4 as both input and output instrument:
+by an iterative process, the user can find a spectral model that reproduces
+the distribution of counts in different bands.  Then switch to a different
+output instrument (in terms of energy range, LED matches the higher end of
+XTE PCA and the lower end of XTE HEXTE) keeping that model.
+
+For the A1 instruments, effective area curves for two gain settings, AGCL
+and AGCP. Both are normalized to produce count rates per square cm to allow
+direct comparison with HEAO-1 A1 X-ray Source Catalog (Wood et al. 1984,
+ApJSupp, 56, 507; also available online). The AGCP version is applicable to
+the majority of sources, while the AGCL setting is appropriate for sources at
+ecliptic longitudes in the 230-265 and 50-85 deg ranges (but excluding those
+at ecliptic latitude >+80 or <-80). The effective area curves were digitized
+from Fig. 7 of Wood et al. by Koji Mukai, while Dr. Kent Wood of NRL kindly
+provided additional information.
+2 Integral
+As of version 3.9f, PIMMS includes effegtive area curves for ISGRI and
+JEM-X instruments, based on calibration as of 2008 March.  See:
+
+	http://obswww.unige.ch/isdc/
+
+for details of the mission.  Since 2010 October, two units of JEM-X are
+operational, but PIMMS continues to provide count rate per one unit.
+This is reflected in the mission-specific comments since PIMMS v4.3.
+2 IXO
+The International X-ray Observatory (IXO) was a proposed joint effort of
+NASA, ESA, and JAXA, and superceded the previously planned Constellation-X
+and XEUS missions.  (Note that the support of Con-X and XEUS missions has been
+discontinued in PIMMS.)  PIMMS v4.1b contains effective area curves
+obtained from the project as of 2010 August.
+2 MAXI
+MAXI (Monitor of All-sky X-ray Image) is an all-sky monitor on-board the
+International Space Station. MAXI payload includes two types of X-ray cameras,
+the Gas Slit Camera (GSC) and the Solid-state Slit Camera (SSC). PIMMS v4.7
+contains effective area curve files provided by the MAXI team in mid-2013,
+normalized to produce count rates per square cm.  More information on MAXI
+can be obtaeind from the MAXI home page at Riken (http://maxi.riken.jp/top/).
+2 NICER
+NICER (the Neutron star Interior Composition ExploreR) is a proposed X-ray
+astrophysics payload on the International Space Station. It builds up total
+effective area in a modular way, with 56 parallel optic-detector pairs. Each
+optic is an X-ray "concentrator" -- a non-imaging grazing-incidence mirror
+assembly that focuses a 6-arcmin-diameter patch of sky onto a detector at a
+focal distance of 108.5 cm. The detectors are of the silicon-drift variety,
+with CCD-like energy resolution. Background levels are anticipated to be
+approximately 0.1 cts/sec (at high Galactic latitudes) from the diffuse
+X-ray background, most of which will be below 2 keV, and 0.1 cts/sec/keV
+from unrejected particle detections masquerading as X-rays.
+
+The current effective-area file was provided by the NICER project in 2014
+December. Note that the NICER project is in the process of making design
+choices that may affect the effective area curves, so the current version
+should be taken as preliminary.
+2 NuSTAR
+NuSTAR is an X-ray satellite with 10-meter focusing length and two
+side-by-side focal plane modules, each with 4 detectors.  The count rate
+calculated by PIMMS reflects the total from both modules for a 50% PSF
+extraction region. In Version 4.7a, the NuSTAR effective area curve file
+and related mission specific information were updated to reflect post-launch
+understanding, based on the response and background files for simulation
+released in 2013 August; also, the upper limit of the nominal energy range
+of the mission was changed from 80 keV to 79 keV. For further details about
+this mission, see
+
+  http://www.nustar.caltech.edu/
+2 ROSAT
+Rontogensatellite is a German/US/UK  collaboration.    It has two co-aligned
+telescopes,  the German  X-ray telescope (XRT)  and the  British  Wide Field
+Camera (WFC).
+3 PSPC
+Position Sensitive Proportional Counter  is an  instrument  similar  to the
+Einstein IPC.  Specify filter OPEN or BRN; the Snowden R bands (see Snowden
+et al 1994, ApJ 424, 714) are also available in PIMMS as 'filters' (R1, R1R2,
+R2, R4, R4R5, R4TOR7, R5, R6, R6R7 and R7), courtesy Dr. Richard West of
+Leicester University.
+3 HRI
+There are no filters with HRI.
+3 WFC
+Specify filters S1, S2, P1 or P2;  the effective area curves available are
+appropriate for the time of launch. Note the S1 and S2 sensitivity dropped
+to ~75% of initial value by the end  of the survey,  followed by a steeper
+decline to 15--20% of the original value after The Tumble.  Non-survey (P1
+and P2) filters have suffered much smaller degradations.
+2 SAX
+SAX (now known as Beppo SAX; the name within pimms will remain 'SAX' for
+brevity) is a Italian-Dutch mission launched in 1996.
+
+It carries 4 narrow field instruments (1 LECS, 2 MECS, 1 HPGSPC, 1 PDS),
+covering the energy band from 0.1 to 200 keV, and two Wide Field Cameras
+(WFC, 2-30 keV) which view the sky through a coded mask perpendicularly
+to the axis of the narrow field instruments.
+3 LECS
+The LECS (0.1-10 keV) is an imaging gas scintillation proportional
+counter similar to the MECS but extends the energy range down to 0.1 keV.
+3 MECS
+The MECS (1-10 keV) is an imaging gas scintillation proportional counter
+similar to the LECS. There are 2 working MECS on board SAX (a third unit
+developed a fault in May 1997). The count rate estimate is for the 2 MECS,
+starting with version 2.4b (previous versions estimated for 3 MECS).
+3 HPGSPC
+The HPGSPC is an high pressure gas scintillation proportional
+counter sensitive in the energy range 3-120 keV with a FOV of 1 deg.
+3 PDS
+The PSD, phoswich detector system, consists in four phoswich units.
+The observations are carried out with two halves of the
+experiment alternatively pointing source and background region, providing
+a continuous monitoring of the background.
+The PSD is sensitive in the 15-300 keV energy bandwidth and has a 
+FOV of 1.5 deg.
+3 WFC
+The Wide field Cameras is position sensitive proportional counter
+sensitive in the 2-30 keV band. There are 2 WFC on board SAX. The FOV
+per unit is 20 deg X 20 deg with an angular resolution of a few arcmin.
+2 Suzaku
+Suzaku (formmerly Astro-E2) is a Japanese-US X-ray astronomy satellite,
+launched in July 2005.  The current PIMMS implimentation is based on
+information from the instrument teams as of 2012 September for the HXD
+and 2014 December for the XIS, as collected by the Suzaku GOF
+(http://suzaku.gsfc.nasa.gov/), and is appropriate for AO-10 proposers.
+
+Note, however, that AO-10 proposals must not require the HXD to
+achieve its core scientific objectives, as the satellite is operated
+without the HXD for the majority of time.
+3 HXD
+The Hard-Xray Detector is a non-imaging instrument with an effective
+area of ~300 square cm featuring a compound-eye configuration and an
+extremely low background.  It consists of two types of sensors, silicon
+PIN diodes and GSO crystal scintillators.
+
+Starting with v3.9h, PIMMS also outputs approximate time needed for 3-sigma
+and 5-sigma detections in standard energy bands (1 for PIN and 2 for GSO),
+taking into account the current level of systematic uncertainties in the
+background models.
+3 XIS
+There are four units of the X-ray Imaging Spectrometer on-board Suzaku,
+three with frontside-illuminated (FI) CCDs and one with a backside-
+illuminated (BI) CCD, although XIS-2 (with an FI chip) has becom inoperative
+in November, 2006.  Each XIS detector is located at the focus of a
+conical foil X-Ray Telescope (XRT) with a 4.75m focal length.  The CCD
+pixels of XIS vastly oversamples the XRT PSF, thereby allowing high S/N
+spectroscopy with a relatively benign amount of photon pile-up.
+
+PIMMS currently returns count rate per one unit of XIS, with no further
+instrument specific information.
+3 XRS
+The X-Ray Spectrometer lost all its liquid helium cryogen and is no longer
+usable.
+2 Swift
+Swift (see http://heasarc.gsfc.nasa.gov/docs/swift/swiftsc.html) is
+a multiwavlength gamma-ray burst observatory launched on 2004 November 20.
+Swift carries a wide-field (2 sr), coded-aperture Burst Alert Telescope
+(BAT, 15-150 keV); an X-Ray Telescope (XRT, 0.2-10 keV); and a UV/Optical
+Telescope (UVOT, 170-650 nm).  The effective area curves for XRT now
+reflects the 2008 July CALDB release, for photon counting and window timing
+modes.  The photodiode mode (no longer operative) is also included
+using an older calibration.  Of the UVOT (9 filters, including "white"
+for unfiltered and 2 grisms) effective areas, those for the 2 grisms
+are pre-launch estimates, and others (in PIMMS 3.9f) are derived from
+the 2007 May CALDB release.  The BAT response in PIMMS v3.6c and later
+yields the counts per fully illuminated detector, which matches the BAT
+analysis software default units.  One detector has a geometric area of
+0.16 cm^2.  An on-axis source illuminates 16384 detectors; PIMMS v3.6b
+and earlier calculated the total on-axis count rates (i.e., per 16384
+detectors).
+
+Note that PIMMS is primarily an X-ray tool, and extrapolation to the
+UV regime introduces additional uncertainties.  In particular, PIMMS
+assumes E(b-v) = Nh / 4.8e+21 and an average Milkyway extinction law.
+2 XMM
+XMM-Newton (implemented using the pre-launch name, XMM, in PIMMS) was launched
+successfully in 1999 December.  It consists of three coaligned
+high-throughput 7.5m focal length telescopes with six arc second (FWHM)
+angular resolution.  The European Photon Imaging Camera (EPIC), which
+consists of two MOS and one PN CCD arrays, provide moderate spectral
+resolution over a30 arc minute field of view.  High-resolution
+spectral information (E/dE~300) is provided by the Reflection Grating
+Spectrometer (RGS) that deflects half of the beam on two of the X-ray
+telescopes (those with the MOS arrays).  The observatory also has a
+coaligned 30cm optical/UV telescope called the Optical Monitor (OM).  
+See http://astro.estec.esa.nl/XMM/xmm.html for further details.
+
+The count rates for the EPIC MOS are given for one instrument each (we have
+averaged of MOS1 and MOS2 effective area curves), not for pairs of instruments.
+Starting with PIMMS v4.1, the EPIC count rates are given for PATTERN=0-12
+(for MOS)/PATTERN=0-4 (pn) events over a large (5 arcmin) extraction region.
+This reverses the practice adoptied in v3.6 to use a 15 arcse radius
+extraction region, and that adopted in v3.9c to report only the PATTERN=0
+count rates for PN.
+
+For the RGS, count rates for RGS1 and RGS2 in two orders can be
+calculated separately (i.e., a total of 4 possible combinations).
+Even though the term 'filter' is used (because that's what the most
+common use of the third level of instrument specification in PIMMS),
+these do not represent physical filters.  Data are taken in all three
+orders simultaneously, to be extracted into separate spectra using
+software filters.
+
+This version of PIMMS contains effective area curves appropriate for
+AO-15 proposals.
+2 XTE
+Although the official name of this mission is Rossi X-ray Timing Explorer,
+the mission name within pimms remains 'XTE'.  See
+	http://xte.gsfc.nasa.gov/
+for details of the mission.
+3 PCA
+The Proportional Counter Array is a mechanically-collimated array of five 
+xenon proportional counters with a total effective area of ~7000 cm^2;
+however, different observations are taken with difeerent numbers of PCUs on.
+Therefore, starting with PIMMS v2.7, user must supply the count rate per PCU
+when this is used as the input mission (from xte pca).  When used as the
+output mission (inst xte pca), the first output is count rate per PCU summed
+over all energies and over all 3 xenon layers.  Additional outputs (the rates
+in the 6 canonical PCA channels required on the proposal form and used in
+RECOMMD) are given for 3 and 2 PCU combinations, which are becoming more
+frequent (the proposal form requires the 3 PCU numbers).  The effective area
+curves, channel boundaries and the extimated background rates are all
+appropriate for Epoch 4 gain setting.
+3 HEXTE 
+The High Energy X-ray Timing Experiment consists of two clusters of 
+detectors, with 4 scintillation detectors in each cluster.  Source and
+background count rates are given per cluster.  Values are given for the
+total count rate, and the count rates in the 4 canonical HEXTE channels
+required on the proposal form and used in HEXTEmporize.
+
+A 'filter' name is now (starting with v2.3) required for HEXTE in PIMMS,
+to choose the LLD (Lower Level Discriminator) value.  The filter names
+are DEFAULT (D; LLD=12), LLD10, LLD15, LLD20, LLD25, or LLD30.
+
+The quoted detection times assume two-cluster 16-s source/background
+beamswitching, i.e., one cluster measures background while the other is
+on-source.  In this case, the "detection time" applies to the combined
+HEXTE instrument.  For those bright source observations (source rate >>
+background rate) where a HEXTE cluster is selected to be in STARE mode,
+this detection time can also be interpreted as appropriate for a single
+HEXTE cluster.  For the combined HEXTE detection time, divide by sqrt(2).
+3 ASM
+On-axis effective area for a single SSC of the All Sky Monitor is included.
+2 Density
+New in PIMMS v3.3: it can now convert to/from flux density at a specific
+energy, rather than integrated flux over a range of energies ("flux").
+To use density, the unit must be specified: "ERGS" for ergs/cm/cm/s/keV
+or "PHOTONS" for photons/cm/cm/s/keV.  Also necessary is the energy of
+interest (in keV).  Alternatively, this can be specified as the wavelength
+in Angstroms, with the optional argument "Angstrom, in which case flux
+density is in (photons or ergs)/cm/cm/s/Angstrom.  Flux density can be
+"unabsorbed" as is flux.
+2 Flux
+PIMMS can also calculate conversion to/from flux values not folded through
+any instrument responses can also be used.  To use flux, the unit must be
+specified: "ERGS" for ergs/cm/cm/s or "PHOTONS" for photons/cm/cm/s.  Also
+necessary is the energy range of interest, to be specified in the form
+"2.5-10" (for 2.5 to 10 keV), or the wavelength range of interest, to be
+specified with a range plus the optional letter A ("1-50 A" --- note the
+space in between).  Optional keyword "UNABSORBED" following the range will
+make PIMMS calculate flux with Nh set to 0.0; this is useful in relating
+the flux to the total bolometric luminosity of the X-ray source before
+interstellar absorption.
+2 Normalization
+PIMMS now supports the use of 'model normalization'.  This is most useful
+for modelx imported from xspec, in which case a normalization of 1.0 is
+the flux level as simulated within xspec.  The use of normalization is not
+recommended for models bulit-in to PIMMS, as they do not necessarily relate
+to any physical quantities.
+1 Command_interpreter
+Commands can be  abbreviated  (as long  as it is  unique),  and numerical  and
+character  string  parameters can  be passed onto  the commands.    Parameters
+are  interpreted  according   to  their  positions  within  the  command  line 
+(first string is input file name,  second file name is  output file name etc.,
+although this does  not happen in PIMMS).   Some parameters  are compulsory  -
+PIMMS  will prompt  you  for  them if they are not given on the  command line;
+others are optional  (default values will  be used unless  the user  specifies
+them  on the  command  line).   Commands can  be stringed  together by using a
+semicolon.
+
+Starting with V3.0, PIMMS can switch command input to a file, using @<filname>
+convention.  PIMMS will assume .xco extension, if none is given.  Nested
+indirections are not allowed.
+1 HELP
+This is the VMS-style help  facility of PIMMS.   If you have never used PIMMS,
+read the "Basics" and "Command_interpreter" section of this help.
+
+Help is invoked by typing "HELP" or "?" (see also Command_Interpreter). Within
+HELP,  information is  stored in a hierarchical structure.   On the top level,
+there are two types of topics.   Those listed in ALL CAPITAL LETTERS are PIMMS
+command names,  containing the usage  of these commands.    Others are of more
+general nature, not linked with specific commands.  HELP items are arranged in
+many levels, so that you start with a general introduction and pick up as many
+specific details as you like by going down several levels.
+2 Ambiguity
+If the string supplied by the user  can be matched to (parts of) two more more
+topic names, then information on all the matching topics will be displayed.
+2 Exit
+Type  the EOF character  (^Z on VMS and ^D on UNIX machines)  to exit from
+this help immediately.
+2 Going_up
+Type <RETURN> as the topic name to go up one level.
+2 Repeating
+Type "?" to repeat the current level.
+2 Topic_Names
+This help is case-insensitive  (i.e., it accepts both lower-case and capital
+letters).   If you type n characters,  it will be matched against  the first
+n characters of  the topic names at that level.   No wild card is allowed in
+specifying item names.
+1 Spawn
+Enter a dollar sign "$" followed by a command to be spawned.  Note that some
+operating system may not pass aliases, environment variables, logicals etc.
+Note that spawning is disabled on the legacy xray account.
+1 This_version_of_PIMMS
+This is PIMMS version 4.8a.
+
+Version 4.8a contains the slightly updated set of effective area curves
+for Chandra, suitable for use for Cycle 18 proposals.
+
+The pile-up formulae for the XMM-Newton EPIC instruments have been revised
+using the latest information from the instrument teams. This brings PIMMS
+in line with tools used at the XMM SOC.
+
+It is released with new XMM-Newton EPIC effective area curves suyitable
+for AO-15 proposal preparation, although any differences with the previous
+version is exteremely minor.
+
+It is also released with new ASTRO-H HXI effective area curves.
+2 V4.7/4.7a/4.7b/4.7c/4.7d
+
+Version 4.7d contains an updated, though still somewhat preliminary,
+effective area curve for the NICER mission.
+
+Version 4.7c is released with a new set of Chandra effective area curves
+suitable for preparation of Cycle 17 proposals, and a new set of Suzaku
+XIS effective area curves suitable for preparation of AO-10 proposals.
+However, any differences with the respective previous versions are
+extremely minor.
+
+Version 4.7b is released with new XMM-Newton EPIC effective area curves
+suitable for AO-14 proposal preparation, although any differences with
+the previous version are extremely minor.
+
+Version 4.7a contains an updated effective area curve and associated
+information for NuSTAR, reflecting the post-launch understanding of the
+mission.  Although documentations for version 4.7 (released 2014 March 5)
+claimed this update was made in that version, this was regrettably not
+the case due to a configruation management error. In version 4.7a, the
+new effective area curve is includedn and the upper limit of the instrument
+energy range was updated from 80 keV to 79 keV.
+
+Version 4.7 newly includes effective area curves for MAXI SSC and GSC
+all-sky monitor instruments. It also newly includes support for the HEAO-1
+A1 instrument, appropriate for a direct comparison with the HEAO-1 A1 X-ray
+Source Catalog. It also contains updated effective area curves for the Chandra
+instruments, appropriate for Cycle 16 proposals.  Differences with Cycle 15
+versions are minor.
+
+The set of APEC model files have been re-generated using ATOMDB 2.0.2 using
+xspec version 12.8.1g on 2013 Dec 9-11, with the "solar" abundance values of
+Asplund et al. 2009.  Previous APEC model files were based on ATOMDB 1.3.1 and
+Anders & Grevesse solar abundances.
+2 V4.6/4.6a/4.6b
+Version 4.6b contains updated Chandra effective area curves appropriate for
+Cycle 15 proposals, although the differences with Cycle 14 versions are
+minor.  Version 4.6b also includes expanded array size for missions and
+instruments, although this only affects those users who wish to add many
+extra missions/instruments to the standard PIMMS installations.
+
+Version 4.6a contains a minor update of Suzaku XIS effective area curves
+appropriate for AO-8 proposers.
+
+Version 4.6 includes a preliminary effective area curve for the proposed
+NICER mission.  It also includes a preliminary algorithm to estimate the
+exposure times necessary to achieve 3 and 5 sigma detections with ASTRO-H
+SGD, the accuracy of which is currently under investigation.
+2 V4.5
+Version 4.5 includes a minor update of effective area curves for the
+Chandra instruments, suitable for use for Cycle 14 proposals.  It also
+includes a minor bug fix to the module that creates the help file
+used by PIMMS.
+2 V4.4
+Version 4.4 includes the effective area curve and further mission-specific
+support for NuSTAR.  It also includes the initial estimate of SXS pile-up
+for the ASTRO-H mission, along with updated effective area curves for all
+instruments.  It also includees minor updates for the effective area curves
+for XMM-Newton and Suzaku.
+2 V4.3
+Version 4.3 includes a new mission-speicific comments regarding Integral
+JEM-X: two units are opreational since 2010 October, but PIMMS continues
+to provide count rate per unit of JEM-X.
+2 V4.2/4.2a
+Version 4.2a includes a new set of Chandra effective area curves, suitable
+for AO-13 proposers.  Of the various instrument configurations, the HRC-I
+effective area curves changed the most.
+
+Version 4.2 includes a new set of Suzaku effective area curves, suitable
+for Cycle 6 proposers, and an accompanying update in the code to estimate
+detection limits for the HXD detectors.  Also, references to count rates
+for point sources observed at the HXD nominal position have been removed,
+as this pointing position is no longer recommended.
+2 V4.1/4.1a/4.1b
+Version 4.1b includes an updated effective area curves for XMM (suitable
+for AO-10 proposals) and for IXO, and an updated version of pms_slmdl.f
+which conforms strictly to the Fortran standard.
+
+Version 4.1a corrected a minor error in Version 4.1, which stated that the
+EPIC count rates are for PATTERNS 0 through 4 for MOS and pn.  In reality,
+for the MOS, PATTERNS 0-12 rate is used in both versions 4.1 and 4.1a.
+
+* By the request of XMM-Newton project at ESA, version 4.1 reverts
+  to using a large extraction region and PATTERNS 0 through 12 (MOS)/4 (pn)
+  in calculating EPIC count rates.
+* Version 4.1 includes preliminary effective area curves for ASTRO-H,
+  the Japanese-US mission scheduled for launch in 2014.
+* Version 4.1 now reports energy/wavelength ranges with an increased
+  number of digits.
+2 V4.0
+As of version 4.0, two new grids of models for collisionally excited thermal
+plasma (using mekal and APEC codes) are available.  The expanded grid of
+Raymond-Smith plasma model that was available as an add-on to the previous
+distributions are now standard; the more limited grid that was the standard
+in V3.9k and earlier versions has now been retired.  Of the three grids,
+APEC is now the default.  To swith among the plasma models, version 4.0
+introduce a new command, "PLASMA."  The syntax of the "MODEL" command
+has accordingly changed.  The old model name, "raymond-smith" (or RS) is
+no longer recognized, to be replaced with "PLASMA".  The model component,
+plasma, requires 3 numerical parameters: temperature, abuandance, and Nh,
+in that order.  An optional string parameter to be placed after the
+temperature can be used to switch the units of temperature from keV
+(default) to logT.
+
+Log files now contain command echos.
+
+As of Version 4.0, the effective area curves for missions Constellation-X,
+XEUS, and Spectrum X-Gamma have been removed from PIMMS.  Those for the
+International X-ray Observatory (IXO) have been added.
+
+Version 4.0 includes updated effective area curves for the Chandra
+instruments, suitable for Cycle 12 proposers.
+2 V3.9 through V3.9k
+Version 3.9k incorporates an updated set of Suzaku effective area curves,
+as well as HXD background numbers, appropriate for Cycle 5 proposers.
+
+Version 3.9j incorporates a new set of Chandra effective area cureves,
+recommended for use by those writing Cycle 11 proposals.
+
+Version 3.9i correctly treats the statistical errors in the Suzaku HXD
+background files provided to the users.  Previous versions would have
+underestimated the necessary exposure times somewhat.  It also corrects
+bugs for Swift XRT grade 0 count rates as well as ASCA count rates within
+the typical extraction regions, in cases when a limited energy range is
+spacified.  Also updated is the message regarding the instrument-specific
+extra information (or the lack thereof) when a limited energy range is
+specified.
+
+Version 3.9h includes minor updates to the effective area curves for
+Suzaku XIS and HXD instruments.  In addition, PIMMS now outputs
+approximate time needed for 3-sigma and 5-sigma detection in standard
+HXD energy bands (1 for PIN and 2 for GSO), given the current level
+of systematic uncertainties in the background models.
+
+Version 3.9g includes updated effective area curves for XMM-Newton EPIC
+MOS cameras, with an added warning from the team regarding MOS1 timing
+mode data.  It also includes updated effective area curves for Swift
+XRT.
+
+Version 3.9f includes up-to-date effective area curves for INTEGRAL
+ISGRI and JEM-X instruments.
+
+Version 3.9f includes updated effective area curves for Constellation-X
+instruments (under the revised mission name, 'conx'), XEUS, and for Swift
+UVOT (except grisms).
+
+Version 3.9e includes updated effective area curves for Chandra instruments
+for Cycle 10 proposers.
+
+Version 3.9d includes updated effective area curves for Suzaku XIS & HXD
+for Cycle 3 propoers.
+
+Version 3.9c includes updated effective area curves for XMM-Newton EPIC
+instruments, including a change for pn to PATTERN=0 events only.  Pile-up
+calculation had to be adjusted to still use total count rates.
+
+Version 3.9b includes a bug fix for energy flux calculations using redshifted
+table-based models (including Raymond-smith).  Effective area curves for
+Chandra instruments have been updated for Cycle 9 proposers in Version 3.9b.
+
+Effective area curves for Suzaku XIS and HXD have been updated for
+Cycle 2 proposers in version 3.9a.
+
+Effective area curves for XMM-Newton EPIC instruments have been updated
+for AO-6 proposers.
+
+One bug, which caused crashes for the command-line version on Linux
+platforms, has been fixed in this version.
+2 V3.8/V3.8a
+Effective area curves for Swift/XRT Photon Counting and Windowed Timing modes
+have been updated in version 3.8a.
+
+Previous versions used an old and incorrect deadtime fraction for burst
+mode for XMM-Newton EPIC-pn detector.  This has been corrected in V3.8.
+
+With this version, PIMMS now calculates Swift/BAT count rates in 4 standard
+survey bands, and also includes the background count rates and hence the
+exposure time necessary to reach a signal-to-noise ratio of 5.0.
+2 V3.7/V3.7a
+
+V3.7a includes Suzaku-specific updates.
+
+This version now provides assumptions regarding the input count rate
+(such as extraction region for imaging instruments) for various missions.
+
+This version includes the AO-5 versions of XMM-Newton EPIC effective area
+curves, which differs slightly from the AO-4 versions.  There are no updates
+for the RGS effective area.
+
+This version also includes calibration updates of the RXTE PCA effective
+area curves.  The count rate should increase by about 11% compared to
+previous versions.  This is deemed minor enough that no impact is expected
+in proposals and in observation planning.
+
+PIMMS now uses the post-launch name, Suzaku, for the former Astro-E2.
+
+This version also includes post-launch calibration of the Swift XRT,
+in three data modes (photon counting, photodiode, and windowed timing).
+2 V3.6/3.6a/3.6b/3.6c
+V3.6 has the new Swift BAT effective area curve for one detector,
+to match the default units used in BAT analysis software.  In comparison,
+previous versions (v3.6b and earlier) used the effective area for 16384
+detectors (the total number fully illuminated by an on-axis source).
+
+It incorporates the new set of Chandra effective area curves for Cycle 7
+proposers (starting with v3.6b)
+
+This version includes XMM-Newton effective area curves updated for AO-4
+proposals, including slightly updated RGS effective area curves
+(the RGS update was not included in the original release of 3.6).
+
+It also corrects a bug in model parser, enabling the users to specify
+Nh for file-based models used as second (etc.) components.
+
+
+2 V3.5 
+This version includes Astro-E2 effective areas, based on best available
+calibration data as of 2004 July, and a routine to estimate XRS grade
+fractions for bright sources.
+2 V3.4/v3.4a
+
+* V3.4a differs from v3.4 only in having an updated set of effective
+  area curves for Chandra AO-6 proposers.
+* Swift effective area curves are newly included; to enable UVOT
+  count rate predictions, a new UV/optical extinction function has
+  been added to the code.
+
+2 V3.3/3.3a
+
+New in v3.3a:
+
+* XMM-Newton effective area curves updated for AO-3 proposers.
+
+New in v3.3:
+
+* Flux density can be calcualted.
+* Chandra Cycle 5 effective area curves.
+
+2 V3.2/3.2a/3.2b/3.2c/3.2d
+
+New in v3.2d:
+
+* Chandra Cycle 4 effective area curves.
+* Minor bug fix in pms_slmdl.f, preventing it from running out of memory.
+* Another minor bug fix in pms_rarea.f, so it can read effective area
+  curve of the maximum size.
+
+New in v3.2c:
+
+* Fixed yet another bug in pms_docrt.f, and made minor updates to
+  XTE HEXTE effective area curves.
+
+New in v3.2b:
+
+* Fixed one bug in pms_docrt.f, which caused some crashes.
+
+New in v3.2a:
+
+* Cosmetic tweaks to eliminate unnecessary warning messages.
+
+New in V3.2:
+* XMM-Newton AO-2 support: Effective area curves for EPIC-MOS, EPIC-PN,
+  and RGS have been updated using in-orbit calibrationand.
+* Also includes a new formula to estimate pile-up for EPIC-MOS, based on
+  in-orbit data.
+* WARNING: This version does not have an updated pile-up formula for EPIC-PN.
+
+2 V3.1a/3.1b/3.1c
+
+* Bug fix in V3.1c: Multiple component models with two or more Raymond-
+  Smith models now work correctly.
+* Chandra AO-3 support, including clarification of first order count rates.
+* Minor clean-ups and bug fixes of v3.0.
+
+2 V3.0
+* Chandra AO-2 support.
+* Preliminary Integral support, including CGRO OSSE effective area curve.
+* Multi-component model capability.
+* Capability to read commands from a file using @<filename> syntax.
+
+2 V2.7
+* ASTRO-E responses updated in 1999 June.
+* XTE PCA calculations uses count rate per PCU as the base number; outputs
+  are given for 3- and 2-PCU observations.
+* Changed all (except historical) references to `AXAF' to `Chandra'.
+* Enlarged the buffer size for storing external spectral models (supplied
+  as an ASCII file) to 65536 lines.
+
+2 V2.6
+New in 2.6 through 2.6c:
+* 1999 January versions of ASTRO-E XRS and XIS responses, including the
+  XRS event grade calculations.
+* 1999 January versions of XMM EPIC responses, including the pile-up and
+  dead-time calculations.
+* XTE PCA calibrations updated for Epoch 4.
+
+2 V2.5
+New in 2.5:
+* Beta-test support for AXAF ACIS pile-up calculation.
+* Now accepts wavelength range as an alternative to the energy range.
+* Now allows power law that increases towards higher energies in
+  photon space [Photons = E**( - par1 ), where par1 is the user input]
+* A preliminary effective area curve for ASTRO-E XRS is now included.
+
+2 V2.4
+New in 2.4b:
+* Updated calibrations of the SAX instruments.
+* Bug-fix for long path/file names
+
+New in 2.4:
+* ASCA SIS image simulation capability has been discontinued.
+* ASCA support has been slightly updated for AO-6.
+* XTE support has been updated for AO-3.
+* Includes preliminary effective areas for AXAF and XMM.
+
+* Model normalization can be used as input.
+* Linux support included on a beta-test basis.

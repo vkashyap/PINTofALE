@@ -1,0 +1,27 @@
+;+ 
+;MCMC_plot.demo
+;	a demo for mcmc_plot
+;
+;usage
+;	plotscheme='NICE INDEX'
+;	@MCMC_plot.demo
+;
+;requires
+;	!ARDB/MCMC_AUMIC.demo.save
+;
+;LiWei Lin 4/10/05
+;- 
+
+defsysv,'!ARDB',exists=iPoA
+if iPoA eq 0 then message,'requires that INITALE be run first'
+
+savfil=filepath('MCMC_AUMIC.demo.save',root_dir=!ARDB)
+if keyword_set(savfil) then restore,savfil
+
+if not keyword_set(plotscheme) then plotscheme='NICE INDEX'
+message,'Using plot scheme '+plotscheme,/informational
+
+mcmc_plot,logt,simdem,demerr,simprb,plotscheme,/yl,slect=1,col_tabl=1,$
+          title = 'Emerging Flux Region DEM' ,$
+          ytitle= 'Column Differential Emission Measure [cm!U-5!N]',$ 
+          xtitle= 'Log!D10!N(T[K])',psym=10,yrange=[1e13,1e18],col_shft=10

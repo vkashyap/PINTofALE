@@ -1,0 +1,194 @@
+# INDEX to SCAR/PINTofALE
+# columns:
+# NAME	of procedure/function
+# DIR	subdirectory in distribution
+# KEYS	exhaustive list of comma-separated keywords which describe the named program
+
+NAME	DIR	KEYS
+S	S	S
+
+acisgarf	specific	function,gratings,effective areas,ARFs,ACIS-S,HEG,MEG,LEG,AXAF,Chandra
+aciss_gaps	specific	procedure,gratings,ACIS-S,chips,HEG,MEG,LEG,AXAF,Chandra
+addlincon	scrypt	script,lines,continuum,spectrum,continua,spectra
+adjustie	.	procedure,fitting lines,line fitting,constraints,ties,parameters
+aria    	.	function,gratings,effective areas,ARFs,PIMMS,structures
+arrayeq 	misc	function,equal arrays,array diffs
+axaf_wgrid	specific	function,transmission gratings,wavelength grids,ACIS-S,HRC-S,HEG,MEG,LEG,AXAF,Chandra
+becca     	esempio	example script,lines,continuum,spectrum,continua,spectra
+binersp  	.	function,RMFs,response matrices,response matrix,position indices,binning
+bland     	.	function,lines,blending
+cat_id    	.	function,lines,list of IDs,identifications,concatenate,structures,emissivity,emissivities,ion
+balance,features list
+cat_ln    	.	function,list of lines,concatenate,structures,emissivity,emissivities
+cont_cie  	mkemis	function,continuum,emissivity,emissivities
+conv_rmf  	.	procedure,RMFs,response matrices,convolve spectrum with response matrix,ARFs,effective areas
+curve_fit	external	function,fitting lines,line fitting,levenberg-marquardt,non-linear least-squares,gradient-expansion,user-defined function,warning: buggy
+darshana	.	procedure,plot,list of IDs,identifications,spectrum,structures
+dem_flx2em	obsolete	function,emission measures,electron density,emissivities,pottasch,use DID2EM instead
+
+#demacs
+#descale2_ups
+#did2em
+#eg_dem_flx2em
+#eg_fidgit
+#eg_fit_levmar
+#eg_fitlines
+#eg_flx2em
+#eg_lineid
+#eg_linespec
+#eg_linespec_em
+#eg_lsd_show
+#eg_mcmc_dem
+#eg_merge_line
+#eg_plotid
+#eg_potave
+#eg_rd_cont
+#eg_rd_list
+#eg_starflux
+#eg_tracespec
+#erors
+#euve_ds
+#euve_lw
+#euve_mw
+#euve_sw
+#fidgit
+#findex
+#findscale
+#fit_levmar
+#fitlines
+#fitlines_event
+#flux_to_em
+#flx2em
+#fold_ioneq
+#fold_resp
+#get_continuum
+#get_ionlist
+#get_pimms_file
+#getabund
+#getlocmax
+#gmodel
+#gratflx
+#hastogram
+#id_to_3par
+#id_to_emis
+#id_to_fitpar
+#inicon
+#initstuff
+#ismtau
+#kaboom
+#kalpana
+#kilroy
+#lablplot
+#lat2arab
+#legalvar
+#levmarq
+#likeli
+#line_brs
+#line_chianti
+#line_spex
+#line_spexD
+#lineflx
+#lineid
+#lineid_menu
+#linerem
+#lineremed
+#linespec
+#linespec_em
+#lmcoeff
+#locmax
+#losrad
+#lsd
+#make_spec
+#marfrmf
+#mcmc_dem
+#mcmc_dem_only
+#mcmc_out
+#merge_line
+#mk_cont_cie
+#mk_dem
+#mk_gauss
+#mk_lcool_chianti
+#mk_lines
+#mk_lorentz
+#mk_model
+#mk_rosat_hr
+#mk_scar_help
+#mrg_spexianti
+#mudra
+#munge_list
+#nary2dec
+#nenh
+#nrg2chan
+#num2str
+#pickrange
+#piffle
+#plotem
+#plotid
+#poplev
+#potave
+#potem_tool
+#pottasch
+#pred_flx
+#propar
+#radloss
+#rangoli
+#rd_3par
+#rd_brs_tab
+#rd_chianti
+#rd_cont
+#rd_ioneq
+#rd_line
+#rd_list
+#rd_ogip_rmf
+#rd_pimms_file
+#rd_sertstab
+#rd_trace
+#rdabund
+#rdarf
+#rdb
+#rdpha
+#rdresp
+#read_elvlc
+#read_ioneq
+#read_splups
+#read_wgfa2
+#rebinw
+#rebinx
+#roofn
+#setabund
+#setcolor
+#setcont
+#show_line
+#smudge
+#splac
+#splic_spexianti
+#squishem
+#starflux
+#str2arr
+#swapna
+#symb2zion
+#syze
+#tekku
+#temp
+#traceflx
+#traceflx0
+#traceresp
+#translabel
+#updatid
+#varsmooth
+#vrdb
+#wc
+#whee
+#which
+#wrap_id2fit
+#wrap_show_line
+#wrap_smudge
+#wrap_starflux
+#wrt_3par
+#wrt_cont_cie
+#wrt_ln_brs
+#wrt_ln_chianti
+#wvlt_scale
+#x3model
+#xinti_mrg
+#zion2symb

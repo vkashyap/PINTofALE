@@ -1,0 +1,6 @@
+from flux ergs 0.1-4
+mo plasma 6.65 logt 0.6 3e19
+inst rosat pspc open
+go 5e-12
+inst rosat pspc r6r7
+go 5e-12

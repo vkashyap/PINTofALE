@@ -1,0 +1,72 @@
+to build up the APED emissivities,
+
+1/ old way
+
+apedfil='Density_v101_line.fits'
+apeddir='/data/fubar/kashyap/Randall/density_v101'
+outdir='/data/fubar/SCAR/emissivity/apedD'
+wrt_ln_aped,apedfil,logT,outdir=outdir,apeddir=apeddir
+
+2/ using released APED
+
+.run initale
+logT=findgen(81)*0.05+4.
+exaped,'apec',emis,Tlog,wvl,edens,Z,ion,desig,econf,jon,src,$
+	/llist,atomdb=!ATOMDB,logT=logT,verbose=10
+linstr=mk_linstr(emis[*,*,0],logT=logT,wvl=wvl,Z=Z,ion=ion,jon=jon,$
+	desig=desig,econf=econf,src=src,verbose=10)
+outdir=!TOPDIR+'/emissivity/aped202D'
+wrt_ln_generic,linstr,outdir,alog10(edens[0]),verbose=10
+
+3/ using custom built APED with density sensitivity
+
+logT=findgen(81)*0.05+4. & outdir='/data/fubar/SCAR/emissivity/apedRSD'
+exaped,'apec_nT',emis,tlog,wvl,edens,Z,ion,desig,econf,jon,src,$
+	/llist,atomdb='/data/rsmith3/pse/runs/jdrake/',logT=logT,$
+	verbose=1
+for i=0L,n_elements(edens)-1L do begin & $
+  print,i,edens[i] & $
+  linstr=mk_linstr(emis[*,*,i],logT=logT,wvl=wvl,Z=Z,ion=ion,jon=jon,$
+  	desig=desig,econf=econf,src=src,verbose=10) & $
+  wrt_ln_generic,linstr,outdir,alog10(edens[i]),verbose=10 & $
+endfor
+
+4/ for APED v2.0.0
+
+logT=findgen(81)*0.05+4.
+exaped,'apec',emis,Tlog,wvl,edens,Z,ion,desig,econf,jon,src,$
+	/llist,atomdb='/data/fubar/SCAR/atomdb_v2.0.0/',logT=logT,verbose=10
+linstr=mk_linstr(emis[*,*,0],logT=logT,wvl=wvl,Z=Z,ion=ion,jon=jon,$
+	desig=desig,econf=econf,src=src,verbose=10)
+outdir='/data/fubar/SCAR/emissivity/aped200D'
+wrt_ln_generic,linstr,outdir,alog10(edens[0]),verbose=10
+
+4a/ for subset of APED v2.0.0
+
+logT=findgen(81)*0.05+4.
+exaped,'apec_v2.0.0_ptesta_4',emis,Tlog,wvl,edens,Z,ion,desig,econf,jon,src,$
+	/llist,atomdb='/data/fubar/SCAR/analysis/apec_ptesta_4/',logT=logT,verbose=10
+linstr=mk_linstr(emis[*,*,0],logT=logT,wvl=wvl,Z=Z,ion=ion,jon=jon,$
+	desig=desig,econf=econf,src=src,verbose=10)
+outdir='/data/fubar/SCAR/emissivity/aped200_ptesta_4D'
+wrt_ln_generic,linstr,outdir,alog10(edens[0]),verbose=10
+
+5/ for APED v2.0.1
+
+logT=findgen(81)*0.05+4.
+exaped,'apec',emis,Tlog,wvl,edens,Z,ion,desig,econf,jon,src,$
+	/llist,atomdb='/data/fubar/SCAR/atomdb_v2.0.1/',logT=logT,verbose=10
+linstr=mk_linstr(emis[*,*,0],logT=logT,wvl=wvl,Z=Z,ion=ion,jon=jon,$
+	desig=desig,econf=econf,src=src,verbose=10)
+outdir='/data/fubar/SCAR/emissivity/aped201D'
+wrt_ln_generic,linstr,outdir,alog10(edens[0]),verbose=10
+
+6/ for ATOMDB v2.0.2
+
+logT=findgen(81)*0.05+4.
+exaped,'apec',emis,Tlog,wvl,edens,Z,ion,desig,econf,jon,src,$
+	/llist,atomdb='/data/fubar/SCAR/atomdb_v2.0.2/',logT=logT,verbose=10
+linstr=mk_linstr(emis[*,*,0],logT=logT,wvl=wvl,Z=Z,ion=ion,jon=jon,$
+	desig=desig,econf=econf,src=src,verbose=10)
+outdir='/data/fubar/SCAR/emissivity/aped202D'
+wrt_ln_generic,linstr,outdir,alog10(edens[0]),verbose=10

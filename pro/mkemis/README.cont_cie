@@ -1,0 +1,11 @@
+all the *.dat files and the cie executable compiled by JJD.
+
+to make continuum emissivity database:-
+
+cd /data/fubar/SCAR
+if ( ! -d emissivity/cont ) mkdir emissivity/cont
+if ( ! -d emissivity/contD ) mkdir emissivity/contD
+
+cd CIE
+idl
+IDL> .run mk_cont_cie

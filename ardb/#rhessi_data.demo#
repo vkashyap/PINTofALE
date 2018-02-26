@@ -1,0 +1,42 @@
+;+
+;rhessi_data.demo
+;       read in a RHESSI data set and display
+;
+;usage
+;       @rhessi_data.demo
+;
+;vinay kashyap (Apr2005)
+;-
+
+;	RHESSI data spectrum and RSPs for passbands
+restore,'rhessi_inputs.save'
+	;G41STR,G42STR,G43STR,G44STR,G45STR,LSTR,CSTR,SPEC,EGRID
+GSTR_0306=G41STR & GSTR_0607=G42STR & GSTR_0708=G43STR
+GSTR_0810=G44STR & GSTR_1012=G45STR
+exptim=60.
+restore,'hsi_qsrm_20030426_024500.save'
+	;HSI_RMF,HSI_EFFAR,HSI_RMF_0306,HSI_EFFAR0306,
+	;HSI_RMF_0607,HSI_EFFAR0607,HSI_RMF_0708,HSI_EFFAR0708,
+	;HSI_RMF_0810,HSI_EFFAR0810,HSI_RMF_1012,HSI_EFFAR1012
+
+peasecolr
+
+;	plot spectrum
+window,0
+plot,egrid,spec,xrange=[3.,12.],psym=10,/xlog,/xstyle,$
+	xtitle='Channel Energy [keV]',ytitle='counts/bin',title='RHESSI'
+oplot,hsi_rmf.elo,hsi_effar*1e4,thick=2,line=1
+oplot,hsi_rmf_0306.elo,hsi_effar0306*1e4,thick=2,col=1
+oplot,hsi_rmf_0607.elo,hsi_effar0607*1e4,thick=2,col=2
+oplot,hsi_rmf_0708.elo,hsi_effar0708*1e4,thick=2,col=3
+oplot,hsi_rmf_0810.elo,hsi_effar0810*1e4,thick=2,col=4
+oplot,hsi_rmf_1012.elo,hsi_effar1012*1e4,thick=2,col=5
+
+window,2
+elo=HSI_RMF.ELO & ehi=HSI_RMF.EHI & ee=0.5*(elo+ehi)
+newHSI_EFFAR=interpol(HSI_EFFAR,ee,egrid)
+nrgrid=mid2bound(egrid) & dE=nrgrid[1:*]-nrgrid
+plot,egrid,spec/newHSI_EFFAR/dE/exptim,xrange=[3.,12.],psym=10,$
+	/xlog,/xstyle,/ylog,chars=1.8,thick=3,$
+	xtitle='Channel Energy [keV]',ytitle='ph/s/cm^2/keV',$
+	title='RHESSI 2003-04-26 03:02:00 UT'

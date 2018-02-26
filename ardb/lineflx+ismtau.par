@@ -1,0 +1,28 @@
+;	(VK, JanMMI)
+message,'Running ISMTAU()*LINEFLX(); requires FOLD_IONEQ(RD_LINE()) output',/info
+lineflx_flx = lineflx( $
+  fold_ioneq_linemis ,$			;output of FOLD_IONEQ(RD_LINE())
+  !LOGT ,$				;must match output of RD_LINE()
+  rd_line_WVL ,$			;output of RD_LINE()
+  rd_line_Z ,$				;output of RD_LINE()
+  DEM    = !DEM ,$
+  temp   = 0 ,$
+  abund  = !ABUND ,$
+  noph   = 0 ,$
+  effar  = effective_area ,$
+  wvlar  = effar_wavelength ,$
+  ikeV   = 0 ,$
+  regrid = 0 ) * $
+    exp(-ismtau( $
+      abs(rd_line_WVL) ,$		;output of RD_LINE()
+      NH      = !NH ,$
+      fH2     = !FH2 ,$
+      He1     = !HE1 ,$
+      HeII    = !HEII ,$
+      Fano    = 0 ,$
+      ikeV    = 0 ,$
+      wam     = 0 ,$
+      bam     = 1 ,$
+      mam     = 0 ,$
+      abund   = !ABUND ,$
+      verbose = !VERBOSE ))

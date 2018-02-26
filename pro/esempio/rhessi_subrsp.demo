@@ -1,0 +1,49 @@
+;+
+;rhessi_subrsp.demo
+;	read in the RHESSI RSP, break it into sub passbands
+;
+;usage
+;	@rhessi_subrsp.demo
+;
+;requires
+;	!ARDB/hsi_qsrm_20030426_024500.fits
+;
+;side-effects
+;	writes out save file
+;		hsi_qsrm_20030426_024500.save
+;	in $cwd
+;
+;vinay kashyap (Apr2005)
+;-
+
+;	RMF
+hsi_rmfile=filepath('hsi_qsrm_20030426_024500.fits',root_dir=!ARDB)
+
+;	colors
+peasecolr
+
+;	read in RMF
+hsi_rmf=rd_ogip_rmf(hsi_rmfile,effar=hsi_effar)
+
+;	break up RMF
+hsi_rmf_0306=break_rmf(hsi_rmf,[3.0,6.0],effar=hsi_effar0306)
+hsi_rmf_0607=break_rmf(hsi_rmf,[6.0,7.2],effar=hsi_effar0607)
+hsi_rmf_0708=break_rmf(hsi_rmf,[7.2,8.2],effar=hsi_effar0708)
+hsi_rmf_0810=break_rmf(hsi_rmf,[8.2,10.0],effar=hsi_effar0810)
+hsi_rmf_1012=break_rmf(hsi_rmf,[10.0,12.0],effar=hsi_effar1012)
+
+;	plot the effective areas
+plot,hsi_rmf.elo,hsi_effar,chars=1.8,thick=3,/xl,xr=[3,15],/xs,$
+	xtitle='Energy [keV]',ytitle='Effective area [cm^2]',title=hsi_rmfile
+oplot,hsi_rmf_0306.elo,hsi_effar0306,thick=2,col=1
+oplot,hsi_rmf_0607.elo,hsi_effar0607,thick=2,col=2
+oplot,hsi_rmf_0708.elo,hsi_effar0708,thick=2,col=3
+oplot,hsi_rmf_0810.elo,hsi_effar0810,thick=2,col=4
+oplot,hsi_rmf_1012.elo,hsi_effar1012,thick=2,col=5
+
+save,file='hsi_qsrm_20030426_024500.save',$
+	hsi_rmf,hsi_effar,hsi_rmf_0306,hsi_effar0306,$
+	hsi_rmf_0607,hsi_effar0607,$
+	hsi_rmf_0708,hsi_effar0708,$
+	hsi_rmf_0810,hsi_effar0810,$
+	hsi_rmf_1012,hsi_effar1012

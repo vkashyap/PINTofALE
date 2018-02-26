@@ -1,0 +1,32 @@
+;+
+;spectrum.demo
+;	read in an example high-resolution Chandra ACIS-S/HETG spectrum
+;	of HR1099 and plot the data
+;
+;usage
+;	@spectrum.demo
+;
+;requires
+;	!ARDB/demo_v711Tau.save
+;
+;history
+;	LiWei Lin (Apr2005)
+;-
+
+defsysv,'!ARDB',exists=iPoA
+if iPoA eq 0 then message,'requires that INITALE be run first'
+
+restore,filepath('demo_v711Tau.save',root_dir=!ARDB)
+
+data_spec     = SPC_M1P_V711TAU	;observed spectrum [ct/bin]
+data_wvl      = LAM_M1P_V711TAU	;wavlengths for observed spectrum [Ang]
+data_spec_err = SPE_M1P_V711TAU	;errors on observed spectrum [ct/bin]
+effar         = EFFAR_M1P 	;effective area [cm^2]
+wvlar         = WVLAR_M1P 	
+
+plot, data_wvl,data_spec,psym=10,xtitle='Wavelength ['+!AA+']',$
+  ytitle='Counts/bin',title='HR 1099: HETG/MEG +1',xrange=[5.,20.],$
+  yr=[0.1,1200],/ys
+for i=0L,n_elements(data_wvl)-1L do oplot,$
+  data_wvl[i]*[1,1],data_spec[i]+data_spec_err[i]*[-1,1],$
+  color=2 

@@ -1,0 +1,14 @@
+;	(VK, JanMMI) (corrected !METALS; VK NovMMXV)
+message,'Running RD_CONT()',/info
+rd_cont_conemis = rd_cont( $
+  !CEROOT ,$
+  pres    = !GASPR ,$
+  logP    = !LOGPR ,$
+  n_e     = !EDENS ,$
+  wrange  = [!WMIN,!WMAX] ,$
+  dbdir   = !CDBDIR ,$
+  abund   = !ABUND ,$
+  metal   = 10.^!METALS ,$
+  wvl     = rd_cont_wvl ,$
+  logT    = rd_cont_logT ,$		;must be same as !LOGT
+  fcstr   = rd_cont_constr )

@@ -1,0 +1,15 @@
+;       (JJD JanMMI)
+message,'finding blending factor of rd_line lines using BLAND()',/info
+blend_frac = bland( $
+  rd_line_linstr ,$
+  in_dwvl ,$
+  flx    = lineflx_flx ,$
+  wflx   = abs(rd_line_linstr.wvl) ,$
+  dem    = !DEM ,$		; following needed to calculate fluxes
+  abund  = !ABUND ,$	
+  effar  = effar ,$
+  wvlar  = wvlar ,$
+  temp   = 0 ,$
+  noph   = in_noph ,$
+  ikev   = 0 ,$
+  regrid = 0 )

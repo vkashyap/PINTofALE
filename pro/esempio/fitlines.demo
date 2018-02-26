@@ -1,0 +1,37 @@
+;+ 
+;fitlines.demo
+;	set up a call to fitlines starting from a nominal
+;	lineid output
+;
+;usage
+;	@fitlines.demo
+;
+;requires
+;	demo_v711Tau.save and lineid_demo.save in !ARDB
+;
+;history
+;	LiWei Lin (Apr2005)
+;-
+
+defsysv,'!ARDB',exists=iPoA
+if iPoA eq 0 then message,'requires that INITALE be run first'
+
+savfil1=filepath('demo_v711Tau.save',root_dir=!ARDB)
+if keyword_set(savfil1) then restore,savfil1
+
+data_spec     = SPC_M1P_V711TAU	;observed spectrum [ct/bin]
+data_wvl      = LAM_M1P_V711TAU	;wavlengths for observed spectrum [Ang]
+data_spec_err = SPE_M1P_V711TAU	;errors on observed spectrum [ct/bin]
+effar         = EFFAR_M1P 	;effective area [cm^2]
+wvlar         = WVLAR_M1P 
+
+;lineid_idstr = lineid(data_wvl, data_spec, stor=rd_line_linstr, $
+;  n_e=!EDENS, dbdir=!LDBDIR, chifil=1, eqfile=!IONEQF, chidir=!CHIDIR, $
+;  DEM=!DEM*EXPTIM_V711TAU, abund=!ABUND, effar=effar, wvlar=wvlar, $
+;  verbose=!VERBOSE)
+savfil2=filepath('lineid_demo.save',root_dir=!ARDB)
+if keyword_set(savfil2) then restore,savfil2
+
+id_to_fitpar, lineid_idstr, pars, ties, thaw, pos=pos,wdt=wdt,flx=flx
+
+fitstr = fitlines(data_wvl,data_spec,pos=pos,wdt=0.01,flx=flx,/dumb,verbose=10)

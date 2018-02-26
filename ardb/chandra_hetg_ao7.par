@@ -1,0 +1,407 @@
+;+
+;chandra_hetg_ao7.par
+;	generate ACIS-S/HETG spectra for a source using a specified DEM
+;       with the option of comparing lines at two densities
+;
+;description
+;	http://hea-www.harvard.edu/PINTofALE/doc/EXAMPLE_Chandra_HETG.html
+;
+;calling sequence
+;	.run initale
+;	@chandra_hetg_ao7.par
+;
+;(LL;Mar03) 
+;update for ao6 (LL/VK;Mar04)
+;update for ao7 (LL;Feb05)
+;bugfix don't check fore effecive area filename if set 
+;to 'none' (LL;Feb06)  
+;
+;-
+
+defsysv,'!PoA',exists=iPoA
+if iPoA eq 0 then stop,'PINTofALE not initialized; first type .RUN initale'
+
+;--------------------------------------------------------------------------
+;	control variables
+;--------------------------------------------------------------------------
+;	environment
+ !LDBDIR = '$SPEX'		;'$CHIANTI','$SPEX','$APED','/path/to/dir'
+ pimmsdir='/home/llin/pimms/data'    ; path to local PIMMS installation
+
+;	source parameters
+ !NH           = 3e20			; H column density [cm^-2]
+ EDENS1        = 1e09   		; electron number density [cm^-3]
+ EDENS2        = 1e12                    ; electron number density [cm^-3] or 'none'      
+ !ABUND        = getabund('grevesse')   ; elemental abundances (SEE:getabund.pro)
+ T_components  = [6.3, 6.4, 7.4]		; log(T[K]) components in the EM
+ EM_components = [6.1d12, 6.1d12, 7.1d12]	; Emission Measure [cm^-3]
+ obs_rate    = 1.0                    ; ROSAT/PSPC count rate [cts/s] -- SET TO ZERO IF NOT REQUIRED
+
+;	observation parameters
+ EXPTIME       = 50.			 ; nominal exposure time [ks]
+ file_GRMF     = 'aciss_meg1_cy07.grmf'	 ; full path name to grating RMF
+ file_ARFp     = 'none';aciss_meg1_cy07.garf'  ; full path name to +ve order grating ARF or 'none'
+ file_ARFn     = 'aciss_meg-1_cy07.garf' ; full path name to -ve order grating ARF or 'none'
+ ;file_ARFn     = 'none'
+;       analysis parameters
+ !WMIN         = 21.5                   ; minimum wavelength for output spectrum [ang]
+ !WMAX         = 22.4                   ; maximum wavelength for output spectrum [ang] 
+ nwbin         = 400L			; number of bins in theoretical spectrum
+
+;--------------------------------------------------------------------------
+;	do not edit anything below unless you know what you are doing
+;--------------------------------------------------------------------------
+
+;       A Differential Emission Measure (DEM) is required to estimate the
+;       amount of emission at various temperatures. Typically, a 2-temperature
+;       model is used. Here we will use PINTofALE's mk_dem(), which constructs 
+;       a DEM array given a temperature grid and emission measure components.  
+;       We use as the temperature grid !LOGT. The emission measure components
+;       are T_components and EM_components as defined above. We choose 'delta'
+;       to treat the EM components as delta functions (see mk_dem() or the
+;       Chandra/ACIS .par for more options)
+
+;	make the dem 
+!DEM=mk_dem('delta',logT=!LOGT,pardem=T_components,indem=EM_components)
+	;-------------------------------------------------------------
+	;if you wish to use a different DEM, place the definition here
+	;-------------------------------------------------------------
+plot,!logT,!DEM,xtitle='log!d10!n(T [K])',ytitle='DEM [cm!u-5!n/logK]'
+
+;--------------------------------------------------------------------------
+;	check to see whether the ARFs and RMFs exist
+;--------------------------------------------------------------------------
+filexist=findfile(file_GRMF,count=ifilexist)
+if ifilexist eq 0 then stop,file_GRMF+': gRMF does not exist'
+
+filexist=findfile(file_ARFp,count=ifilexist)
+if ifilexist eq 0 and file_ARFp ne 'none' then $
+ stop,file_ARFp+': +ve order ARF does not exist'
+
+filexist=findfile(file_ARFn,count=ifilexist)
+if ifilexist eq 0 and file_ARFn ne 'none' then $
+stop,file_ARFn+': -ve order ARF does not exist'
+
+
+
+;--------------------------------------------------------------------------
+;{	if speed is an issue, and rescaling to ROSAT/PSPC is not required,
+;	comment out the block below
+;--------------------------------------------------------------------------
+
+;DEM renormalization using ROSAT/PSPC count rate
+;--------------------------------------------------------------------------------------
+;       We will assume that a ROSAT/PSPC count rate is available, 
+;       and that the simulation will match this rate.  We will assume
+;       a count rate of 0.2 cts/s .  Data from other missions such
+;       as ASCA, BeppoSAX, etc. can be dealt with in the same manner.
+;       First find and read in the ROSAT/PSPC effective area.
+;       You will need to know where your local PIMMS installation
+;       is to do this.
+
+	       rosat_pspc_open=get_pimms_file('ROSAT','PSPC','OPEN',pdir=pimmsdir)
+               rd_pimms_file, rosat_pspc_open, pspc_effar, pspc_wvlar, /wave
+
+	       ;Make sure that the wavelengths are sorted in increasing order
+	       ae=sort(pspc_wvlar) & pspc_wvlar=pspc_wvlar[ae] & pspc_effar=pspc_effar[ae]
+         
+	 ;A] Read in line cooling emissivities and calculate line intensities
+	 
+               ;Read  line cooling emissivities of all possible
+	       ;lines in the ROSAT/PSPC wavelength range from the atomic data base. 
+	       !EDENS = EDENS1
+	       lconf=rd_line(atom,n_e=!EDENS,wrange=[MIN(pspc_wvlar),MAX(pspc_wvlar)],$
+			     dbdir=!LDBDIR,verbose=!VERBOSE,wvl=LWVL,logT=LLOGT,Z=Z,$
+			          ion=ION,jon=JON,fstr=lstr)
+
+	       ;The output of rd_line.pro will only include level population,
+               ;and not ion balances. We will use fold_ioneq.pro to fold ion balances.
+               if strpos(strlowcase(!LDBDIR),'aped',0) lt 0 then lconf=$
+               fold_ioneq(lconf,Z,JON,chidir=!CHIDIR,$
+                                logT=LLOGT,eqfile=!IONEQF,verbose=!VERBOSE)      
+
+               if strpos(strlowcase(!LDBDIR),'aped',0) ge 0 then  v_ABUND =$
+               !ABUND/getabund('anders & grevesse') else v_ABUND=!ABUND
+
+               ;And now calculate line intensities using lineflx.pro.
+               linint=lineflx(lconf,!LOGT,LWVL,Z,DEM=!DEM,abund=v_ABUND) ;[ph/s]
+
+	 ;B] Read in continuum emissivities and calculate continuum intensities
+	  
+	       ;We can read in continuum emissivities using rd_cont.pro.
+	       ;It is important to note that the output emissivities of rd_cont.pro
+	       ;are in [1e-23 erg cm^3/s/Ang] and not [1e-23 erg cm^3/s] as with rd_line.pro
+	       !EDENS=EDENS1
+               cconf=rd_cont(!CEROOT,n_e=!EDENS,wrange=[min(pspc_wvlar),max(pspc_wvlar)],$
+                      dbdir=!CDBDIR,abund=!ABUND,verbose=!VERBOSE,$
+                      wvl=CWW,logT=ClogT)
+
+	       ;The continuum intensities per angstrom can be calculated again using
+	       ;lineflx.pro. Note that CWW contains the wavelength bin boundaries for 
+	       ;the emissivity array.
+	       CWVL=0.5*(CWW[1:*]+CWW) 
+	       conint=lineflx(cconf,!LOGT,CWVL,DEM=!DEM)   ;[ph/s/Ang]
+
+	       ;Now to get just continuum intensity, we must multiply by an array
+	       ;containing the bin widths. If we define this array simply
+	       ;with:  CDW=CWW[1:*]-CWW, we will get an ugly 'saw-toothed' figure. 
+	       ;(a side-effect of the way the data-base is constructed) To work 
+	       ;around this, we can use CWVL, the mid-bin values, and mid2bound.pro, 
+	       ;which gives intelligent bin-boundary values given mid-bin values:
+
+	       CWB=mid2bound(CWVL) & CDW=CWB[1:*]-CWB
+	       conint=conint*CDW       ;[ph/s/Ang]*[Ang]
+
+	 ;C] Correct for inter-stellar absorption
+
+	       ;Derive ISM absorptions using ismtau.pro
+	       ltau=ismtau(LWVL,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+                           Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+	       ctau=ismtau(CWW,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+                           Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+	       ltrans=exp(-ltau) & ctrans=exp(-ctau)
+
+	       ;Derive theoretical line fluxes
+	       linflx = linint * ltrans        ;[ph/s/cm^2]
+
+	       ;Derive theoretical continuum fluxes
+	       conflx = conint * ctrans        ;[ph/s/cm^2]
+
+	       ;make input theoretical spectrum grid
+	       dwvl=float((max(pspc_wvlar)-min(pspc_wvlar))/nwbin)
+	       wgrid=findgen(nwbin+1L)*dwvl+min(pspc_wvlar)
+ 
+         ;D] Bin spectra and fold in effective area 
+
+	       ;Rebin to form theoretical line spectrum using hastrogram.pro
+	       linspc = hastogram(abs(LWVL),wgrid,wts=linflx)  ;[ph/s/cm^2/bin]
+
+	       ;Rebin to form theoretical continuum spectrum using rebinw.pro
+	       conspc = rebinw(conflx,CWVL,wgrid,/perbin)      ;[ph/s/cm^2/bin]
+
+	       ;Derive predicted flux spectrum.
+	       WVLS=0.5*(WGRID[1:*]+WGRID)
+	       newEffAr=(interpol(pspc_effar,pspc_wvlar,WVLS) > 0) < (max(pspc_effar))
+	       flxspc = (linspc + conspc) * newEffAr
+
+	       ;Derive predicted counts spectrum.
+	       flxspc=flxspc*EXPTIME*1e3               ;[ct/bin]
+
+
+       ;Now get the total count rate and renormalize the DEM to the 
+       ;"observed rate" of 0.1 ct/s. 
+
+       pred_rate = total(flxspc/EXPTIME/1e3)       ;[ct/s]
+       if obs_rate gt 0 then print,'Rescaling DEM by factor '+strtrim(obs_rate/pred_rate,2)
+       if obs_rate gt 0 then !DEM = !DEM * obs_rate/pred_rate
+   ;---------------------------------------------------------------------end dem renorm 
+
+;--------------------------------------------------------------------------
+;	if speed is an issue, comment out the block above if not rescaling
+;	to ROSAT/PSPC rate}
+;--------------------------------------------------------------------------
+
+
+;Spectra Construction
+;-----------------------------------------------------------------------------------
+;       The construction of the simulated spectra is largely a  
+;       repetition of the steps carried out to rescale the DEM. 
+;       It is in fact different only in three aspects: we will use 
+;       Chandra's instrumental response files and account for 
+;       differences in plus/minus orders.  Also, we will convolve 
+;       the resulting spectrum with an RMF (for the DEM normalization,
+;       only the total counts was important). Thridly, because we
+;       seek to look at the Oxygen triplet, we can concentrate on
+;       a small wavelength range, and will read from the emissivity
+;       databases accordingly.  We will repeat steps A through D as
+;       above, and add a step E, RMF Convolution. Also, we will
+;       construct spectra at two different densities: ne = 1e12 and 1e9 [cm-3]
+
+                ;make input theoretical spectrum grid
+	        dwvl=float((!WMAX-!WMIN)/nwbin) & wgrid=findgen(nwbin+1L)*dwvl+!WMIN
+
+	        ;	read in gARFs
+	        if strlowcase(file_ARFp) ne 'none' then $
+	       	         effar_p=rdarf(file_ARFp,ARSTRp) else $
+		 	 effar_p=fltarr(nwbin)
+	        if strlowcase(file_ARFn) ne 'none' then $
+	            	 effar_n=rdarf(file_ARFn,ARSTRn) else $
+			 effar_n=fltarr(nwbin)
+	        if n_tags(ARSTRp) gt 0 then $
+		         wvlar_p=!fundae.KEVANG/(0.5*(ARSTRp.ELO+ARSTRp.EHI)) else $
+		 	 wvlar_p=0.5*(wgrid[1:*]+wgrid)
+	        if n_tags(ARSTRn) gt 0 then $
+			 wvlar_n=!fundae.KEVANG/(0.5*(ARSTRn.ELO+ARSTRn.EHI)) else $
+			 wvlar_n=0.5*(wgrid[1:*]+wgrid)
+
+         ;A] Read in line cooling emissivities and calculate line intensities
+
+	        ;	  read in line emissivities
+	        
+		!EDENS=EDENS1
+		lconf=rd_line(atom,n_e=!EDENS,wrange=[!WMIN,!WMAX],$
+	           dbdir=!LDBDIR,verbose=!VERBOSE,$
+		   wvl=LWVL,logT=LLOGT,Z=Z,ion=ION,jon=JON,fstr=lstr,help=help)
+	        
+		;	  include ion balance
+                
+                if strpos(strlowcase(!LDBDIR),'aped',0) lt 0 then lconf=$		
+		fold_ioneq(lconf,Z,JON,chidir=!CHIDIR,$
+	          logT=LLOGT,eqfile=!IONEQF,verbose=!VERBOSE)
+		  lstr.LINE_INT = lconf
+	        
+		;	calculate line intensities
+		linint=lineflx(lconf,!LOGT,LWVL,Z,DEM=!DEM,abund=v_ABUND) ;[ph/s]
+         
+		;       repeat for second density
+                if strlowcase(EDENS2) ne 'none' then  lconf0=$
+               rd_line(atom,n_e=EDENS2,wrange=[!WMIN,!WMAX],$
+	           dbdir=!LDBDIR,verbose=!VERBOSE,$
+		   wvl=LWVL,logT=LLOGT,Z=Z,ion=ION,jon=JON,fstr=lstr,help=help) else $
+                lconf0= 0
+
+                if strpos(strlowcase(!LDBDIR),'aped',0) lt 0 then  lconf0=$
+               fold_ioneq(lconf0,Z,JON,chidir=!CHIDIR,logT=LLOGT,$
+                                       eqfile=!IONEQF,verbose=!VERBOSE)
+                linint0=lineflx(lconf0,!LOGT,LWVL,Z,DEM=!DEM,abund=v_ABUND) ;[ph/s]
+
+	     ;B] Read in continuum emissivities and calculate continuum intensities
+		    
+		    ;	read in continuum database
+		   
+		    !EDENS=EDENS1
+		    cconf=rd_cont(!CEROOT,n_e=!EDENS,wrange=[!WMIN,!WMAX],$
+		      dbdir=!CDBDIR,abund=!ABUND,verbose=!VERBOSE,$
+		      wvl=CWW,logT=ClogT)
+		    CWVL=0.5*(CWW[1:*]+CWW) & CDW=CWW[1:*]-CWW
+		   
+		    ;	hack to avoid annoying saw-toothed CDW
+		   
+		    CWB=mid2bound(CWVL) & CDW=CWB[1:*]-CWB
+		    
+		    ;	calculate continuum intensities
+		    conint=lineflx(cconf,!LOGT,CWVL,DEM=!DEM)*CDW	;[ph/s/Ang]*[Ang]
+	     
+		    ;       repeat for second density
+		    if strlowcase(EDENS2) ne 'none' then $ 
+		    cconf0=rd_cont(!CEROOT,n_e=EDENS2,wrange=[!WMIN,!WMAX],$
+				   dbdir=!CDBDIR,abund=!ABUND,verbose=!VERBOSE,$
+				   wvl=CWW,logT=ClogT) else $ 
+		    cconf0=0
+		    
+		    CWVL=0.5*(CWW[1:*]+CWW)
+		    conint0=lineflx(cconf0,!LOGT,CWVL,DEM=!DEM)       ;[ph/s/Ang]
+		    CWB=mid2bound(CWVL) & CDW=CWB[1:*]-CWB
+		    conint0=conint*CDW ;[ph/s/Ang]*[Ang]
+	    
+	     ;C] Correct for inter-stellar absorption
+	 
+                ;	derive ISM absorptions
+	        ltau=ismtau(LWVL,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+	       	Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+		ctau=ismtau(CWW,NH=!NH,fH2=!fH2,He1=!He1,HeII=!HeII,$
+		Fano=Fano,wam=wam,/bam,abund=!ABUND,verbose=!VERBOSE)
+		ltrans=exp(-ltau) & ctrans=exp(-ctau)
+
+		;	derive theoretical line fluxes
+		linflx = linint * ltrans	;[ph/s/cm^2]
+	        linflx0 = linint0 * ltrans                    ;[ph/s/cm^2]
+	
+		;	derive theoretical continuum fluxes
+		conflx = conint * ctrans	;[ph/s/cm^2]
+		conflx0 = conint0 * ctrans                    ;[ph/s/cm^2]
+		
+		;	rebin to form theoretical line spectrum
+		linspc = hastogram(abs(LWVL),wgrid,wts=linflx)	;[ph/s/cm^2/bin]
+		linspc0 = hastogram(abs(LWVL),wgrid,wts=linflx0) ;[ph/s/cm^2/bin]
+		
+		;	rebin to form theoretical continuum spectrum
+		conspc = rebinw(conflx,CWVL,wgrid,/perbin)	;[ph/s/cm^2/bin]
+		conspc0 = rebinw(conflx0,CWVL,wgrid,/perbin)     ;[ph/s/cm^2/bin]
+
+	 ;D] Bin spectra and fold in effective area 
+
+		;	derive predicted flux spectrum
+		WVLS=0.5*(WGRID[1:*]+WGRID)
+		newEffArP=(interpol(EFFAR_p,WVLAR_p,WVLS) > 0) < (max(EFFAR_p))
+		newEffArN=(interpol(EFFAR_N,WVLAR_n,WVLS) > 0) < (max(EFFAR_n))
+
+		;	[ct/s/bin] (if DEM is [cm^-5]: [ct/s/cm^2/bin])
+		flxspcP = (linspc + conspc) * newEffArP
+		flxspcN = (linspc + conspc) * newEffArN
+		flxspcP0 = (linspc0 + conspc0) * newEffArP
+		flxspcN0 = (linspc0 + conspc0) * newEffArN
+	
+
+		;	derive predicted counts spectrum
+		flxspcP=flxspcP*EXPTIME*1e3		;[ct/bin]
+		flxspcN=flxspcN*EXPTIME*1e3		;[ct/bin]
+		flxspcP0=flxspcP0*EXPTIME*1e3                  ;[ct/bin]
+		flxspcN0=flxspcN0*EXPTIME*1e3                  ;[ct/bin]
+
+		EGRID=!fundae.KEVANG/WGRID
+
+	 ;E] Convolve with RMF 
+
+		conv_rmf,EGRID,flxspcP,CHANP,CTSPCP,file_gRMF,rmfstr=grmf
+		conv_rmf,EGRID,flxspcN,CHANN,CTSPCN,grmf
+		conv_rmf,EGRID,flxspcP0,CHANP,CTSPCP0,grmf
+		conv_rmf,EGRID,flxspcN0,CHANN,CTSPCN0,grmf
+		CHAN=CHANP
+
+
+;       The final step is a simulation of counts based on the spectrum
+;       predicted above
+	
+	nbin=n_elements(ctspcP)
+	sim_spec=intarr(nbin)
+	CTSIM=intarr(nbin) & CTSIM0=intarr(nbin)
+	ctspc=ctspcP+ctspcN
+        ctspc0=ctspcP0+ctspcN0         ;[ct/bin]
+
+        for i=0L,nbin-1L do if ctspc[i] gt 0 then $
+	     CTSIM[i]=randomu(seed,poisson=ctspc[i])
+        
+	for i=0L,nbin-1L do if ctspc0[i] gt 0 then $
+	       CTSIM0[i]=randomu(seed,poisson=ctspc0[i])
+
+;       Note that the output energy grid of the spectra will be by
+;       default the energy grid defined by the RMF.  The spectrum
+;       however will only show lines and continuum between the
+;       selected wavelength ranges.
+;----------------------------------------------------------------------------
+;       Now to make a comparison plot : 
+
+plot, !fundae.kevang/CHANP, CTSPC, /nodata,$
+	xtitle='['+!AA+']', ytitle='[ct]', /xstyle, /ystyle,$
+	title='Compare O VII triplet at two densities with ACIS/HETGS/MEG',$
+	xrange=[!WMIN,!WMAX], yrange=[0,1.1*max(ctspc)], thick=2
+oplot, !fundae.kevang/CHANP, CTSIM, thick=2, psym=10, color=2
+if strlowcase(EDENS2) ne 'none' then $
+	oplot, !fundae.kevang/CHANP, CTSIM0, thick=2, psym=10, color=3
+stample
+
+;	report
+print,'' & print,'' & print,''
+print,'The simulated counts spectra are in: ' 
+	print,'                CTSIM(chan)  (for density='+strtrim(edens1,2)+')'
+	if strlowcase(edens2) ne 'none' then $
+	print,'                CTSIM0(chan) (for density='+strtrim(edens2,2)+')'
+print,'The redistributed counts spectra are in: '
+	print,'		CTSPC(chan) = ctspcP(chanP) + ctspcN(chanN) [ct/bin]'
+	if strlowcase(edens2) ne 'none' then $
+	print,'		CTSPC0(chan) = ctspcP0(chanP) + ctspcN0(chanN) [ct/bin]'
+print,'The idealized flux spectra are in: '
+	print,'		flxspcP(wgrid) and flxspcN(wgrid) [ct/bin]'
+	if strlowcase(edens2) ne 'none' then $
+	print,'		flxspcP0(wgrid) and flxspcN0(wgrid) [ct/bin]'
+print,'The theoretical line fluxes are in: '
+	print,'		linspc(lwvl) [ph/s[/cm^2]]'
+	if strlowcase(edens2) ne 'none' then $
+	print,'		linspc0(lwvl) [ph/s[/cm^2]]'
+print,'The theoretical continuum fluxes are in: '
+	print,'		conspc(cwvl) [ph/s[/cm^2]]'
+	if strlowcase(edens2) ne 'none' then $
+	print,'		conspc0(cwvl) [ph/s[/cm^2]]'
+print,'' & print,'' & print,''
+print,'' & print,'' & print,''

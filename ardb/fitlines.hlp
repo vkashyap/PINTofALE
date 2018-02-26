@@ -1,0 +1,109 @@
+         Fit 3-parameter family of functions to 1-D data
+							            2000-02-23
+I: GUI
+II: Usage
+III: Features
+
+
+                   I: Brief description of GUI
+
+                            First Row
+
+FIT: fit the defined MODEL to the data over specified XRANGE
+VIEW: plot data and models
+--> SHOW: display in X-windows
+--> Hardcopy: make postscript plot
+--> Set Default: change plot attributes via keyboard
+    (type Q to return to widget control)
+XRANGE: change range over which data are fit
+--> Cursor: interactively select the range
+--> Keyboard: enter Xmin, Xmax via keyboard
+--> Guess: take a guess based on thawed positions
+--> RESET: reset range to default value
+MODEL: control model components and parameters
+--> Freeze All: Freeze all parameters
+--> Thaw All: Thaw all parameters
+--> Freeze Unimportant: Freeze all parameters outside chosen XRANGE
+--> Delete Component: Delete a model component (try not to do this!)
+--> ADD Component: add a component to the models (use wisely!)
+CONTINUUM: define the continuum
+--> (sub XRANGE): remove lines from chosen sub range
+--> (full XRANGE): remove lines over entire spectrum
+--> Piecewise: interactively set a piecewise linear continuum
+--> ACCEPT: unless *accepted*, newly defined continuum will not take effect
+--> RESET: rest continuum to the original values
+WIDTH: parameter for CONTINUUM, approximate line width [pixels]
+THRESHOLD: parameter for CONTINUUM, threshold to flag a feature as
+    significantly above background [Gaussian $\sigma$]
+QUIT: quit program
+
+                           Second Row
+
+Status messages.
+
+                            Third Row
+
+HELP: display this document
+RENORM: renormalize non-frozen fluxes to match the summed spectrum
+UNDO FIT: replace fit parameters and errors with pre-fit values
+SAVE: replace original values of fit parameters/errors with current values
+Reset Original: EMERGENCY RESET to original values
+DUMP: dump the current state to an IDL save file.  this state may be
+    recovered using FITLINES_UNDUMP.PRO
+ERRORS: compute projection errors
+dCHI: change in chisq to use to find projection error bounds
+Fit Algorithm: LevMarq and IDL's native CURVEFIT are implemented
+    (But CURVEFIT does not handle frozen parameters)
+
+                           Fourth Row
+
+Left column: Entry fields to edit parameter values of specified component.
+-- Type index in topmost field to access the parameters for that component.
+-- Position      is echoed and may be changed in the second field from the top.
+-- Width         is echoed and may be changed in the third field from the top.
+-- Flux       	 is echoed and may be changed in the fourth field from the top.
+-- Function type is echoed and may be changed in the bottommost field.
+	Valid function types (if FUNCS=X3MODEL) are
+	Gaussian ("G" "g" "gauss" "Gaussian" etc.)
+	Lorentzian ("L" "l" "lor" "lorentz" etc.)
+	Beta-profile ("Beta=<value>" "b=<value>" "beta <value>"
+		"beta:<value>" "beta<tab><value>" etc.)
+	Asymmetric Beta-profile ("slant=<angle>,<beta>" "s:<a> <b>", etc.)
+	Broken Power-law ("pl=<break>")
+		-- in this case, "Position" and "Width" actually refer to
+		the two power-law indices
+
+Right column: list of model parameters with checkboxes to freeze or thaw
+    particular parameters.
+
+                            Fifth Row
+
+TIES: set up constraints on parameters
+--> Positions: force positions to be within dPOS
+--> Widths: force widths to be within dWDT
+--> Fluxes: force fluxes to be within dFLX*YSIGMA
+DELETE: delete parameter constraints
+--> Selected: delete constraints selected with mouse clicks
+--> Clear All: delete them all, god will know her own.
+EDIT: edit selected constraint
+ADD: add a new constraint
+
+                            Sixth Row
+
+dPOS: leeway for position constraints, held to +- dPOS
+dWDT: leeway for width constraints, held to +- dWDT
+dFLX: leeway for flux constraints, held to +- dFLX*YSIGMA
+
+List of all existing ties.
+
+
+
+                   II. How to use this program
+
+     http://hea-www.harvard.edu/PINTofALE/FITLINES.howto
+
+
+
+                          III. Features
+
+TBW.

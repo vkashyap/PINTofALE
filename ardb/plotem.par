@@ -1,0 +1,19 @@
+;	(VK Dec1998; JJD JanMMI)
+message,'plotting the output of POTEM_TOOL() with PLOTEM',/info
+plotem, $
+  !LOGT ,$			;temperature grid
+  potem_tool_em ,$		;emission measures
+  idstr   = lineid_idstr ,$	;ID structure, to figure out labels
+  markmin = 0, $		;mark only the locations of the minima?
+  multid  = potem_too_multid ,$
+  lcol    = 200 ,$			;color for labels
+  lsiz    = 1 ,$			;size of labels
+  xtitle  = 'log!d10!n(T [K])' ,$
+  ytitle  = 'EM [cm!u-5!n]' ,$
+  title   = 'Emission Measure Upper Limits' ,$
+  xrange  = plotem_xra ,$
+  yrange  = plotem_yra ,$
+  xstyle  = 1 ,$
+  ystyle  = 1 ,$
+  xlog    = 0 ,$
+  ylog    = 1

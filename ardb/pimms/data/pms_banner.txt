@@ -1,0 +1,3 @@
+*** PIMMS version 4.8a ***
+    2015 Dec 16th Release
+    Reading mission directory, please wait

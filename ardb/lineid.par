@@ -1,0 +1,40 @@
+;	(VK, JanMMI)
+message,'Running LINEID()',/info
+lineid_idstr = lineid( $
+  data_wvl ,$
+  data_spec ,$
+  elem ,$
+  wrng    = in_wrng ,$
+  wshift  = in_wshift ,$
+  locmax  = 0 ,$
+  best    = -1 ,$
+  topX    = -20.01 ,$
+  batch   = 0 ,$
+  stor    = emis_str ,$
+  oldid   = old_lineid_idstr ,$
+  omatch  = 1 ,$
+  pres    = !GASPR ,$
+  logP    = !LOGPR ,$
+  n_e     = !EDENS ,$
+  dbdir   = !LDBDIR ,$
+  allah   = 0 ,$
+  chifil  = 1 ,$
+  eqfile  = !IONEQF ,$
+  chidir  = !CHIDIR ,$
+  DEM     = !DEM ,$
+  abund   = !ABUND ,$
+  effar   = effar ,$
+  wvlar   = wvlar ,$
+  sigmay  = data_spec_err ,$
+  xsize   = xsize ,$
+  ysize   = ysize ,$
+  wid     = wid ,$
+  dynrng  = 3 ,$
+  oxr     = pickrange_oxr ,$
+  oyr     = pickrange_oyr ,$
+  markw   = in_markw ,$
+  markp   = 1 ,$
+  markc   = 222 ,$
+  marks   = 1 ,$
+  marko   = 90 ,$
+  quiet = (not keyword_set(!VERBOSE)) > 0 )

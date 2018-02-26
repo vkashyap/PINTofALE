@@ -1,0 +1,14 @@
+;	(VK, DecMM)
+message,'Running FOLD_IONEQ(); requires RD_LINE() output',/info
+fold_ioneq_linemis = fold_ioneq( $
+  rd_line_linemis ,$			;output of RD_LINE()
+  rd_line_Z ,$				;output of RD_LINE()
+  rd_line_JON ,$			;output of RD_LINE()
+  logT    = rd_line_logT ,$		;output of RD_LINE()
+  tmax    = fold_ioneq_tmax ,$
+  trng    = fold_ioneq_trng ,$
+  level   = 0.1 ,$
+  chifil  = 1 ,$
+  chidir  = !CHIDIR ,$
+  eqfile  = !IONEQF ,$
+  verbose = !VERBOSE )

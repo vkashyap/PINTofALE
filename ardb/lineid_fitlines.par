@@ -1,0 +1,40 @@
+;	(JJD, JanMMI)
+message,'Setting up to use output of LINEID in FITLINES',/info
+if n_tags(lineid_idstr) eq 0 then message,'Require ID structure from LINEID()'
+;	get the number of independent line features --
+fitlines_pos=lineid_idstr.WVL & ncomp=n_elements(fitlines_pos)
+;	set the first guess fluxes to those already in the ID structure
+fitlines_flx=fltarr(ncomp)
+for i=0L,ncomp-1L do fitlines_flx[i]=total(lineid_idstr.(i+1).FLUX)
+;	make labels for each feature
+fitlines_epithet=strarr(ncomp) & all_labels=idlabel(lineid_idstr,j,/Wbeda)
+for i=0L,n_elements(j)-1L do $
+	fitlines_epithet[j[i]]=fitlines_epithet[j[i]]+all_labels[i]+' '
+
+; now ready for FITLINES
+message,'Running FITLINES()',/info
+fitlines_fitstr = fitlines( $
+  data_wvl ,$
+  data_spec ,$
+  ysig    = data_spec_err ,$
+  pos     = fitlines_pos ,$
+  perrp   = fitlines_perrp ,$
+  perrm   = fitlines_perrm ,$
+  perrc   = fitlines_perrc ,$
+  flx     = fitlines_flx ,$
+  ferrp   = fitlines_ferrp ,$
+  ferrm   = fitlines_ferrm ,$
+  ferrc   = fitlines_ferrc,$
+  wdt     = fitlines_wdt ,$
+  werrp   = fitlines_werrp ,$
+  werrm   = fitlines_werrm ,$
+  werrc   = fitlines_werrc,$
+  thaw    = fitlines_thaw ,$
+  type    = fitlines_type ,$
+  epithet = fitlines_epithet ,$
+  ties    = fitlines_ties ,$
+  conlev  = fitlines_conlev ,$
+  consig  = fitlines_consig ,$
+  dumb    = 1 ,$
+  verbose = !verbose )
+fitlines_flxerr = 0.5*(fitlines_fitstr.ferrp+fitlines_fitstr.ferrm)

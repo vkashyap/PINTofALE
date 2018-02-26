@@ -1,0 +1,15 @@
+;	(JJD, JanMMI; further mangled by VK)
+message,'Running ISMTAU(); requires wavelengths as input',/info
+ismtau_tau = ismtau( $
+      abs(in_wvl) ,$			;output of RD_LINE(), for example
+      NH      = !NH ,$
+      fH2     = !FH2 ,$
+      He1     = !HE1 ,$
+      HeII    = !HEII ,$
+      Fano    = 0 ,$
+      ikeV    = 0 ,$
+      wam     = 0 ,$
+      bam     = 1 ,$
+      mam     = 0 ,$
+      abund   = !ABUND ,$
+      verbose = !VERBOSE )

@@ -1,0 +1,7 @@
+from exosat me
+inst xte pca
+mo plasma 1 1.0 5e19
+go 1
+model plasma 1.0 1 1e20
+plasma mekal
+go 1

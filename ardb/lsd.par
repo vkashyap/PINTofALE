@@ -1,0 +1,28 @@
+;       (VK, DecMM)
+message,'Running LSD()',/info
+lsd_list = lsd( $
+  [!WMIN,!WMAX] ,$
+  lsd_flx ,$
+  lsd_wvl ,$
+  elem    = in_elem ,$
+  edens   = in_edens ,$
+  DEM     = !DEM ,$
+  tlog    = !LOGT ,$
+  dbdir   = !LDBDIR ,$
+  ceiling = in_ceiling ,$
+  flor    = in_flor ,$
+  ratmax  = lsd_ratmax ,$
+  flxmax  = lsd_flxmax ,$
+  outZ    = lsd_Z ,$
+  outIon  = lsd_Ion ,$
+  chifil  = 1 ,$
+  chidir  = !CHIDIR ,$
+  eqfile  = !IONEQF ,$
+  abund   = !ABUND ,$
+  temp    = 0 ,$
+  noph    = 0 ,$
+  effar   = effar ,$
+  wvlar   = wvlar ,$
+  ikeV    = 0 ,$
+  tol     = 1e-4 )
+

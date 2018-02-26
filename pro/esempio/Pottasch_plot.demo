@@ -1,0 +1,46 @@
+;+ 
+;Pottasch_plot.demo
+;	create pottasch curve plot for stellar data using 
+;	potem_tool.pro and plotem.pro 
+;
+;usage
+;	@Pottasch_plot.demo
+;
+;requires
+;	!ARDB/AUMICftstr.save
+;	!ARDB/AUMICidstr.save
+;	!ARDB/aciss_meg-1_cy07.garf
+;	!ARDB/aciss_meg1_cy07.garf
+;
+;history
+;	LiWei Lin 4/10/05 
+;- 
+
+;      /home/llin/AUMIC/sav/
+restore, filepath('AUMICftstr.save',root_dir=!ARDB)
+restore, filepath('AUMICidstr.save',root_dir=!ARDB)
+
+  fitstr =  AUMICftstr 
+  oo = sort(fitstr.pos)
+  flx  = fitstr.flx(oo) 
+  wvl  = fitstr.pos(oo) 
+  con  = reverse(fitstr.conlev)
+  conx = reverse(fitstr.conlevx)
+  erru = 0.5*(fitstr.ferrp(oo)+fitstr.ferrm(oo))
+
+;FOLD IN EFFECTIVE AREAS to get ph/cm^2
+;      /home/llin/PoAdemo/synthspec/MEG/
+
+  arf_1p = mrdfits(filepath('aciss_meg-1_cy07.garf',root_dir=!ARDB),1,head) 
+  arf_1m = mrdfits(filepath('aciss_meg1_cy07.garf',root_dir=!ARDB),1,head) 
+  effarm = reverse(arf_1p.specresp + arf_1m.specresp)
+  wvlarm = reverse(0.5*(arf_1p.bin_lo+arf_1p.bin_hi))
+  fold = fltarr(n_elements(flx)) 
+   
+for j = 0, n_elements(flx) - 1 do fold(j) = effarm(where(hastogram(wvl(j), reverse(arf_1p.bin_hi)) eq 1))
+flx=flx/fold
+erru=erru/fold
+
+abund = getabund('feldman')
+demis = potem_tool(aumicidstr, flx, abund = abund)
+plotem, !logt, demis

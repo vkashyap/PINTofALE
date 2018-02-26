@@ -1,0 +1,136 @@
+*       This is PIMMS Version 2.2 (No image simulation)
+*                                 XTE, SAX and ASCA specials
+*       New command 'LOG' added in version 2.3
+*	Version 2.4
+*                    XTE update
+*                    'Normalization' as a possible 'instrument'
+*                    A bunch of minor bug fixes
+*       Version 2.4b
+*                    SAX update
+*                    *.sys files update to handle long filenames
+*
+*       Version 2.5
+*                    AXAF specific routines (beta-release)
+*                    Support for entering flux range in Angstroms
+*                    Allows 'positive' slope power laws.
+*
+*       Version 2.6
+*                    XMM and ASTRO-E specific routines
+*       Version 2.6a
+*                    New XMM and ASTRO-E routines
+*       Version 2.6b
+*                    Updated handling of EPIC pile-up at high count rate
+*       Version 2.6c
+*                    Updated XTE PCA information for Epoch 4
+*                    1999 May 03
+*       Version 2.7
+*                    Updated ASTRO-E effective area curves;
+*                    Including 2/3 PCU support for XTE
+*
+*       Version 3.0
+*                    Includes Integral and Chandra AO-2 support
+*                    Added @file capability in the command interpreter
+*                    Now supports multi-component models
+*       Version 3.1a
+*                    Minor clean-ups in get_param.f, pms_slmdl.f, pms_write.f
+*                    Chandra AO-3 suport 
+*               3.1b Clarification of Chandra grating rates
+*               3.1c Fixed the extrapolation bug for file-based models
+*                    (inc. Raymond-Smith).  If there was one such component,
+*                    the problem was subtle; multi-component models with
+*                    multiple RS were often grossly wrong when extrapolated.
+*       Version 3.2  Updated XMM information for AO-2 but does not yet
+*                    contain a new pile-up formula for EPIC-PN
+*               3.2a Minor tweaks in pms_docrt.f, tranmm.f and xrs_pileup.f
+*                    which should not affect the outputs.
+*               3.2b One bug fix in pms_docrt.f
+*               3.2c Continued to fix pms_docrt.f, also tweaked sax_limit.f
+*                    and updated XTE HEXTE effective area curves.
+*               3.2d A bug fix in pms_slmdl.f, another in pms_rarea.f,
+*                    released with Chandra Cycle 4 effective area curves.
+*       Version 3.3  Added "density" (flux density).  2002 November
+*                    Chandra Cycle 5 effective area curves
+*               3.3a Only change in code is the banner displayed;
+*                    released with new XMM effective area curves for AO-3
+*       Version 3.4  Added "tranuvo" for UV/optical/IR extinction, so that
+*                    Swift UVOT can be included.      2003 September
+*               3.4a Only change is the substitution of new effective area
+*                    curves for Chandra AO-6          2004 January
+*       Version 3.5  Replaced ASTRO-E specific routines with the Astro-E2
+*                    version, including XRS pileup    2004 July
+*       Version 3.6  Updated XMM-Newton effective area for AO-4
+*                    and fixed a bug in pms_slmdl     2004 September
+*       Version 3.6a Now includes minor update in XMM-Newton RGS area
+*       Version 3.6b Now includes Chandra Cycle 7 effective area curves.
+*       Version 3.6c New (per detector) effective area curve for Swift BAT
+*       Version 3.7  Additional "Specials" on input instruments
+*                    along with updated areas for Swift XRT, XMM EPIC,
+*                    and RXTE PCA.
+*       Version 3.7a Minor updates for Suzaku
+*       Version 3.8  Updates for Swift/BAT and XMM/EPIC-pn burst modes
+*       Version 3.8a  Updates for Swift/XRT
+*       Version 3.9  Updates for XMM AO-6; minor bug fix for Linux users
+*       Version 3.9a  Updates for Suzaku Cycle 2
+*       Version 3.9b  Bug fix for redshifted Raymond-Smith model
+*                     and new effective area curve for Chandra
+*       Version 3.9c Update for XMM AO-7; changes in pn to PATTERN=0
+*       Version 3.9d Update for Suzaku Cycle 3 - effective area curve
+*                     substitution and documentation updates.
+*       Version 3.9e Updated effective area curves for Chandra AO-10
+*       Version 3.9f Updated effective area curves for Con-X, XEUS,
+*                     Swift UVOT, and Integral (but without background)
+*       Version 3.9g Updated effective area curves for Swift XRT
+*                     and XMM-Newton EPIC (with MOS1 timing mode warning)
+*       Version 3.9h Updated effective area curves for Suzaku
+*                     and included detection limit for HXD
+*       Version 3.9i Updated HXD limit calculation (now includes statistical
+*                     fluctuation of the model-based background files),
+*                     band-limited case for pms_docrt for columns 2-n (now
+*                     inherits the limited energy range), and updated
+*                     "further info" message
+*       Version 3.9j Updated Chandra effective area curves for AO-11
+*       Version 3.9k Updated Suzaku effective area curves/HXD bgd for AO-5
+*
+*       Version 4.0  A major update released in 2010 February
+*                    - now includes APEC (default), mekal, and Raymond-Smith
+*                      as plasma models
+*                    - Incluedes nustar and IXO, retired Con-X, Xeus, and SXG
+*                    - Chandra updated for AO-12
+*	Version 4.1  Upon XMM project request, changing EPIC back to an
+*                     effectively infinite extraction region.  Added ASTRO-H.
+*       Version 4.1a Minor correction: V4.1 claimed EPIC MOS rate was for
+*                       patterns 0-4 in screen output and in documentation,
+*                       while in fact it was for patterns 0-12
+*       Version 4.1b Updated effective area curves for XMM-Newton and IXO,
+*                       and an updated version of pms_slmdl.f which conforms
+*                       more strictly to the Fortran standard.
+*	Version 4.2 Updated hxd_limit.f with new background numbers for AO-6
+*                       and removed comments about HXD nominal count rates
+*       Version 4.2a Updated the Chandra effective area curves for AO-13
+*                       proposers.  Of the various instrument configurations,
+*                       the HRC-I effective curves changed the most.
+*       Version 4.3 Updated mission-specific outputs for Integral JEM-X,
+*                       which has two operational units since 2010 Oct.
+*       Version 4.4 Included NuSTAR; updated effective area curves for
+*                       ASTRO-H and included initial pile-up estimates for SXS;
+*                       updated Suzaku and XMM-Newton effective area curves
+*       Version 4.5 Updated Chandra effective area curves for Cycle 14,
+*                       and a bug fix for ahmake.f for strict compilers.
+*	Version 4.6 Added NICER preliminary effective area curve,
+*                       and added a instrument-specific feature to
+*                       estimate 3 and 5-sigma detection times for ASTRO-H SGD
+*       Version 4.6b Expanded the array size for missions/instruments.
+*       Version 4.7 Added MAXI GSC and SSC and HEAO-1 A1 (AGCL and AGCP gain
+*                       settings); substantially updated NuSTAR using
+*                       post-launch calibration files; updated APEC plasma
+*                       model files using ATOMDB version 2.0.2
+*       Version 4.7a Changed upper energy bound of NuSTAR from 80 to 79 keV
+*                       and emphasized the two-module nature.
+*       Version 4.7b Clean-up of NuSTAR dead-time fraction display for >99%
+*                       and XMM EPIC effective area curves updated for AO-14
+*       Version 4.7c Chandra effective area curves for Cycle 17 and Suzaku
+*                       XIS effective area curves for AO-10
+*       Version 4.7d Updated effective area curve for NICER.
+*       Version 4.8  Completely revised the pile-up calculation for XMM EPIC
+*                    New effective area curves for ASTRO-H HXI and XMM EPIC
+*       Version 4.8a Chandra effective area curves for Cycle 18

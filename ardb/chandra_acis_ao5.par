@@ -1,0 +1,90 @@
+;+
+;chandra_acis_ao5.par
+;	generate an ACIS spectrum for a source using a DEM,
+;	and optionally rescale the DEM to produce the same
+;	counts as a ROSAT/PSPC observation
+;
+;calling sequence
+;	.run initale
+;	@chandra_acis_ao5.par
+;
+;(VK; Mar03)
+;-
+
+;--------------------------------------------------------------------------
+;	control variables
+;--------------------------------------------------------------------------
+;	environment
+ !LDBDIR = '$APED'		;'$CHIANTI','$SPEX','$APED','/path/to/dir'
+ pimmsdir = '/soft/pimms/data'	;path to local PIMMS installation
+;	source parameters
+ !NH           = 3e20			;H column density [cm^-2]
+ !EDENS        = 1e10			;electron number density [cm^-3]
+ T_components  = [6.9,    7.4]		;log(T[K]) components in the EM
+ EM_components = [5.1d12, 6.1d12]	;Emission Measure [cm^-3]
+ obs_rate      = 0.1			;ROSAT/PSPC rate [ct/s] -- SET TO ZERO IF NOT REQUIRED
+;	observation parameters
+ EXPTIME       = 50.			;nominal exposure time [ks]
+ ACIS_ARF      = !ARDB+'/acisi_aimpt_cy05.arf'	;location of Cycle 5 ARF
+ ACIS_RMF      = !ARDB+'/acisi_aimpt_cy05.rmf'	;location of Cycle 5 RMF
+
+;--------------------------------------------------------------------------
+;	do not edit anything below unless you know what you are doing
+;--------------------------------------------------------------------------
+!DEM=mk_dem('delta',logT=!LOGT,pardem=T_components,indem=EM_components)
+src_DIST      = 10.			;source distance [pc]
+src_DCOR = 10.D^(alog10(4.*!DPI)+2.*alog10(src_DIST*3.1d18))
+!DEM = !DEM * src_DCOR
+v_DIST=src_DIST			;distance in [pc]
+
+;--------------------------------------------------------------------------
+;{	if speed is an issue, comment out the block below if not rescaling
+;	to ROSAT/PSPC rate
+;--------------------------------------------------------------------------
+rosat_pspc_open=get_pimms_file('ROSAT','PSPC','OPEN',pdir=pimmsdir)
+rd_pimms_file, rosat_pspc_open, pspc_effar, pspc_wvlar, /wave
+ae=sort(pspc_wvlar) & pspc_wvlar=pspc_wvlar[ae] & pspc_effar=pspc_effar[ae]
+v_LOGT=!LOGT			;temperature grid
+v_DEM=!DEM			;DEM in [cm^-3]
+v_EFFAR=pspc_effar > 0		;effective area in [cm^2]
+v_WVLAR=pspc_wvlar		;effective area wavelength grid in [Ang]
+v_WGRID=mid2bound(pspc_wvlar)	;sorted wavelength bin boundaries in [Ang]
+v_RMF='none'			;name of OGIP-compatible RMF
+v_EXPTIME=EXPTIME		;nominal exposure time [ks]
+;
+.run make_spectrum
+;
+pred_rate = total(v_flxspc/v_EXPTIME/1e3)	;[ct/s]
+if obs_rate gt 0 then !DEM = !DEM * obs_rate/pred_rate
+if obs_rate gt 0 then print,'Rescaling DEM by factor '+strtrim(obs_rate/pred_rate,2)
+;--------------------------------------------------------------------------
+;	if speed is an issue, comment out the block above if not rescaling
+;	to ROSAT/PSPC rate}
+;--------------------------------------------------------------------------
+
+acisi_effar=rdarf(ACIS_ARF,arstr)
+elo=arstr.ELO & ehi=arstr.EHI & wlo=12.3985/ehi & whi=12.3985/elo
+wlo=reverse(wlo) & whi=reverse(whi) & acisi_effar=reverse(acisi_effar)
+wgrid=[wlo,max(whi)] & midwvl=0.5*(wgrid+wgrid[1:*])
+v_LOGT=!LOGT			;temperature grid
+v_DEM=!DEM			;DEM in [cm^-3]
+v_EFFAR=acisi_effar		;effective area in [cm^2]
+v_WVLAR=midwvl			;effective area wavelength grid in [Ang]
+v_WGRID=wgrid			;sorted wavelength bin boundaries in [Ang]
+v_RMF=ACIS_RMF			;name of OGIP-compatible RMF
+v_EXPTIME=EXPTIME		;nominal exposure time [ks]
+;
+.run make_spectrum
+;
+nbin=n_elements(v_CTSPC)
+sim_spec=intarr(nbin)
+for i=0L,nbin-1L do $
+  if v_CTSPC[i] gt 0 then sim_spec[i]=randomu(seed,poisson=v_CTSPC[i])
+;
+plot,v_CHAN,v_CTSPC,xtitle='[keV]',ytitle='[ct]',/xl,xr=[0.5,7],$
+  /yl,yr=[0.1,max(v_CTSPC)],thick=2
+oplot,v_CHAN,sim_spec,psym=10,color=3
+;
+print,''
+print,''
+print,''

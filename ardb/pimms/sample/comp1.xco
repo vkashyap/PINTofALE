@@ -1,0 +1,5 @@
+mo plasma 6.6 logt 1.0 3e19 plasma 7.2 logt 1.0 3e19 0.5 1.0
+output apec2t 0.1 4.0 0.002
+inst rosat pspc open
+from flux ergs 0.1-2.0 u
+go 3e-11

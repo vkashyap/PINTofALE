@@ -1,0 +1,21 @@
+;	(VK, DecMM)
+message,'Running RD_LINE()',/info
+rd_line_linemis = rd_line( $
+  atom ,$				;no need to define this variable
+  pres    = !GASPR ,$
+  logP    = !LOGPR ,$
+  n_e     = !EDENS ,$
+  wrange  = [!WMIN,!WMAX] ,$
+  dbdir   = !LDBDIR ,$
+  wvl     = rd_line_wvl ,$
+  logT    = rd_line_logT ,$		;should be same as !LOGT
+  z       = rd_line_z ,$
+  ion     = rd_line_ion ,$
+  jon     = rd_line_jon ,$
+  src     = rd_line_src ,$
+  desig   = rd_line_desig ,$
+  econf   = rd_line_econf ,$
+  fstr    = rd_line_linstr ,$
+  allah   = 0 ,$
+  help    = 0 ,$
+  verbose = !VERBOSE )

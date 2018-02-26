@@ -1,0 +1,33 @@
+;	(VK Dec1998; JJD MMI)
+message,'Running POTEM_TOOL()',/info
+potem_tool_EM=potem_tool( $
+  lineid_idstr ,$		;ID structure
+  in_flx ,$			;observed fluxes
+  logT    = !LOGT ,$		;temperature grid for output
+  abund   = !ABUND ,$		;abundances
+  ldir    = in_ldir ,$		;set to DBDIR if IDSTR.(#).EMIS is to be ignored
+  dwvl    = 5e-3 ,$		;roundoff error on input matching wavelengths
+  okmult  = 0 ,$		;set to 1 to obtain one EM curve for each match
+  kettle  = 0 ,$		;if set, calls POTTASCH
+  outid   = potem_tool_outid ,$	;returns a "collapsed" ID structure
+  multid  = potem_tool_multid ,$
+  verbose = !VERBOSE ,$
+  pres    = !GASPR ,$		;RD_LINE
+  logp    = !LOGPR ,$
+  n_e     = !EDENS ,$
+  chifil  = 1 ,$		;FOLD_IONEQ
+  eqfile  = !IONEQF ,$
+  chidir  = !CHIDIR ,$		;RD_IONEQ
+  noph    = 0 ,$		;FLUX_TO_EM
+  defEM   = defEM ,$
+  thresh  = 1e-2 ,$
+  temp    = 0 ,$		;LINEFLX
+  ikeV    = 0 ,$
+  effar   = effar ,$
+  wvlar   = wvlar ,$
+  NH      = !NH ,$		;ISMTAU
+  fh2     = !FH2 ,$		;ISMTAU
+  He1     = !He1 ,$
+  HeII    = !HeII ,$
+  Fano    = 1 ,$
+  level   = 0.1 )		;POTTASCH

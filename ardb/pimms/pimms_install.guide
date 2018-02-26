@@ -1,0 +1,29 @@
+How to install PIMMS
+====================
+
+The gzip'ed tar file is available at
+	ftp://legacy.gsfc.nasa.gov/software/tools/pimms4_8a.tar.gz
+
+After downloading this file into a suitable directory,
+
+% gunzip pimms4_8a.tar
+% tar xvf pimms4_8a.tar
+
+should create four subdirectories: data, models, sample and source.
+
+Goto the source subdirectory and edit the file called 'sitespec.inc'
+so that ddir_name correctly points to the data, and mdir_name
+to the models subdirectory.
+
+% make arch=linux
+
+The makefile allows for linux, darwin (Mac OS X), solaris, alpha, sun (for
+pre-Solaris SunOS), and dec (Ultrix), although recent versions have not
+been tested on many of the legacy systems.  PIMMS does not make extensive
+use of sstem dependent features, so it should work, possibly with some
+effort, on all UNIX and UNIX-like systems.  The make command will leave
+the executable, pimms, in the directory above source; there you can find
+the LaTeX documentation file pimms.tex.
+
+On some systems, it may be necessary to insert a line specifying the fortran
+compiler (e.g., "FC = gfortran") in the Makefile.

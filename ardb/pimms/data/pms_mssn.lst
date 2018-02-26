@@ -1,0 +1,174 @@
+'CHANDRA',10
+ 'ACIS-I',0
+ 'ACIS-S',0
+ 'HRC-I',0
+ 'HRC-S',0
+ 'HETG-ACIS-I',1
+  'ORDER0'
+ 'HETG-ACIS-S',4
+  'HEG1MEG1'
+  'HEG1'
+  'MEG1'
+  'ORDER0'
+ 'LETG-ACIS-I',1
+  'ORDER0'
+ 'LETG-ACIS-S',2
+  'LETG1'
+  'ORDER0'
+ 'LETG-HRC-I',1
+  'ORDER0'
+ 'LETG-HRC-S',3
+  'LETGHI'
+  'LETG1'
+  'ORDER0'
+'ASCA',2
+ 'SIS',0
+ 'GIS',0
+'ASTROH',4
+ 'SXS',4
+  'OPEN'
+  'OBF'
+  'BE25'
+  'BE50'
+ 'SXI',0
+ 'HXI',2
+  'ALL'
+  'TOP'
+ 'SGD',0
+'BBXRT',1
+ 'A0',0
+'CGRO',1
+ 'OSSE',0
+'EINSTEIN',3
+ 'HRI',0
+ 'IPC',0
+ 'MPC',0
+'EUVE',5
+ 'SW',0
+ 'MW',0
+ 'LW',0
+ 'SCANNER',2
+  'ALTIC'
+  'LEXB'
+ 'DS',2
+  'ALC'
+  'LEXB'
+'DRIVEL',0
+'EXOSAT',3
+ 'ME',0
+ 'GSPC',0
+ 'LE',5
+  'LX3'
+  'LX4'
+  'ALP'
+  'BRN'
+  'OPEN'
+'GINGA',1
+ 'LAC',2
+  'TOP'
+  'BOTH'
+'HEAO1',1
+ 'A4',0
+'INTEGRAL',2
+ 'ISGRI',0
+ 'JEMX',0
+'IXO',7
+ 'XMS',2
+  'GLASS'
+  'SPO'
+ 'WFI',2
+  'GLASS'
+  'SPO'
+ 'HXI',1
+  'SPO'
+ 'OPXGS',1
+  'SPO'
+ 'CATXGS',2
+  'GLASS'
+  'SPO'
+ 'HTRS',2
+  'GLASS'
+  'SPO'
+ 'XPOL',2
+  'GLASS'
+  'SPO'
+'NICER',0
+'NUSTAR',0
+'ROSAT',3
+ 'HRI',0
+ 'PSPC',12
+  'OPEN'
+  'BRN'
+  'R1'
+  'R1R2'
+  'R2'
+  'R4'
+  'R4R5'
+  'R4TOR7'
+  'R5'
+  'R6'
+  'R6R7'
+  'R7'
+ 'WFC',4
+  'S1'
+  'S2'
+  'P1'
+  'P2'
+'SAX',5
+ 'LECS',0
+ 'MECS',0
+ 'PDS',0
+ 'WFC',0
+ 'HPGSPC',0
+'SUZAKU',3
+ 'XRS',2
+  'OPEN'
+  'BE'
+ 'XIS',2
+  'FI'
+  'BI'
+ 'HXD',2
+  'PIN'
+  'GSO'
+'SWIFT',3
+ 'XRT',3
+  'PC'
+  'WT'
+  'PD'
+ 'BAT',1
+  'SINGLE'
+ 'UVOT',9
+  'UVW2'
+  'UVW1'
+  'UVM2'
+  'U'
+  'B'
+  'V'
+  'UGRISM'
+  'VGRISM'
+  'WHITE'
+'XMM',4
+ 'PN',3
+  'THIN'
+  'MEDIUM'
+  'THICK'
+ 'MOS',3
+  'THIN'
+  'MEDIUM'
+  'THICK'
+ 'RGS1',2
+  'O1'
+  'O2'
+ 'RGS2',2
+  'O1'
+  'O2'
+'XTE',3
+ 'PCA',0
+ 'HEXTE',6
+  'DEFAULT'
+  'LLD10'
+  'LLD15'
+  'LLD20'
+  'LLD25'
+  'LLD30'
+ 'ASM',0

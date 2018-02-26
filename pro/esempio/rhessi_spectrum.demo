@@ -1,0 +1,85 @@
+;+
+;rhessi_spectrum.demo
+;       compute a RHESSI spectrum for a given DEM and compare with data
+;
+;usage
+;       @rhessi_spectrum.demo
+;
+;requires
+;	!ARDB/rhessi_inputs.save
+;	!ARDB/hsi_qsrm_20030426_024500.save
+;
+;vinay kashyap (Apr2005)
+;-
+
+loadct,3 & peasecolr
+
+;	restore the emissivity functions and the RMFs
+restore,filepath('rhessi_inputs.save',root_dir=!ARDB)
+	;G41STR,G42STR,G43STR,G44STR,G45STR,LSTR,CSTR,SPEC,EGRID
+GSTR_0306=G41STR & GSTR_0607=G42STR & GSTR_0708=G43STR
+GSTR_0810=G44STR & GSTR_1012=G45STR
+restore,filepath('hsi_qsrm_20030426_024500.save',root_dir=!ARDB)
+	;HSI_RMF,HSI_EFFAR,HSI_RMF_0306,HSI_EFFAR0306,
+	;HSI_RMF_0607,HSI_EFFAR0607,HSI_RMF_0708,HSI_EFFAR0708,
+	;HSI_RMF_0810,HSI_EFFAR0810,HSI_RMF_1012,HSI_EFFAR1012
+
+;	first, show what the line emissivities are like..
+window,0
+ot=where(lstr.LOGT gt 6.5,mot)
+tmp=(lstr.LINE_INT)[ot,*]>1e-6
+nrg=12.3985/abs(lstr.WVL)
+surface,tmp,(lstr.LOGT)[ot],nrg,$
+	chars=2,/ylog,/ys,yr=[3.,10.],ax=40,$
+	xtitle='log!d10!n(T[K])',ytitle='Energy [keV]',$
+	ztitle='[10!u23!n ergs cm!u3!n s!u-1!n]',$
+	title='line emissivities'
+
+window,1
+surface,tmp,(lstr.LOGT)[ot],nrg,$
+	chars=2,/ylog,/ys,yr=[3.,10.],/zlog,zr=[1e-6,1e2],/zs,ax=40,$
+	xtitle='log!d10!n(T[K])',ytitle='Energy [keV]',$
+	ztitle='[10!u23!n ergs cm!u3!n s!u-1!n]',$
+	title='line emissivities'
+;cc='hit any key to continue' & print,cc & cc=get_kbrd(1)
+;ow=where(nrg ge 3 and nrg lt 6,mow)
+;surface,tmp[*,ow],(lstr.LOGT)[ot],nrg[ow],col=1,/noerase,$
+;	chars=2,/ylog,/ys,yr=[3.,10.],/zlog,zr=[1e-6,1e2],/zs,ax=40
+;cc='hit any key to continue' & print,cc & cc=get_kbrd(1)
+ow=where(nrg ge 6 and nrg lt 7.2,mow)
+surface,tmp[*,ow],(lstr.LOGT)[ot],nrg[ow],col=2,/noerase,$
+	chars=2,/ylog,/ys,yr=[3.,10.],/zlog,zr=[1e-6,1e2],/zs,ax=40
+;cc='hit any key to continue' & print,cc & cc=get_kbrd(1)
+;ow=where(nrg ge 7.2 and nrg lt 8.2,mow)
+;surface,tmp[*,ow],(lstr.LOGT)[ot],nrg[ow],col=3,/noerase,$
+;	chars=2,/ylog,/ys,yr=[3.,10.],/zlog,zr=[1e-6,1e2],/zs,ax=40
+;cc='hit any key to continue' & print,cc & cc=get_kbrd(1)
+;ow=where(nrg ge 8.2 and nrg lt 10.0,mow)
+;surface,tmp[*,ow],(lstr.LOGT)[ot],nrg[ow],col=4,/noerase,$
+;	chars=2,/ylog,/ys,yr=[3.,10.],/zlog,zr=[1e-6,1e2],/zs,ax=40
+;cc='hit any key to continue' & print,cc & cc=get_kbrd(1)
+;ow=where(nrg ge 10. and nrg lt 12.0,mow)
+;surface,tmp[*,ow],(lstr.LOGT)[ot],nrg[ow],col=5,/noerase,$
+;	chars=2,/ylog,/ys,yr=[3.,10.],/zlog,zr=[1e-6,1e2],/zs,ax=40
+
+;	make a DEM and see what the predicted response looks like
+window,2
+dem=mk_dem('cursor',logt=(lstr.logT)[ot],pardem=[1d10,1d15])
+
+yr=minmax(tmp[*,ow])>1e-6
+plot,(lstr.logT)[ot],tmp[*,ow[0]],yr=yr,/xs,/ys,chars=2,/nodata,$
+	xtitle='log!d10!n(T[K])',ytitle='[10!u23!n ergs cm!u3!n s!u-1!n]',$
+	title='emissivities'
+for j=0L,mow-1L do oplot,(lstr.logT)[ot],tmp[*,ow[j]],col=2
+oplot,(lstr.logT)[ot],dem*max(tmp[*,ow])/max(dem),thick=3,col=3
+
+window,3
+wvlar=GSTR_0607.wvlar & effar=GSTR_0607.effar
+areff=interpol(effar,12.3985/wvlar,nrg[ow])
+yr=[min(tmp[*,ow]*areff)*min(dem),max(tmp[*,ow]*areff)*max(dem)]
+areff=interpol(effar,12.3985/wvlar,nrg[ow])
+plot,(lstr.logT)[ot],areff*tmp[*,ow[0]]*dem/1d14,yr=yr,/xs,/ys,chars=2,/nodata,$
+	xtitle='log!d10!n(T[K])',ytitle='[10!u-14!n ergs cm!u-2!n s!u-1!n]',$
+	title='surface flux'
+for j=0L,mow-1L do oplot,(lstr.logT)[ot],areff[j]*tmp[*,ow[j]]*dem,col=3
+;resp=dblarr(mot) & for j=0L,mow-1L do resp=resp+areff[j]*tmp[*,ow[j]]

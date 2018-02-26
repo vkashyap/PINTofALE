@@ -1,0 +1,27 @@
+;       (JJD, JanMMI)
+message,'LINESPEC(); all singing, dancing line spectrum routine',/info
+linespec_spec = linespec( $
+  in_atom ,$
+  wmin    = !WMIN ,$
+  wmax    = !WMAX ,$
+  nbin    = io_nbin ,$
+  wlog    = io_wlog ,$
+  ww      = io_ww ,$		;this takes precedence over WMIN,WMAX,NBIN,WLOG
+  ikev    = in_ikev ,$
+  fstr    = linespec_linstr ,$
+  desig   = in_desig ,$
+  econf   = in_econf ,$
+  dbdir   = !LDBDIR ,$
+  pres    = !GASPR ,$
+  logP    = !LOGPR ,$
+  n_e     = !EDENS ,$
+  allah   = 0 ,$
+  DEM     = !DEM ,$
+  abund   = !ABUND ,$
+  effar   = effar ,$
+  wvlar   = wvlar ,$
+  noph    = in_noph ,$
+  chifil  = 1 ,$
+  chidir  = !CHIDIR ,$
+  eqfile  = !IONEQF ,$
+  verbose = !VERBOSE )
