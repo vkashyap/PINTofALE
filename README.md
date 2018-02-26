@@ -1,6 +1,6 @@
 # PINTofALE
 
-## ## Package for Interactive Analysis of Line Emission
+## Package for Interactive Analysis of Line Emission
 
 http://hea-www.harvard.edu/PINTofALE/
 
