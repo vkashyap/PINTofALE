@@ -104,6 +104,7 @@
 *         101 & 102:	ASCA SIS & GIS
 *	  201 - 215:	XTE (PCA, old HEXTE, ASM; XTE with LLDs)
 *         304:          HEAO-1 A4
+*         311 - 312:    HEAO-1 A1 (AGCL and AGCP gain settings)
 *         401 - 404:    SAX (LECS, MECS, HPGSPC and PDS)
 *         501 - 531:    CHANDRA (ACIS pileup)
 *         601, 612-614:	XMM (MOS and PN pile-up)
@@ -113,6 +114,7 @@
 *         1001:         NuSTAR
 *         1101-1104:    ASTRO-H SXS
 *         1131:         ASTRO-H SGD
+*         1201-1202:    MAXI
 
         if( special .eq. 101 ) then
 *         This hard-wired code means we're dealing with ASCA SIS
@@ -218,6 +220,9 @@
             call HA4_LEVIN( results, n_res )
           end if
 
+        else if( special .eq. 311 .or. special .eq. 312 ) then
+*         This hard-wired code means we're dealing with HEAO-1 A1
+          call PWRITE( '   (Count rate is per sq. cm)' )
 
         else if ( special .eq. 401 ) then
 *         This hard-wired code means we're dealing with SAX LECS
@@ -519,6 +524,11 @@ c
           else
             call SGD_LIMIT( results, n_res )
           end if
+
+        else if( special .ge. 1201 .and. special .le. 1202 ) then
+*         Hard-wired code for MAXI GSC and SSC
+          call PWRITE( '  (MAXI count rates are given in units of ' //
+     &                                                    'c/s/cm^2)' )
 
         end if
 

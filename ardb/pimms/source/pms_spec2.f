@@ -85,6 +85,7 @@
 *         101 & 102:	ASCA SIS & GIS
 *	  201 - 215:	XTE (PCA, old HEXTE, ASM; XTE with LLDs)
 *         304:          HEAO-1 A4
+*         311 - 312:    HEAO-1 A1 (AGCL and AGCP gain settings)
 *         401 - 404:    SAX (LECS, MECS, HPGSPC and PDS)
 *         501 - 531:    CHANDRA (ACIS pileup)
 *         601, 612-614:	XMM (MOS and PN pile-up)
@@ -93,6 +94,7 @@
 *         901-913:      Swift
 *         1001:         NuSTAR
 *         1101-1104:    ASTRO-H SXS
+*         1201-1202:    MAXI
 
         character*78 pw_strng
         integer lpw
@@ -114,6 +116,10 @@
         else if( special .ge. 210 .and. special .le. 215 ) then
 *         This hard-wired code means we're dealing with XTE HEXTE
           pw_strng = '%!% Net count rate per cluster assumed'
+
+        else if ( special .eq. 311 .or. special .eq. 312 ) then
+*         This hard-wired code means we're dealing with HEAO-1 A1 AGCL
+          pw_strng = '%!% Count rate interpreted to be per sq. cm'
 
         else if ( special .eq. 402 ) then
 *         This hard-wired code means we're dealing with SAX MECS
@@ -189,6 +195,11 @@
 *                                          1103: Be50 filter; 1104: OBF)
           pw_strng = '%!% Count rate assumed to be for ' //
      &                    'a point source excatly centered on the array'
+
+        else if( special .ge. 1201 .and. special .le. 1202 ) then
+*         Hard-wired code for MAXI GSC and SSC
+          pw_strng = '%!% Count rate assumed to be ' //
+     &                                            'in units of c/s/cm^2'
 
         end if
 

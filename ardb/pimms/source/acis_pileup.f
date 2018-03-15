@@ -1,3 +1,5 @@
+*       Updated 2014 January with inputs from Antonella Fruscione
+
 *       Note --- Identical parameters appear in several subroutine
 *                in this file.  If you change one, change all.
 
@@ -32,10 +34,10 @@
 *         The user has typed an extra number, try to interpret that as
 *            the (non-standard) frame time and calculate the pileup
           call GET_PARAM_N( 2, frame_time )
-          if( frame_time .gt. frame_def
-     &                            .or. frame_time .lt. frame_fast ) then
-            call PWRITE
-     &             ( '  The input frame time is out of sensible range' )
+          if( frame_time .gt. frame_def )then
+            call PWRITE( '  The input frame time is too long.' )
+          else if( frame_time .lt. frame_fast ) then
+            call PWRITE( '  The input frame time is too short.' )
           else
             call DO_PILEUP
      &                 ( cps_given, frame_time, cps_piled, pileup_frac )
@@ -69,10 +71,11 @@
             call PWRITE( p_strng )
           else if( pu_flag .eq. 0 ) then
 *           Frame time given such that pile-up is at threshold value.
-            p_strng( : 31 ) = '  Pile-up is tolerable (     %)'
-            write( p_strng( 25: 28 ), '(f4.1)' ) accept_pu * 100.0
-            p_strng( 32: 59 ) = ' at a frame-time of        s'
-            write( p_strng( 52: 57 ), '(f6.3)' ) rev_ret
+            p_strng( : 41 ) =
+     &                       '  Pile-up is generally tolerable (     %)'
+            write( p_strng( 35: 38 ), '(f4.1)' ) accept_pu * 100.0
+            p_strng( 42: 69 ) = ' at a frame-time of        s'
+            write( p_strng( 62: 67 ), '(f6.3)' ) rev_ret
             call PWRITE( p_strng )
           else
 *           Pile-up severe even at the fastest frame time
@@ -81,7 +84,7 @@
             p_strng( 39: 76 ) = 'fastest single-chip frame time (0.2 s)'
             write( p_strng( 71: 73 ), '(f3.1)' ) frame_fast
             call PWRITE( p_strng )
-            p_strng = '  Consider using the Continuous Clocking mode'
+            p_strng = '  Consult the Chandra POG for mitigation methods'
             call PWRITE( p_strng )
           end if
 
@@ -184,7 +187,7 @@
         call DO_PILEUP( cps_given, frame_def, cps_piled, pileup_frac )
 
         p_strng = ' '
-        p_strng( : 34 ) = '  The count rate after pile-up is '
+        p_strng( : 34 ) = '  The piled-up count rate is '
         if( cps_piled .ge. 100.0 ) then
           write( p_strng( 35: 44 ), '(1p,e10.3)' ) cps_piled
         else if( cps_piled .ge. 0.001 ) then

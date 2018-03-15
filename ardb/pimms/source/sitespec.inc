@@ -10,6 +10,6 @@
 
 * UNIX examples
         data ddir_name /
-     & '/data/fubar/SCAR/ardb/pimms/data' /
+     & '/home/carfax/mukai/nra/pimms/NEXT/data' /
         data mdir_name /
-     & '/data/fubar/SCAR/ardb/pimms/models' /
+     & '/home/carfax/mukai/nra/pimms/NEXT/models' /
