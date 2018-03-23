@@ -28,6 +28,9 @@ function ebound2gammadist,xdn,xup,plev=plev,ngrid=ngrid,niter=niter,eps=eps,verb
 ;	verbose	[INPUT] controls chatter
 ;	_extra	[JUNK] here only to prevent crashing the program
 ;
+;example usage
+;	.run ebound2gammadist
+;
 ;history
 ;	Vinay Kashyap (2018-mar-23; based on Cook, J.D. (2010), Determining
 ;	  distribution parameters from quantiles, via Luis Campos)
@@ -125,21 +128,29 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;	an example, using the upper and lower bounds based on Gehrels 1986 (ApJ 303, 336)
-nn=[5,10,30] & ss=1. & xdn=nn-ss*sqrt(nn-0.25)+(ss^2-1.)/4. & xup=nn+ss*sqrt(nn+0.75)+(ss^2+3.)/4.
+nn=[5,10,30]
+if not keyword_set(ss) then ss=3.
+xdn=nn-ss*sqrt(nn-0.25)+(ss^2-1.)/4.	;Gehrels 1986 Eqn 7
+xup=nn+ss*sqrt(nn+0.75)+(ss^2+3.)/4.	;Gehrels 1986 Eqn 11
 
-if ss eq 1. then plev=0.68
-if ss eq 1.282 then plev=0.9
-if ss eq 1.645 then plev=0.95
-if ss eq 1.960 then plev=0.975
-if ss eq 2. then plev=0.9772
-if ss eq 2.326 then plev=0.99
-if ss eq 2.576 then plev=0.995
-if ss eq 3.0 then plev=0.9987
+;	interpolate for plev from Table 3
+sarr=[1.,	1.282,	1.645,	1.960,	2.,	2.326,	2.576,	3.,	3.090,	3.291]
+parr=[0.8413,	0.9,	0.95,	0.975,	0.9772,	0.99,	0.995,	0.9987,	0.999,	0.9995]
+plev=interpol(parr,sarr,ss)
 
-ngrid=1000L
-niter=50
+if not keyword_set(ngrid) then ngrid=1000L
+if not keyword_set(niter) then niter=200
+if not keyword_set(eps) then eps=1e-5
+if not keyword_set(verbose) then verbose=0
 
+;	calling sequence
+print,''
+jnk=ebound2gammadist()
+print,''
+
+;	example based on small counts
 ab=ebound2gammadist(xdn,xup,plev=plev,ngrid=ngrid,niter=niter,eps=eps,verbose=verbose)
-print,ab
+for i=0L,n_elements(nn)-1L do print,$
+'N='+strtrim(nn[i],2)+' ['+strtrim(xdn[i],2)+','+strtrim(xup[i],2)+'] @plev='+strtrim(plev,2)+' ==> gamma('+strtrim(ab[0,i],2)+','+strtrim(ab[1,i],2)+')'
 
 end
