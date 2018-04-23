@@ -67,10 +67,7 @@
  'LAC',2
   'TOP'
   'BOTH'
-'HEAO1',2
- 'A1',2
-  'AGCL'
-  'AGCP'
+'HEAO1',1
  'A4',0
 'INTEGRAL',2
  'ISGRI',0
@@ -95,9 +92,6 @@
  'XPOL',2
   'GLASS'
   'SPO'
-'MAXI',2
- 'GSC',0
- 'SSC',0
 'NICER',0
 'NUSTAR',0
 'ROSAT',3

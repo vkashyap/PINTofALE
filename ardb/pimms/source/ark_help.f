@@ -4,8 +4,6 @@ C	A brand new ARK routine to simulate VAX/VMS on-line help
 C	on UNIX systems.  Requires an ark help library (pre-processed
 C	by AHMAKE.FOR) and takes a string as the starting position.
 C
-C       Updated using Judy Chen (CfA)'s modifications re initializations
-
 	Implicit None
 C
 	Integer m_Level, m_Item
@@ -22,15 +20,10 @@ C
 	Integer l_Item( m_Item ), p_Item( m_Item ), r_Found( m_Item )
 	Integer Head, Body, Level, n_Req, Req, K, Pointer, Item, L
 	Integer n_Item, n_Line, Found, Ln, l_Page, F, l_Msg, Upto
-        integer ierr, ii
+        integer ierr
 	Logical not_Found, Ambiguous, gone_Up
 C
 	blank_Line = '                                '
-
-	do ii = 1, m_level
-          s_title( ii ) = blank_line
-	end do
-
         call ARKOPN( k, dir_name, lib_name, 'AHL', 'OLD',
      &               'READONLY', 'UNFORMATTED', 'DIRECT', 80, ierr )
         if( ierr .lt. 0 ) then
@@ -42,8 +35,7 @@ C
 	Head = 1
 	dummy_Line = String
 	Do While( .True. )
-          Found = 0
-
+                   
 	  Call AH_PROC_REQ( dummy_Line, to_Find, l_Find,
      1						m_Level, n_Req )
 	  not_Found = .False.

@@ -47,6 +47,7 @@ pro propermotion_corrector,catra,catdec,pmra,pmdec,newra,newdec,$
 ;
 ;history
 ;	vinay kashyap (2014sep05)
+;	replaced call to julday() with systime(/julian) for GDL compatibility (VK; 2018mar04)
 ;-
 
 ;	usage
@@ -83,8 +84,8 @@ if keyword_set(catyr) then begin
   if ncyr eq 1 then catepoch[*]=float(catyr[0])
   if ncyr gt 1 then catepoch[0:(nra<ncyr)-1]=float(catyr[0:(ncyr<nra)-1])
 endif
-caldat,julday(),mon,day,yr,hr,min,sec
-curepoch=2000.+(julday()-julday(1,1,2000))/365.256360417
+caldat,systime(/julian),mon,day,yr,hr,min,sec
+curepoch=2000.+(systime(/julian)-julday(1,1,2000))/365.256360417
 newepoch=fltarr(nra)+curepoch
 if keyword_set(newyr) then begin
   nnyr=n_elements(newyr)
