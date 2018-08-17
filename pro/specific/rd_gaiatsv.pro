@@ -47,7 +47,10 @@ function rd_gaiatsv,tsvfil,sep=sep,cols=cols,fmts=fmts,verbose=verbose,_extra=e
 ;	find_gaia_dr2.py --format tsv -m 1692919135 -r 30 "22 38 45.5747 -20 37 16.081" > gaia_FKAqr.tsv
 ;	gaiastr=rd_gaiatsv('gaia_FKAqr.tsv')
 ;
-;vinay k (Apr2018)
+;history
+;	Vinay Kashyap (Apr2018)
+;	corrected for when first column had different number of dashes at beginning of
+;	  data block (VK; Aug2018)
 ;-
 
 ;	check input
@@ -152,7 +155,7 @@ while not eof(ug) do begin
     readf,ug,cc
     print,cc
     header=[header,cc]
-    if strpos(cc,'--------',0) eq 0 then datablock=1
+    if strpos(cc,'--------',0) ge 0 then datablock=1
     ;if datablock ne 0 then stop,datablock
   endelse
 endwhile

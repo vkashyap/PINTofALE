@@ -164,6 +164,8 @@
 ;	bug fix: some variables were not being set if not defined in initale.par
 ;	cleaned up a bit, fixed bugs due to calls to getpoadef, and now no longer
 ;	  loads !ARDB/initale.par by default (VK; SepMMXV)
+;	defsysv nowadays fails if int is given as update when long is required
+;	  (VK; AugMMXVIII)
 ;-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -283,7 +285,7 @@ zlogT=findgen(81)*0.05+4.			;[log[degK]]
 zDEM=dblarr(n_elements(zlogT))+1d12		;[cm^-5, typically]
 znh=1e18 & zfh2=0.26 & zhe1=1e17 & zheII=1e16	;[cm^-2]
 zwmin=1.239854 & zwmax=3000.0			;[Ang]
-zverbose=5
+zverbose=5L
 zaa=[	string(byte(197)),$
 	'!3'+string(byte(197))+'!X',$
 	'!3!sA!r!u!9 %!n!X',$
@@ -370,7 +372,7 @@ if (ivar eq 0) or (ivar eq 1 and zfactory eq 1) then defsysv,'!WMIN',zWMIN
 ivar=0 & defsysv,'!WMAX',exists=ivar
 if (ivar eq 0) or (ivar eq 1 and zfactory eq 1) then defsysv,'!WMAX',zWMAX
 ivar=0 & defsysv,'!VERBOSE',exists=ivar
-if (ivar eq 0) or (ivar eq 1 and zfactory eq 1) then defsysv,'!VERBOSE',zVERBOSE
+if (ivar eq 0) or (ivar eq 1 and zfactory eq 1) then defsysv,'!VERBOSE',long(zVERBOSE)
 ivar=0 & defsysv,'!AA',exists=ivar
 if ivar eq 0 then defsysv,'!AA','!3'+string(byte(197))+'!X'
 ivar=0 & defsysv,'!ANGSTROM',exists=ivar

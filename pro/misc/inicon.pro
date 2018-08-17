@@ -322,7 +322,7 @@ if get_fun gt 0 then begin				;(FUNDAE
   ;kevAng=12.39852066		& kevAng_h='keV*Ang (1e8*h*c/(e*1e10))'
   kevAng=1d8*h*c/(e*1d10)	& kevAng_h='keV*Ang (1e8*h*c/(e*1e10))'
   eVwav=12379.7d-8		& eVwav_h='1 eV in wave numbers [/cm]'
-  degeV=8.6173468d-05		& degeV_h='1 deg K in eV [eV] (degK*degev/1e3->keV, or degev*1e3/keV->degK)'
+  degeV=8.6173468d-05		& degeV_h='1 deg K in eV [eV] (multiply degev*1e3 by MK to get keV; divide KEV by degev*1e3 to get MK)'
   JouleV=e			& JouleV_h='1 eV in Joule = Coulomb*meter [J]'
   ergeV=JouleV*1e7		& ergeV_h='1 eV in ergs [erg]'
   s=create_struct(s,'kevAng',kevAng,'eVwav',eVwav,'degeV',degeV,'JouleV',JouleV,'ergeV',ergeV)
