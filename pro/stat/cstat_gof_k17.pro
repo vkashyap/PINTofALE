@@ -31,6 +31,7 @@ function cstat_gof_k17,mval,obsstat,pval,C_e=C_e,S_nu=S_nu,C_nu=C_nu,zval=zval,v
 ;
 ;history
 ;	Vinay Kashyap (2018-jul-29)
+;	bug fix (VK; 2018-aug-30)
 ;-
 
 ;	usage
@@ -71,7 +72,7 @@ c_e = 0.*mval & s_nu = c_e & c_nu = s_nu
 
 if mo00 gt 0 then begin & c_e[o00] = 0. & s_nu[o00]=0. & c_nu[o00]=0. & endif	;this catches incidences of alog(0)'s
 if mo08 gt 0 then c_e[o08] = -0.25*mval[o08]^3 + 1.38*mval[o08]^2 - 2.*mval[o08]*alog(mval[o08])
-if mo09 gt 0 then c_e[o09] = -0.00335*mval[o09]^5 + 0.04259*mval[o09]^4 - 0.27331*mval[o09]^3 + 1.381*mval[o09]^2 - 2.*mval[o08]*alog(mval[o09])
+if mo09 gt 0 then c_e[o09] = -0.00335*mval[o09]^5 + 0.04259*mval[o09]^4 - 0.27331*mval[o09]^3 + 1.381*mval[o09]^2 - 2.*mval[o09]*alog(mval[o09])
 if mo10 gt 0 then c_e[o10] = 1.019275 + 0.13145*exp((0.461-0.9*alog(mval[o10]))*alog(mval[o10]))
 if mo11 gt 0 then c_e[o11] = 1.00624 + 0.604*exp(-1.68*alog(mval[o11]))
 if mo12 gt 0 then c_e[o12] = 1. + 0.1649/mval[o12] + 0.226/mval[o12]^2
