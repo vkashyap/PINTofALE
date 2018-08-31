@@ -1,5 +1,5 @@
 pro hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
-  pha,statbit, ampscl,fineu,finev,fracu,fracv,u,v,au3cor=au3cor,av3cor=av3cor,$
+  pha,statbit, ampscl,fineu,finev,fracu,fracv,u,v,samp,au3cor=au3cor,av3cor=av3cor,$
   rawu=rawu,rawv=rawv,xdet=xdet,ydet=ydet,Hfilt=Hfilt,HXfilt=HXfilt,$
   caldb=caldb, degaps=degaps,degapf=degapf,tringf=tringf,$
   dampcor=dampcor,ampgain_s=ampgain_s,ampratio_s=ampratio_s,$
@@ -18,7 +18,7 @@ pro hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
 ;
 ;syntax
 ;	hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
-;	pha,statbit, ampscl,fineu,finev,fracu,fracv,u,v,au3cor=au3cor,av3cor=av3cor,$
+;	pha,statbit, ampscl,fineu,finev,fracu,fracv,u,v,samp,au3cor=au3cor,av3cor=av3cor,$
 ;	rawu=rawu,rawv=rawv,xdet=xdet,ydet=ydet,Hfilt=Hfilt,HXfilt=HXfilt,$
 ;	caldb=caldb,degaps=degaps,degapf=degapf,tringf=tringf,$
 ;	dampcor=dampcor,ampgain_s=ampgain_s,ampratio_s=ampratio_s,$
@@ -51,6 +51,7 @@ pro hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
 ;	fracv	[OUTPUT] fraction of center-tap events in V
 ;	u	[OUTPUT] degapped U position
 ;	v	[OUTPUT] degapped V position
+;	samp	[OUTPUT] rescaled SUMAMPs
 ;
 ;keywords
 ;	au3cor	[OUTPUT] tap ringing corrected AU3
@@ -65,7 +66,7 @@ pro hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
 ;		* if not set, assumed to be /soft/ciao/CALDB/
 ;	degapf	[INPUT] CALDB file containing the degap coefficients
 ;		* if not set (and DEGAPS is not set), read from file
-;		$CALDB/data/chandra/hrc/bcf/degap/hrcsD1999-07-22gapN0002.fits
+;		$CALDB/data/chandra/hrc/gaplookup/hrcsD1999-07-22gaplookupN0004.fits
 ;		* if string, read from specified file
 ;		* ignored if DEGAPS is well-defined
 ;	degaps	[I/O] the degap coefficients in a structure of the
@@ -78,12 +79,12 @@ pro hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
 ;		* if set to 0, will NOT remove gaps
 ;	tringf	[INPUT] CALDB file containing the tap ringing coefficients
 ;		* must be pathname relative to CALDB, e.g.,
-;		  '/data/chandra/hrc/bcf/tapring/hrcsD1999-07-22tapringN0001.fits'
+;		  '/data/chandra/hrc/tapringtest/hrcsD1999-07-22tapringN0002.fits'
 ;		* if not defined, then looks at keywords
 ;		    VA,VB,VC,VD,VBETA,VGAMMA,VTHR,VOFF,
 ;		    UA,UB,UC,UD,UBETA,UGAMMA,UTHR,UOFF
 ;		  for the values, which btw default to the values in
-;		  $CALDB/data/chandra/hrc/bcf/tapring/hrcsD1999-07-22tapringN0001.fits
+;		  $CALDB/data/chandra/hrc/tapringtest/hrcsD1999-07-22tapringN0002.fits
 ;	dampcor	[INPUT] if set, dynamically determines the PHA range
 ;		over which the SUMAMPS scale changes
 ;	hevt	[INPUT] the header from the EVT1 file, to be used to
@@ -104,6 +105,8 @@ pro hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$
 ;	added keyword HEVT,RANGELEV (VK; Aug03)
 ;	added keywords TRINGF,UOFF,VOFF, and changed algorithm on which
 ;	  events to apply tap ringing correction (VK; Sep03)
+;	updated to degap vN0003 and tapring vN0002 (VK; Mar17)
+;	added SAMP to output parameter list and changed default degap to v4 (VK; Aug18)
 ;-
 
 ;	usage
@@ -138,7 +141,7 @@ if np lt 10 then ok='Insufficient input parameters' else $
 		       if (ni ne nst and ni ne nst/4) then ok='CHIP_ID incompatible with STATBIT'
 if ok ne 'ok' then begin
   print,'Usage: hrcs_process_evt,chip_id,au1,au2,au3,av1,av2,av3,amp_sf,crsu,crsv,$'
-  print,'       pha,statbit, ampscl,fineu,finev,fracu,fracv,u,v,au3cor=au3cor,av3cor=av3cor,$'
+  print,'       pha,statbit, ampscl,fineu,finev,fracu,fracv,u,v,samp,au3cor=au3cor,av3cor=av3cor,$'
   print,'       rawu=rawu,rawv=rawv,xdet=xdet,ydet=ydet,Hfilt=Hfilt,HXfilt=HXfilt,$'
   print,'       degaps=degaps,degapf=degapf,caldb=caldb,verbose=v,$'
   print,'       dampcor=dampcor,ampgain_s=ampgain_s,ampratio_s=ampratio_s,$'
@@ -164,7 +167,7 @@ if not keyword_set(caldb) then begin
 endif
 ;DEGAPF
 ndf=n_elements(degapf) & nds=n_elements(degaps) & mds=n_tags(degaps)
-degapfil=CALDB+'/data/chandra/hrc/bcf/degap/hrcsD1999-07-22gapN0002.fits'
+degapfil=CALDB+'/data/chandra/hrc/gaplookup/hrcsD1999-07-22gaplookupN0004.fits'
 if ndf ne 0 then begin
   szd=size(degapf) & nszd=n_elements(szd)
   if szd[nszd-2] eq 7 then degapfil=degapf[0]
@@ -208,7 +211,7 @@ if not keyword_set(vc) then	vc=0.279
 if not keyword_set(vd) then	vd=655.0
 if not keyword_set(vbeta) then	vbeta=0.0
 if not keyword_set(vgamma) then	vgamma=1.0
-if not keyword_set(vthr) then	vthr=0.2
+if not keyword_set(vthr) then	vthr=0.0	;was 0.2 in tapringN0001
 if not keyword_set(voff) then	voff=0.0
 ;
 if not keyword_set(ua) then	ua=-24.0
@@ -217,7 +220,7 @@ if not keyword_set(uc) then	uc=0.279
 if not keyword_set(ud) then	ud=530.0
 if not keyword_set(ubeta) then	ubeta=6.7
 if not keyword_set(ugamma) then	ugamma=1.75
-if not keyword_set(uthr) then	uthr=0.2
+if not keyword_set(uthr) then	uthr=0.0	;was 0.2 in tapringN0001
 if not keyword_set(uoff) then	uoff=0.0
 ntf=n_elements(tringf)
 if ntf ne 0 then begin
@@ -316,7 +319,7 @@ if keyword_set(dampcor) then begin
       endif else ampscl[oo]=iamp & s0=ss    	;))
     endif    					;)
   endfor						;}
-  sumamp=long(sumamps)*2^(ampscl-1)
+  samp=long(sumamps)*2^(ampscl-1)
 endif else begin
   if vv gt 10 then plot,pha,sumamps,/xs,/ys,/nodata
   ampscl=0*amp_sf+1
@@ -340,6 +343,7 @@ endif else begin
   endif
   oo=where(pha ge pha_2to3+w_2to3,moo) & if moo gt 0 then ampscl[oo]=3
   if vv gt 10 and moo gt 0 then oplot,pha[oo],sumamps[oo],psym=3,col=3
+  samp=long(sumamps)*2^(ampscl-1)
 endelse
 ;o1=where(ampscl eq 1,mo1) & o2=where(ampscl eq 2,mo2) & o3=where(ampscl eq 3,mo3)
 ;oplot,pha[o1],sumamps[o1],psym=3,col=1
@@ -422,6 +426,7 @@ endif
 
 ;	apply degap
 u=crsu+fineu & v=crsv+finev	;initialize
+nodegap=1
 if not keyword_set(nodegap) then begin
   nrow=n_elements(degapstr.CHIP_ID) & mds=n_tags(degapstr)
   ncoeff=(mds-3)/2 & al=fltarr(ncoeff) & ar=al
