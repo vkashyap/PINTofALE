@@ -142,6 +142,7 @@ function ppd_src,ns,nb,sgrid,smap=smap,scred=scred,clev=clev,ppdstr=ppdstr,$
 ;	added HPD1,HPD2,HPD3,HPD0 to the output (VK; Mar06)
 ;	changed hardcoded minimum of AGAMMA from 1 to 0.001 (VK; Feb16)
 ;	added GDL bypass for SPLINE_P (VK; Apr17)
+;	forced HPD minimum to be always >0 (VK; Jun18)
 ;-
 
 ;	usage
@@ -322,7 +323,7 @@ jnk=max(pp,imx) & smap=ss[imx]
 os=reverse(sort(pp)) & cpp=total(double(pp[os]),/cumul) & cpp=cpp/max(cpp) & xx=ss[os]
 om=where(xx le smap,mom) & hpdm=fltarr(4)+smap
 op=where(xx ge smap,mop) & hpdp=fltarr(4)+smap
-if mom gt 1 then hpdm=interpol(xx[om],cpp[om],[crlev,0.68,0.95,0.997])
+if mom gt 1 then hpdm=interpol(xx[om],cpp[om],[crlev,0.68,0.95,0.997]) > 0
 if mop gt 1 then hpdp=interpol(xx[op],cpp[op],[crlev,0.68,0.95,0.997])
 
 ;	find the mean

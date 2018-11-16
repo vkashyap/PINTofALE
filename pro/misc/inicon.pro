@@ -52,6 +52,7 @@ pro inicon,atom=atom,aname=aname,amu=amu,fip=fip,fundae=fundae,roman=roman,$
 ;	  (VK; MMXI.XI)
 ;	new IAU definition for A.U. (VK; MMXII.IX)
 ;	added new Pluto and Charon measurements from New Horizons (VK; MMXV.VII)
+;	updated h to match new SI definition (Cho 2018, Science 362, 625; VK MMXVII.XI)
 ;-
 
 ;	usage
@@ -281,10 +282,11 @@ endif							;FIP)
 ;	physical and astronomical constants
 if get_fun gt 0 then begin				;(FUNDAE
 
-  c=2.99792458d10  	& c_h='Speed of light [cm/s]'
+  c=2.99792458d10  	& c_h='Speed of light (defines SI meter) [cm/s]'
   s=create_struct('c',c) & SH=create_struct('c',c_h)
 
   h=6.626176d-27  	& h_h="Planck's constant [erg s]"
+  h=6.626207015d-27	& h_h="Planck's constant (defines SI kg) [erg s]"
   s=create_struct(s,'h',h) & SH=create_struct(SH,'h',h_h)
 
   G=6.672e-8      	& G_h='Gravitational constant [cm^3/gm/s^2]'
@@ -322,7 +324,7 @@ if get_fun gt 0 then begin				;(FUNDAE
   ;kevAng=12.39852066		& kevAng_h='keV*Ang (1e8*h*c/(e*1e10))'
   kevAng=1d8*h*c/(e*1d10)	& kevAng_h='keV*Ang (1e8*h*c/(e*1e10))'
   eVwav=12379.7d-8		& eVwav_h='1 eV in wave numbers [/cm]'
-  degeV=8.6173468d-05		& degeV_h='1 deg K in eV [eV] (multiply degev*1e3 by MK to get keV; divide KEV by degev*1e3 to get MK)'
+  degeV=8.6173468d-05		& degeV_h='1 deg K in eV [eV] (degK*degev/1e3->keV, or degev*1e3/keV->degK)'
   JouleV=e			& JouleV_h='1 eV in Joule = Coulomb*meter [J]'
   ergeV=JouleV*1e7		& ergeV_h='1 eV in ergs [erg]'
   s=create_struct(s,'kevAng',kevAng,'eVwav',eVwav,'degeV',degeV,'JouleV',JouleV,'ergeV',ergeV)

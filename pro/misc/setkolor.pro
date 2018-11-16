@@ -60,7 +60,8 @@ pro setkolor,colors,icols,ocols,rgbfil=rgbfil,oldr=oldr,oldg=oldg,oldb=oldb,$
 ;	added switch to choose file_search() instead of findfile()
 ;	  for IDL 7+ (JJD/VK; Apr14)
 ;	added keyword QUIET (VK; Nov15)
-;	if GDL now does not use findfile (VK; Nov16)
+;	if GDL, now does not use findfile (VK; Nov16)
+;	added special colors 'CfA Red', 'CfA Violet', 'CfA Dark Blue' (VK; Nov18)
 ;-
 
 forward_function findfile,file_search
@@ -125,11 +126,13 @@ endif else cols=colors
 rc=rr & gc=gg & bc=bb
 for i=1L,ncol do begin			;{for each color
   cc=strlowcase(strtrim(cols(i-1L),2)) & ii=jcols(i-1L)
+
   if ii ge mcol then begin
     message,'Color '+strtrim(ii,2)+' currently unavailable (max:'+$
 	strtrim(mcol-1L,2)+')',/info
     goto,nextcol		;{yeah, a goto
   endif
+
   c1=strmid(cc,0,1)
   if c1 eq '#' then begin		;(decode color from hex
     lcol=strlen(cc)-1
@@ -152,7 +155,19 @@ for i=1L,ncol do begin			;{for each color
       spawn,cmd,cmtch & nmtch=n_elements(cmtch)
       if not keyword_set(cmtch) then nmtch=0
       case nmtch of
-        0: message,'no matches found for color: '+cc,/info	;do nothing
+        0: begin
+	  kcfa=''
+	  ;	special cases
+	  if strpos(strupcase(cc),'CFAR') ge 0 or strpos(strupcase(cc),'CFA R') ge 0 then kcfa='cfared'
+	  if strpos(strupcase(cc),'CFAV') ge 0 or strpos(strupcase(cc),'CFA V') ge 0 then kcfa='cfaviolet'
+	  if strpos(strupcase(cc),'CFAB') ge 0 or strpos(strupcase(cc),'CFAD') ge 0 or strpos(strupcase(cc),'CFA B') ge 0 or strpos(strupcase(cc),'CFA D') ge 0 then kcfa='cfadarkblue'
+	  case kcfa of
+	    'cfared': begin & rc(ii)=141 & gc(ii)=0 & bc(ii)=52 & end
+	    'cfaviolet': begin & rc(ii)=43 & gc(ii)=53 & bc(ii)=117 & end
+	    'cfadarkblue': begin & rc(ii)=19 & gc(i)=26 & bc(ii)=60 & end
+	    else: message,'no matches found for color: '+cc,/info	;do nothing
+	  endcase
+	end
         else: begin
 	  k=0L & norm0=total(fix(byte(cc))) & dnorm=norm0
 	  for j=0L,nmtch-1L do begin
