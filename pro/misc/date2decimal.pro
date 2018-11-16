@@ -1,11 +1,11 @@
-function date2decimal,datestr,fod=fod,doy=doy,jday=jday, _extra=e
+function date2decimal,datestr,fod=fod,doy=doy,jday=jday,verbose=verbose, _extra=e
 ;+
 ;function	date2decimal
 ;		compute and return decimal representation of date
 ;		as fraction of the year.
 ;
 ;syntax
-;	date=date2decimal(datestr,fod=fod,doy=doy,jday=jday)
+;	date=date2decimal(datestr,fod=fod,doy=doy,jday=jday,verbose=verbose)
 ;
 ;parameters
 ;	datestr	[INPUT; required] date string in format 'YYYY-MM-DDTHH:MM:SS'
@@ -16,10 +16,12 @@ function date2decimal,datestr,fod=fod,doy=doy,jday=jday, _extra=e
 ;	fod	[OUTPUT] fraction of day
 ;	doy	[OUTPUT] day of year
 ;	jday	[OUTPUT] Julian day
+;	verbose	[INPUT] controls chatter
 ;
 ;history
 ;	vinay kashyap (2014nov)
 ;	bug fix: Feb was resetting doy counter (VK; 2015jun)
+;	added keyword VERBOSE (VK; 2018jun)
 ;-
 
 ;	usage
@@ -27,7 +29,7 @@ ok='ok' & np=n_params() & nd=n_elements(datestr) & sd=size(datestr,/type)
 if nd eq 0 then ok='Insufficient parameters' else $
  if sd ne 7 then ok='DATESTR must be a string'
 if ok ne 'ok' then begin
-  print,'Usage: date=date2decimal(datestr,fod=fod,doy=doy,jday=jday)'
+  print,'Usage: date=date2decimal(datestr,fod=fod,doy=doy,jday=jday,verbose=verbose)'
   print,'  Given date string as YYYY-MM-DDTHH:MM:SS, computes and
   print,'  returns date in decimal years, fraction of day, day of year,
   print,'  and Julian Day'
@@ -39,6 +41,8 @@ endif
 mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 dayspermon=[31,28,31,30,31,30,31,31,30,31,30,31]
 dayspermon_leap=dayspermon & dayspermon_leap[1]=dayspermon[1]+1
+
+vv=0L & if keyword_set(verbose) then vv=long(verbose[0])>1L
 
 ;	set up default
 today=systime()
@@ -53,6 +57,7 @@ date=dblarr(nd) & fod=dblarr(nd) & doy=intarr(nd) & jday=dblarr(nd)
 for i=0L,nd-1L do begin	;{I=0,ND-1
 
   cc=strsplit(datestr[i],'T',/extract)
+  if vv gt 100 then print,cc
 
   if n_elements(cc) eq 2 then begin	;(N(CC)=2
     cc1=strsplit(cc[0],'-',/extract) & cc2=strsplit(cc[1],':',/extract)
@@ -69,6 +74,7 @@ for i=0L,nd-1L do begin	;{I=0,ND-1
   endif else begin			;N(CC)=2)(N(CC)=/=2
     zyr=yr0 & zmon=mon0 & zday=day0 & zhr=hr0 & zmin=min0 & zsec=sec0
   endelse				;N(CC)=/=2)
+  if vv gt 100 then print,zyr,zmon,zday,zhr,zmin,zsec
 
   ;	is this a leap year or what?
   yesleap=0 & daymon=dayspermon	;not is the default
@@ -96,10 +102,13 @@ for i=0L,nd-1L do begin	;{I=0,ND-1
 
   ;	and the Julian Days too, for completeness
   jday[i]=julday(zmon,zday,zyr,zhr,zmin,zsec)
+  
+  if vv gt 100 then print,i,date[i],jday[i],doy[i],fod[i]
 
 endfor			;I=0,ND-1}
 
 ;	
+if vv gt 1000 then stop,'halting; type .CON to continue'
 
 return,date
 end
