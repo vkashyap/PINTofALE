@@ -73,6 +73,8 @@ function mk_dem,type,logT=logT,pardem=pardem,indem=indem,$
 ;	  for LOOP (VK; Mar05)
 ;	added keyword LCOMP (VK; Jun05)
 ;	button press status now stored in !MOUSE, not !ERR (VK; Apr09)
+;	bug fix to look at only the necessary letters in TYPE; added
+;	  Brosius DEM curves (VK; Dec18)
 ;-
 
 ;	usage
@@ -93,6 +95,8 @@ usage=[	'Usage: DEM=mk_dem(type,logT=logT,indem=indem,pardem=pardem,$',$
 	'  L*oop:- loop-model DEMs from EMs; PARDEM=[LOGTmax],INDEM==EM[LOGTmax]',$
 	'         also uses keywords SLOOP, LOOPY, LCOMP',$
 	'  D*elta:- multiple EM components: PARDEM=[LOGT],INDEM=EM[LOGT]',$
+	'  AR:- Active Region DEM from Brosius et al. 1996',$
+	'  QS:- Quiet Sun DEM from Brosius et al. 1996',$
 	'-----------------------------------------------']
 nu=n_elements(usage)
 
@@ -103,16 +107,18 @@ nT=n_elements(logT) & np=n_elements(pardem) & nD=n_elements(indem)
 
 ;	what type?
 code='h'					;default
-if strpos(todo,'h') eq 0 then code='h'		;help
-if strpos(todo,'i') eq 0 then code='i'		;interpolate
-if strpos(todo,'co') eq 0 then code='co'	;DEM(T)=const.
-if strpos(todo,'ch') eq 0 then code='ch'	;Chebyshev polynomials
-if strpos(todo,'cu') eq 0 then code='cu'	;cursor interactive
-if strpos(todo,'s') eq 0 then code='s'		;Spline interpolation
-if strpos(todo,'v') eq 0 then code='v'		;Variable scale smoothing
-if strpos(todo,'r') eq 0 then code='r'		;Variable scale rebinning
-if strpos(todo,'l') eq 0 then code='l'		;loop-model DEM from EM(T)
-if strpos(todo,'d') eq 0 then code='d'		;multi EM components
+if strpos(strmid(todo,0,1),'h') eq 0 then code='h'		;help
+if strpos(strmid(todo,0,1),'i') eq 0 then code='i'		;interpolate
+if strpos(strmid(todo,0,2),'co') eq 0 then code='co'		;DEM(T)=const.
+if strpos(strmid(todo,0,2),'ch') eq 0 then code='ch'		;Chebyshev polynomials
+if strpos(strmid(todo,0,2),'cu') eq 0 then code='cu'		;cursor interactive
+if strpos(strmid(todo,0,1),'s') eq 0 then code='s'		;Spline interpolation
+if strpos(strmid(todo,0,1),'v') eq 0 then code='v'		;Variable scale smoothing
+if strpos(strmid(todo,0,1),'r') eq 0 then code='r'		;Variable scale rebinning
+if strpos(strmid(todo,0,1),'l') eq 0 then code='l'		;loop-model DEM from EM(T)
+if strpos(strmid(todo,0,1),'d') eq 0 then code='d'		;multi EM components
+if strpos(strmid(todo,0,2),'ar') eq 0 then code='ar'		;Active Region DEM of Brosius et al. 1996
+if strpos(strmid(todo,0,2),'qs') eq 0 then code='qs'		;Quiet Sun DEM of Brosius et al. 1996
 
 idlvers=float(!VERSION.release) & if idlvers le 0 then idlvers=7
 
@@ -352,6 +358,18 @@ case code of
       dem[j]=dem[j]+xEM[i]/(logtbound[i+1L]-logtbound[i])
     endfor
   end						;multi EM components)
+  'ar': begin					;(Active Region DEM of Brosius et al. 1996
+    brosdem=[22.0,20.7,20.4,20.5,21.1,21.5,21.1,21.3,19.7]
+    broslgT=[5.0, 5.4, 5.6, 5.7, 6.0, 6.2, 6.4, 6.7, 7.0]
+    bdem_AR=(spline(broslgT,brosdem,logT)>min(brosdem))<max(brosdem)
+    DEM=10.D^(bdem_AR)
+  end						;AR)
+  'qs': begin					;(Quiet Sun DEM of Brosius et al. 1996
+    brosdem=[22.1,21.6,19.9,19.6,20.3,20.7,19.5,19.0]
+    broslgT=[ 4.8, 5.0, 5.5,5.75, 6.0,6.15, 6.5,6.625]
+    bdem_QS=(spline(broslgT,brosdem,logT)>0.)<max(brosdem)
+    DEM=10.D^(bdem_QS)
+  end						;QS)
   else: begin					;(help
     for i=0L,nu-1L do print,usage[i]
     dem=0*logT+1.
