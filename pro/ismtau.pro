@@ -1,9 +1,11 @@
-function ismtau,w,NH=NH,fH2=fH2,He1=He1,HeII=HeII,Fano=Fano,ikev=ikev,$
+function ismtau,w,NH=NH,fH2=fH2,He1=He1,He2=He2,Fano=Fano,ikev=ikev,$
     vion=vion,wam=wam,bam=bam,mam=mam, noHeH=noHeH,$
-    tauH1=tauH1,tauH2=tauH2,tauHeII=tauHeII,tauHe1=tauHe1,tauX=tauX,tauTB=tauTB,$
+    tauH1=tauH1,tauH2=tauH2,tauHe2=tauHe2,tauHe1=tauHe1,tauX=tauX,tauTB=tauTB,$
+    tauFano=tauFano,tauFM=tauFM,$
     icrstr=icrstr,$
     EBV=EBV,R_V=R_V,LMC2=LMC2,AVGLMC=AVGLMC,ExtCurve=ExtCurve,$
     fmgamma=fmgamma,fmx0=fmx0,fmc1=fmc1,fmc2=fmc2,fmc3=fmc3,fmc4=fmc4,$
+    HeII=HeII,tauHeII=tauHeII,$
     _extra=e
 ;+
 ;function	ismtau
@@ -41,10 +43,10 @@ function ismtau,w,NH=NH,fH2=fH2,He1=He1,HeII=HeII,Fano=Fano,ikev=ikev,$
 ;	to obtain transmission factors, use exp(-ismtau(...))
 ;
 ;syntax
-;	tau=ismtau(w,NH=NH,fH2=fH2,He1=He1,HeII=HeII,Fano=Fano,/ikev,$
+;	tau=ismtau(w,NH=NH,fH2=fH2,He1=He1,He2=He2,Fano=Fano,/ikev,$
 ;	/vion,/wam,/bam,/mam, abund=abund,noHeH=noHeH,verbose=verbose,$
-;	tauH1=tauH1,tauH2=tauH2,tauHeII=tauHeII,tauHe2=tauHe2,tauHe1=tauHe1,$
-;	tauX=tauX,tauTB=tauTB,$
+;	tauH1=tauH1,tauH2=tauH2,tauHe2=tauHe2,tauHe2=tauHe2,tauHe1=tauHe1,$
+;	tauX=tauX,tauTB=tauTB,tauFano=tauFano,tauFM=tauFM,$
 ;	R_V=R_V,LMC2=LMC2,AVGLMC=AVGLMC,ExtCurve=ExtCurve,$
 ;       fmgamma=fmgamma,fmx0=fmx0,fmc1=fmc1,fmc2=fmc2,fmc3=fmc3,fmc4=fmc4,$
 ;	icrstr=icrstr,ionfrac=ionfrac,vfkydir=vfkydir,nconsec=nconsec,$
@@ -78,10 +80,11 @@ function ismtau,w,NH=NH,fH2=fH2,He1=He1,HeII=HeII,Fano=Fano,ikev=ikev,$
 ;		  float number to include H2 cross-sections
 ;		* if NoHeH is set to exclude H, fH2 is assumed to be 0
 ;	He1	[INPUT; default=0.1*NH] neutral He column density [cm^-2]
-;	HeII	[INPUT; default=0.1*He1] ionized He column density [cm^-2]
+;	He2	[INPUT; default=0.1*He1] ionized He column density [cm^-2]
 ;		* if NoHeH is set to exclude He, both HeI and HeII cross-sections
 ;		  will be excluded regardless of what the keywords He1 and
-;		  HeII are set to
+;		  He2 are set to
+;	HeII	[OBSOLETE; same as HE2] kept around for backwards compatibility
 ;	Fano	[INPUT] if set, the 4 strongest auto-ionizing resonances
 ;		of He I are included; the shape of these resonances are
 ;		given by a Fano profile (cf. Rumph, Bowyer, & Vennes 1994,
@@ -117,14 +120,17 @@ function ismtau,w,NH=NH,fH2=fH2,He1=He1,HeII=HeII,Fano=Fano,ikev=ikev,$
 ;	tauH1	[OUTPUT] optical depth due to H
 ;	tauH2	[OUTPUT] optical depth due to molecular H2
 ;	tauHe2	[OUTPUT] optical depth due to HeII
-;	tauHeII	[OUTPUT] same as TAUHE2
+;	tauHeII	[OBSOLETE] same as TAUHE2
 ;		* both present here for backwards compatibility
 ;	tauHe1	[OUTPUT] optical depth due to HeI
-;		* NOTE: if VION is set, it computes H, HeI, and HeII
-;		  cross-sections, so the parts of tauH1, tauHe1, tauHe2
-;		  that overlap the relevant range get set to zero
+;		* NOTE: if BAM or VION is set, BAMABS() and IONABS() compute
+;		  H, HeI, and HeII cross-sections, so the parts of tauH1,
+;		  tauHe1, tauHe2 that overlap the relevant range get set to zero
 ;	tauX	[OUTPUT] optical depth in EUV and X-ray regime (0.03-10 keV)
 ;	tauTB	[OUTPUT] optical depth in hard X-ray regime (>10 keV)
+;	tauFano	[OUTPUT] Fano correction to optical depth due to HeI
+;		* NOTE: this is included after VION
+;	tauFM	[OUTPUT] optical depth due to Fitzpatrick & Massa reddening
 ;	icrstr	[I/O] passed without comment to IONABS()
 ;	EBV	[INPUT] color excess, E(B-V), passed on to FM_UNRED
 ;		* default is 0
@@ -176,14 +182,17 @@ function ismtau,w,NH=NH,fH2=fH2,He1=He1,HeII=HeII,Fano=Fano,ikev=ikev,$
 ;	  /vion was double counting tauH,tauHe1,tauHe2
 ;	  (WARNING: changes behavior of tauH, tauHe1,tauHe2 on output)
 ;	added keyword TAUHE2 (VK; Sep13)
+;	added keyword He2 as alternative for HeII; added keywords tauFano and
+;	  tauFM; reincluded Fano correction after /vion; zeroed out He opacities
+;	  after call to BAMAMS (VK; Jan19)
 ;-
 
 ;	usage
 nw=n_elements(w)
 if nw eq 0 then begin
-  print,'Usage: tau=ismtau(W,NH=NH,fH2=fH2,He1=He1,HeII=HeII,/Fano,/ikev,$'
+  print,'Usage: tau=ismtau(W,NH=NH,fH2=fH2,He1=He1,He2=He2,/Fano,/ikev,$'
   print,'       /vion,/wam,/bam,/mam, noHeH=noHeH, abund=abund,verbose=verbose,$'
-  print,'       tauH1=tauH1,tauH2=tauH2,tauHeII=tauHeII,tauHe2=tauHe2,tauHe1=tauHe1,$'
+  print,'       tauH1=tauH1,tauH2=tauH2,tauHe2=tauHe2,tauHe1=tauHe1,$'
   print,'       tauX=tauX,tauTB=tauTB, icrstr=icrstr,ionfrac=ionfrac,$'
   print,'       EBV=EBV,R_V=R_V,LMC2=LMC2,AVGLMC=AVGLMC,ExtCurve=ExtCurve,$'
   print,'       fmgamma=fmgamma,fmx0=fmx0,fmc1=fmc1,fmc2=fmc2,fmc3=fmc3,fmc4=fmc4,$
@@ -201,7 +210,9 @@ if n_elements(NH) eq 0 then NH=1.			;N(HI)
  ;if n_elements(fH2) eq 0 then fH2=0.26			;N(H2)/N(HI)
 if not keyword_set(fH2) then fH2=0.			;N(H2)/N(HI)
 if n_elements(He1) eq 0 then He1=0.1*NH			;N(HeI)
-if n_elements(HeII) eq 0 then HeII=0.1*He1		;N(HeII)
+if n_elements(He2) eq 0 then begin			;N(HeII)
+  if n_elements(HeII) ne 0 then He2=HeII[0] else He2=0.1*He1
+endif
 ;	if input photon "energy" is in [Ang], convert to [keV]
 if not keyword_set(ikeV) then begin
   wvl=nrg & oo=where(nrg gt 0,moo)
@@ -237,7 +248,7 @@ endif
 
 ;	initialize
 tauH=0*wvl & tauH2=tauH & tauHeII=tauH & tauHeI=tauH & tauX=tauH & tauTB=tauH
-tauFM=tauH
+tauFano=tauH & tauFM=tauH
 
 ;	HI photoionization (from ISMEUV)
 ev30 = 12.3985/(30.e-3)
@@ -259,7 +270,7 @@ r=4*wvl/911.75
 oo=where(r ge ev30/911.75 and r lt 1,moo)
 if moo gt 0 then begin
   z=0*r & z[oo]=sqrt(r[oo]/(1.-r[oo]))
-  tauHeII[oo]=HeII[0]*3.44e-16*(r[oo]^4)*$
+  tauHeII[oo]=He2[0]*3.44e-16*(r[oo]^4)*$
     exp(-4.0*z[oo]*atan(1./z[oo]))/((1.0-exp(-2*!pi*z[oo]))*4)
 endif
 
@@ -279,7 +290,7 @@ fano_gamma=[ 2.64061d-03, 6.20116d-04, 2.56061d-04, 1.320159d-04 ]
 esubi=3.0d - 1.0d/nu^2 + 1.807317d
 ;
 ;INCORRECT-> oo=where(wvl gt 0 and wvl lt 503.97,moo)
-oo=where(wvl gt ev30 and wvl lt 503.97,moo) & x=0*wvl & y=x & eps=x
+oo=where(wvl gt ev30 and wvl lt 503.97,moo) & x=0*wvl & y=x & yf=y & eps=x
 if moo gt 0 then begin
   x[oo]=alog10(wvl[oo])
   o1=where(wvl ge 46.0 and wvl lt 503.97,mo1)
@@ -290,10 +301,11 @@ if moo gt 0 then begin
     eps[oo]=911.2671/wvl[oo]
     for i=0,3 do begin
       x[oo]=2.0*((eps[oo]-esubi[i])/fano_gamma[i])
-      y[oo]=y[oo]+alog10((x[oo]-q[i])^2/(1.+x[oo]*x[oo]))
+      yf[oo]=yf[oo]+alog10((x[oo]-q[i])^2/(1.+x[oo]*x[oo]))
     endfor
   endif
   tauHeI[oo]=He1[0] * 10.^(y[oo])
+  tauFano[oo]=10.^(yf[oo])
 endif
 
 ;	H2 (from ISMABS)
@@ -324,6 +336,10 @@ if keyword_set(iMAM) then begin
     if moo gt 0 then tauX[oo]=NH[0]*sig0*$
       (c0[i]+c1[i]*nrg[oo]+c2[i]*nrg[oo]^2)/(nrg[oo])^3
   endfor
+  oy=where(nrg ge 0.0136 and nrg lt 0.03,moy)
+  if moy gt 0 then begin
+    message,'Morrison & McCammon X-ray opacities between 13.6 to 300 eV set to 0',/informational
+  endif
 endif
 
 if keyword_set(iBAM) then begin
@@ -331,12 +347,17 @@ if keyword_set(iBAM) then begin
   oo=where(nrg ge 0.03 and nrg le 10.,moo)
   if moo gt 0 then tauX[oo]=bamabs(nrg[oo],/ikeV,Fano=Fano,noHeH=noHeH, _extra=e)*NH[0]
 
+  oy=where(nrg ge 0.0136 and nrg lt 0.03,moy)
+  if moy gt 0 then begin
+    message,'Balucinska-Church & McCammon X-ray opacities between 13.6 to 300 eV set to 0',/informational
+  endif
+
   ;	BUG FIX? Jeremy Drake (2014-jul-30; same as the one pointed out by Jon Slavin 2013-sep-12)
   ;	these are already included in bamabs (when noHeH is not set [and when it is set,
   ;	makes no difference]), so no need to add them in again below
-  ;if moo gt 0 then tauH[oo]=0.
-  ;if moo gt 0 then tauHeI[oo]=0.
-  ;if moo gt 0 then tauHeII[oo]=0.
+  if moo gt 0 then tauH[oo]=0.
+  if moo gt 0 then tauHeI[oo]=0.
+  if moo gt 0 then tauHeII[oo]=0.
 endif
 
 if keyword_set(iVION) then begin
@@ -350,6 +371,7 @@ if keyword_set(iVION) then begin
   if moo gt 0 then tauH[oo]=0.
   if moo gt 0 then tauHeI[oo]=0.
   if moo gt 0 then tauHeII[oo]=0.
+  if moo gt 0 then tauX[oo]=tauX[oo]+(1.-exclHe)*He1[0]*tauFano[oo]	;include Fano correction because VION does not include it
 endif
 
 ;	Hard X-ray regime (from ISMABS)
@@ -360,7 +382,7 @@ if moo gt 0 then tauTB[oo]=NH[0]*c0*(nrg[oo])^(c1)
 ;	UV/optical/IR (call FM_UNRED)
 oo=where(nrg gt 0 and nrg le 12.3985/911.75,moo)
 if moo gt 0 then begin
-  ;(if IDLastro is in the path (I don't know how to test for that generally so ignoring it for now)
+  ;if IDLastro is in the path (I don't know how to test for that generally so ignoring it for now)
     wave=12.3985/nrg[oo] & flux=fltarr(moo)+1.
     if not keyword_set(EBV) then zEBV=0. else zEBV=ebv[0] > 0
     fm_unred,wave,flux,zEBV,funred,$
@@ -371,7 +393,7 @@ if moo gt 0 then begin
 endif
 
 ;	add up ever'thin
-tau = (1.-exclH)*tauH + (1.-exclH)*tauH2 + (1.-exclHe)*tauHeII + (1.-exclHe)*tauHeI + tauX + tauTB + tauFM
+tau = (1.-exclH)*tauH + (1.-exclH)*tauH2 + (1.-exclHe)*tauHeII + (1.-exclHe)*tauHeI*tauFano + tauX + tauTB + tauFM
 
 ;	strictly for keyword compatibility
 ;	because IDL doesn't understand that tauHeII and tauHeI are different keyword names
