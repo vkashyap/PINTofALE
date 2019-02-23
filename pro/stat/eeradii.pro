@@ -36,7 +36,7 @@ if np lt 2 then ok='Insufficient parameters' else $
  if nx eq 0 then ok='X positions of events are not given' else $
   if ny eq 0 then ok='Y positions of events are not given' else $
    if nx ne ny then ok='X and Y positions are incompatible' else $
-    if nx lt minph then ok='Too few events; must have at least 50'
+    if nx lt minph then ok='Too few events, reset NMIN (which cannot be <50)'
 if ok ne 'ok' then begin
   print,'Usage: ree=eeradii(xx,yy,eelev,eree=eree,bkgct=bkgct,bkgscal=bkgscal,nmin=nmin,verbose=verbose)'
   print,'  returns EE radii of list of events at specified EE levels, accounting for background'
@@ -55,7 +55,7 @@ ree=fltarr(nl) & eree=ree
 
 ;	compute
 xcen=mean(xx,/double) & ycen=mean(yy,/double) & dd=sqrt((xx-xcen)^2+(yy-ycen)^2)
-os=sort(dd) & dd=dd[os] & xs=xx[os] & ys=yy[os]
+os=sort(dd) & dd=dd[os] & xs=xx[os]-xcen & ys=yy[os]-ycen
 areacirc=!dpi*dd^2 & areas=areacirc
 go_on=1 & i=nx-1L
 while go_on do begin
