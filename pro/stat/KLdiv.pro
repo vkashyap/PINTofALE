@@ -40,7 +40,7 @@ function KLdiv,p1,q2,zeros=zeros,eps=eps,Hp=Hp,Hq=Hq,useln=useln,$
 ;		  entropy relative to the baseline to judge whether it is large
 ;		  or not.  See https://stats.stackexchange.com/a/111523 for a
 ;		  good description.
-;		* If USELN is set, divide both DKL and Hp by alog(2) before
+;		* If USELN is set, does NOT divide DKL and Hp by alog(2) before
 ;		  assessing entropy changes
 ;	Hq	[OUTPUT] the entropy of Q2, computed as -(sum Q2*log(Q2)),
 ;		provided here strictly for completeness
@@ -52,6 +52,7 @@ function KLdiv,p1,q2,zeros=zeros,eps=eps,Hp=Hp,Hq=Hq,useln=useln,$
 ;example
 ;	.run KLdiv
 ;	(pops up windows to make plots if !D.NAME='X')
+;	(uses PEASECOLR)
 ;
 ;history
 ;	Vinay Kashyap (2019feb)
