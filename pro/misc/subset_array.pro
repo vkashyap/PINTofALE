@@ -17,6 +17,9 @@ function subset_array,arr,kd,idx,verbose=verbose,_extra=e
 ;	verbose	[INPUT] controls chatter
 ;	_extra	[JUNK] here only to prevent crashing the program
 ;
+;example
+;	.run subset_array
+;
 ;history
 ;	Vinay Kashyap (2019feb)
 ;	  Michael Stevens and Kathy Reeves posed this question on 2018-jul-23,
