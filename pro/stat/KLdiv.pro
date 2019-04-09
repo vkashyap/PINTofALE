@@ -165,8 +165,8 @@ if !d.name eq 'X' then begin
 endif
 
 ;	how does D_KL/Hp go for Gaussians?
-npos=41L & pos=findgen(npos)*0.05-1.0   	;position ranges from -1 to +1
-nsig=35L & sig=1.+findgen(nsig)*0.05-0.7	;width ranges from 0.3 to 2
+npos=201L & pos=findgen(npos)*0.01-1.0   	;position ranges from -1 to +1
+nsig=171L & sig=1.+findgen(nsig)*0.01-0.7	;width ranges from 0.3 to 2
 DKLarr=dblarr(npos,nsig) & Hparr=dblarr(npos,nsig)
 xx=findgen(601)*0.01-3. & gdef=mk_gauss(xx,0.,1.,/norm)
 for i=0L,npos-1L do begin
@@ -184,11 +184,12 @@ if !d.name eq 'X' then begin
   peasecolr
   contour,100.*DKLarr/Hparr,pos,sig,/xs,/ys,xtitle='!4d!Xx',ytitle='!4dr!X',$
   	title='KLdiv(): % change in entropy for Gaussians',$
-  	levels=100*[0.005,0.01,0.02,0.03,0.05,0.08,0.13,0.21,0.34,0.55,0.89,1.44,2.33],$
+  	levels=100*[0.001,0.005,0.01,0.02,0.03,0.05,0.08,0.13,0.21,0.34,0.55,0.89,1.44,2.33],$
 	/downhill,$
 	c_labels=[1,1,1,1,1,1,1,1,1,1],c_charsize=1.5,$
 	c_color=[1,2,3,4,5,6,7,8,9],$
 	;/fill,$
+	xtickinterval=0.2,ytickinterval=0.2,xticklen=1,yticklen=1,xgridstyle=1,ygridstyle=1,$
   	thick=2,xthick=2,ythick=2,charthick=2,charsize=2
 endif
 
