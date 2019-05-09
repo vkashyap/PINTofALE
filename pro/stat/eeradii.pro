@@ -1,5 +1,5 @@
 function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
-	nmin=nmin,verbose=verbose, _extra=e
+	cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose, _extra=e
 ;+
 ;function	eeradii
 ;	computes the enclosed energy radii and corresponding error at the
@@ -7,7 +7,8 @@ function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;	contamination
 ;
 ;syntax
-;	ree=eeradii(xx,yy,eelev,eree=eree,nmin=nmin,bkgct=bkgct,bkgscal=bkgscal,verbose=verbose)
+;	ree=eeradii(xx,yy,eelev,eree=eree,nmin=nmin,bkgct=bkgct,bkgscal=bkgscal,$
+;	    cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose)
 ;
 ;parameters
 ;	xx	[INPUT; required] X positions of events
@@ -20,6 +21,8 @@ function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;		(will not work well for EELEV close to 0 or 1, and for small numbers of events)
 ;	bkgct	[INPUT; default=0] number of counts in the background region
 ;	bkgscal	[INPUT; default=1] ratio of the background to source areas
+;	cenX	[INPUT] if given overrides the central X location determined by centroiding
+;	cenY	[INPUT] if given overrides the central Y location determined by centroiding
 ;	nmin	[INPUT; default=100] minimum number of events before any calculations are done
 ;		* hardcoded minimum is 50
 ;	verbose	[INPUT] controls chatter
@@ -27,6 +30,7 @@ function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;
 ;history
 ;	Vinay Kashyap (2018nov)
+;	added keywords CENX,CENY (VK; 2019may)
 ;-
 
 ;	usage
@@ -54,7 +58,10 @@ clev=0.85 & if nl gt 0 then clev=eelev[*] & nl=n_elements(clev)
 ree=fltarr(nl) & eree=ree
 
 ;	compute
-xcen=mean(xx,/double) & ycen=mean(yy,/double) & dd=sqrt((xx-xcen)^2+(yy-ycen)^2)
+xcen=mean(xx,/double) & ycen=mean(yy,/double)
+if keyword_set(cenX) then xcen=cenX[0]
+if keyword_set(cenY) then ycen=cenY[0]
+dd=sqrt((xx-xcen)^2+(yy-ycen)^2)
 os=sort(dd) & dd=dd[os] & xs=xx[os]-xcen & ys=yy[os]-ycen
 areacirc=!dpi*dd^2 & areas=areacirc
 go_on=1 & i=nx-1L
