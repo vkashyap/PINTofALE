@@ -24,6 +24,7 @@ pro cfacolor,type,cmin=cmin,cmax=cmax,oldr=oldr,oldg=oldg,oldb=oldb, _extra=e
 ;
 ;history
 ;	Vinay Kashyap (2018nov)
+;	bug fix (VK; 2019nov)
 ;-
 
 ;	initialize
@@ -54,7 +55,23 @@ if ok ne 'ok' then begin
   for i=0L,n_elements(help)-1L do print,help[i]
   return
 endif
-ityp=long(type[0]) & if ityp ge nctyp then ityp=0
+;	figure out the type
+if szt eq 7 then begin
+  cc=strupcase(type[0])
+  if strpos(cc,'CFA') ge 0 then ityp=1 else $
+   if strpos(cc,'INV') ge 0 then ityp=2 else $
+    if strpos(cc,'RED') ge 0 then ityp=3 else $
+     if strpos(cc,'VIO') ge 0 then ityp=4 else $
+      if strpos(cc,'BLU') ge 0 then ityp=5 else $
+       if strpos(cc,'1') ge 0 then ityp=1 else $
+        if strpos(cc,'2') ge 0 then ityp=2 else $
+         if strpos(cc,'3') ge 0 then ityp=3 else $
+          if strpos(cc,'4') ge 0 then ityp=4 else $
+           if strpos(cc,'5') ge 0 then ityp=5 else $
+            ityp=0
+endif else begin
+  ityp=long(type[0]) & if ityp ge nctyp then ityp=0
+endelse
 
 ;	keywords
 kmin=1b & if keyword_set(cmin) then kmin=(byte(cmin[0])>0b)<255b
@@ -65,17 +82,6 @@ kk=kmax-kmin+1
 redR=141 & redG=0  & redB=52
 vioR=43  & vioG=53 & vioB=117
 bluR=19  & bluG=26 & bluB=60
-
-;	figure out the type
-if szt eq 7 then begin
-  cc=strupcase(type[0])
-  if strpos(cc,'CFA') ge 0 then ityp=1 else $
-   if strpos(cc,'INV') ge 0 then ityp=2 else $
-    if strpos(cc,'RED') ge 0 then ityp=3 else $
-     if strpos(cc,'VIO') ge 0 then ityp=4 else $
-      if strpos(cc,'BLU') ge 0 then ityp=5 else $
-       ityp=0
-endif
 
 ;	make the new color tables
 rc=rr & gc=rr & bc=rr

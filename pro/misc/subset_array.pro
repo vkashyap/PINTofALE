@@ -17,6 +17,11 @@ function subset_array,arr,kd,idx,verbose=verbose,_extra=e
 ;	verbose	[INPUT] controls chatter
 ;	_extra	[JUNK] here only to prevent crashing the program
 ;
+;warning
+;	because IDL throws away trailing dimensions of size 1, permanently
+;	reducing the dimensionality of the array, the input cannot have any
+;	columns with size 1.
+;
 ;example
 ;	.run subset_array
 ;
@@ -30,6 +35,7 @@ function subset_array,arr,kd,idx,verbose=verbose,_extra=e
 ;	  the N-dimensional matrix such that the dimension of interest is now
 ;	  the first one in the list, do the extraction, then transpose back.
 ;	  Et voila.
+;	added warning about columns of size 1 (VK; 2019mar)
 ;-
 
 ;	usage
@@ -56,6 +62,8 @@ vv=0L & if keyword_set(verbose) then vv=long(verbose[0])>1L
 zz=long(0*arr)-1L	;first make a holding index array
 
 dims=sza[1:sza[0]]	;what are the dimensions we have to deal with?
+o1=where(dims eq 1,mo1) & if mo1 ne 0 then message,$
+	'CAVEAT VSVATOR: some columns have size 1.  They may inadvertantly get compressed.',/informational
 newdims=dims & newdims[kd]=ni	;what are the output dimensions?
 idims=lindgen(sza[0])	;just the original sequence of dimensions
 kdims=shift(idims,-kd)	;shift like this such that the KDth dimension becomes the first one

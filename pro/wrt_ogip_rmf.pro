@@ -82,6 +82,8 @@ pro wrt_ogip_rmf,rmf,rmfile,hdrfil=hdrfil,$
 ;history
 ;	vinay kashyap (Nov2001)
 ;	force variable length arrays even when N_GRP=1 (VK; Jul02)
+;	if input RMF structure has a different number of rows than the header template,
+;	  NAXIS2 is updated accordingly (VK; Jul19)
 ;-
 
 ;	usage
@@ -204,6 +206,8 @@ tmp=sxpar(hdrsm,'EXTNAME') & c='(MATRIX or SPECRESP MATRIX)'
 if not keyword_set(tmp) then begin
   if keyword_set(matext) then fxaddpar,hdrsm,'EXTNAME',matext,c else fxaddpar,hdrsm,'EXTNAME','SPECRESP MATRIX',c
 endif
+tmp=sxpar(hdrsm,'NAXIS1') & c='Number of rows'
+fxaddpar,hdrsm,'NAXIS2',rmf.NNRG,c
 tmp=sxpar(hdreb,'EXTNAME') & c='EBOUNDS'
 if not keyword_set(tmp) then begin
   if keyword_set(ebext) then fxaddpar,hdreb,'EXTNAME',ebext,c else fxaddpar,hdreb,'EXTNAME','EBOUNDS',c

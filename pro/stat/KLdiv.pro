@@ -56,6 +56,8 @@ function KLdiv,p1,q2,zeros=zeros,eps=eps,Hp=Hp,Hq=Hq,useln=useln,$
 ;
 ;history
 ;	Vinay Kashyap (2019feb)
+;	changed name of physical file to all lowercase because for some reason
+;	  IDL 8.7.2 does not know about mixed case (VK; 2019nov)
 ;-
 
 ;	usage

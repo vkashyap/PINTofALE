@@ -1,4 +1,4 @@
-function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
+function eeradii,xx,yy,eelev,eemax=eemax,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 	cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose, _extra=e
 ;+
 ;function	eeradii
@@ -7,7 +7,7 @@ function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;	contamination
 ;
 ;syntax
-;	ree=eeradii(xx,yy,eelev,eree=eree,nmin=nmin,bkgct=bkgct,bkgscal=bkgscal,$
+;	ree=eeradii(xx,yy,eelev,eemax=eemax,eree=eree,nmin=nmin,bkgct=bkgct,bkgscal=bkgscal,$
 ;	    cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose)
 ;
 ;parameters
@@ -17,6 +17,10 @@ function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;		* if not given, computes the radii corresponding to EE=85%
 ;
 ;keywords
+;	eemax	[INPUT] sometimes (xx,yy) does not cover the full set, and only a subset
+;		is included.  If given, this factor corrects where the max of the cdf
+;		falls.
+;		* default (and hardcoded maximum) is 1
 ;	eree	[OUTPUT] error bars on REE computed assuming a symmetric binomial error
 ;		(will not work well for EELEV close to 0 or 1, and for small numbers of events)
 ;	bkgct	[INPUT; default=0] number of counts in the background region
@@ -24,25 +28,26 @@ function eeradii,xx,yy,eelev,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;	cenX	[INPUT] if given overrides the central X location determined by centroiding
 ;	cenY	[INPUT] if given overrides the central Y location determined by centroiding
 ;	nmin	[INPUT; default=100] minimum number of events before any calculations are done
-;		* hardcoded minimum is 50
+;		* hardcoded minimum is 10
 ;	verbose	[INPUT] controls chatter
 ;	_extra	[JUNK] here only to prevent crashing the program
 ;
 ;history
 ;	Vinay Kashyap (2018nov)
 ;	added keywords CENX,CENY (VK; 2019may)
+;	added keyword EEMAX; changed hardcoded min for NMIN from 50 to 10 (VK; 2019oct)
 ;-
 
 ;	usage
 ok='ok' & np=n_params() & nx=n_elements(xx) & ny=n_elements(yy) & nl=n_elements(eelev)
-minph=100L & if keyword_set(nmin) then minph=long(nmin[0])>50L
+minph=100L & if keyword_set(nmin) then minph=long(nmin[0])>10L
 if np lt 2 then ok='Insufficient parameters' else $
  if nx eq 0 then ok='X positions of events are not given' else $
   if ny eq 0 then ok='Y positions of events are not given' else $
    if nx ne ny then ok='X and Y positions are incompatible' else $
-    if nx lt minph then ok='Too few events, reset NMIN (which cannot be <50)'
+    if nx lt minph then ok='Too few events, reset NMIN (which cannot be <10)'
 if ok ne 'ok' then begin
-  print,'Usage: ree=eeradii(xx,yy,eelev,eree=eree,bkgct=bkgct,bkgscal=bkgscal,nmin=nmin,verbose=verbose)'
+  print,'Usage: ree=eeradii(xx,yy,eelev,eemax=eemax,eree=eree,bkgct=bkgct,bkgscal=bkgscal,nmin=nmin,verbose=verbose)'
   print,'  returns EE radii of list of events at specified EE levels, accounting for background'
   if np ne 0 then message,ok,/informational
   return,-1L
@@ -53,6 +58,7 @@ vv=0L & if keyword_set(verbose) then vv=long(verbose[0])>1L
 bgct=0L & if keyword_set(bkgct) then bgct=long(abs(bkgct[0]))>1L
 backscal=1.D & if keyword_set(bkgscal) then backscal=double(bkgscal[0])
 clev=0.85 & if nl gt 0 then clev=eelev[*] & nl=n_elements(clev)
+eecorr=1.0D & if n_elements(eemax) gt 0 then eecorr=abs(eemax[0])<1.0D
 
 ;	outputs
 ree=fltarr(nl) & eree=ree
@@ -89,6 +95,7 @@ cdf=dindgen(nx)
 cdfb=(cdf/(nx-1L))*(areas/maxarea)*(float(bgct)/backscal)
 
 cdfs=cdf-cdfb & cdfs=cdfs/max(cdfs)
+cdfs=cdfs*eecorr
 o1=where(cdfs ge 1,mo1) & cdfs[o1[0]:*]=1.
 
 ree=interpol(dd,cdfs,clev)

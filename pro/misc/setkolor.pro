@@ -23,7 +23,8 @@ pro setkolor,colors,icols,ocols,rgbfil=rgbfil,oldr=oldr,oldg=oldg,oldb=oldb,$
 ;keywords
 ;	rgbfil	[INPUT] name of file containing (r,g,b) color values
 ;		and corresponding names in same format as:-
-;		* the default, /usr/lib/X11/rgb.txt
+;		* default is /usr/lib/X11/rgb.txt, or if that does not exist,
+;		  /opt/X11/share/X11/rgb.txt
 ;		* note: some new linux systems don't seem to have this file.
 ;		  those users can copy over this file from another system, or
 ;		  use the copy provided in !ARDB+'/rgb.txt'
@@ -62,6 +63,7 @@ pro setkolor,colors,icols,ocols,rgbfil=rgbfil,oldr=oldr,oldg=oldg,oldb=oldb,$
 ;	added keyword QUIET (VK; Nov15)
 ;	if GDL, now does not use findfile (VK; Nov16)
 ;	added special colors 'CfA Red', 'CfA Violet', 'CfA Dark Blue' (VK; Nov18)
+;	allowed to look for /opt/X11/share/X11/rgb.txt as an alternate default (VK; Nov19)
 ;-
 
 forward_function findfile,file_search
@@ -79,6 +81,7 @@ endif
 ;	check inputs
 nic=n_elements(icols) & jcols=lindgen(ncol)+1
 if not keyword_set(rgbfil) then rgbfil='/usr/lib/X11/rgb.txt'
+rgbfil2='/opt/X11/share/X11/rgb.txt'
 
 ;	should we use findfile or file_search?
 idlversion=float(strmid(!version.release,0,1))
@@ -87,6 +90,12 @@ defsysv,'!GDL',exists=igdl
 ;	does RGBFIL exist?  if not, look in !ARDB
 if (igdl eq 0 and idlversion le 6) then fil=findfile(rgbfil,count=nfil) else $
 	fil=file_search(rgbfil,count=nfil)
+if nfil eq 0 then begin
+  ; look for alternate RGBFIL
+  rgbfil=rgbfil2
+  if (igdl eq 0 and idlversion le 6) then fil=findfile(rgbfil,count=nfil) else $
+	fil=file_search(rgbfil,count=nfil)
+endif
 if nfil eq 0 then begin
   zTOPDIR='/data/fubar/SCAR/'
   ivar=0 & defsysv,'!TOPDIR',exists=ivar	;if !TOPDIR exists

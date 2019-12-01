@@ -1,5 +1,5 @@
 function haartran,y,scales,ss,ysig=ysig,thrsig=thrsig,thrloc=thrloc,$
-	thrpoi=thrpoi,wy=wy,verbose=verbose, _extra=e
+	thrpoi=thrpoi,wy=wy,bwy=bwy,verbose=verbose, _extra=e
 ;+
 ;function	haartran
 ;	Run the input 1D array through a sequence of Haar wavelets,
@@ -94,6 +94,7 @@ function haartran,y,scales,ss,ysig=ysig,thrsig=thrsig,thrloc=thrloc,$
 ;history
 ;	vinay kashyap (Dec'02)
 ;	now centers the kernel; added keyword BWY (Nov'14)
+;	*really* added keyword BWY (Nov'19)
 ;-
 
 ;	usage
@@ -171,8 +172,8 @@ for i=0L,ns-1L do begin			;{step through the scales
   bkern=[0.5+fltarr(scale), fltarr(scale), 0.5+fltarr(scale)]/(2.*scale)
   if vv gt 1 then kilroy,dot=strtrim(i,2)+'.'
   if vv gt 3 then kilroy,dot=strtrim(ss[i],2)+':'
-  tmp=convol(float(y),kern,/edge_truncate,center=1) & wy[i+1,*]=tmp
   tmp=convol(float(y),bkern,/edge_truncate,center=1) & bwy[i+1,*]=tmp
+  tmp=convol(float(y),kern,/edge_truncate,center=1) & wy[i+1,*]=tmp
   if keyword_set(thrpoi) then begin	;(local probability threshold
     message,'sorry, THRPOI not implemented yet',/informational
     return,-1L

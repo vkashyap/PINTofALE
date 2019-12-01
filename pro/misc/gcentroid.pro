@@ -31,6 +31,7 @@ function gcentroid,img,xsig=xsig,ysig=ysig,itermax=itermax,eps=eps,$
 ;
 ;history
 ;	Vinay Kashyap (MMXIX.V)
+;	bugfix (VK; MMXIX.X)
 ;-
 
 ;	usage
@@ -67,8 +68,8 @@ iA=i0-1L & iB=i0+1L & jA=j0-1L & jB=j0+1L
 ;	{this block just in case the maximum is flush along an edge
 if iA lt 0 then begin & iA=0L & iB=iB+1L & ki=0 & endif
 if jA lt 0 then begin & jA=0L & jB=jB+1L & kj=0 & endif
-if iB eq nx then begin & iB=iB-1L & iB=nx-1L & ki=2 & endif
-if jB eq ny then begin & jB=jB-1L & jB=ny-1L & kj=2 & endif
+if iB eq nx then begin & iA=iA-1L & iB=nx-1L & ki=2 & endif
+if jB eq ny then begin & jA=jA-1L & jB=ny-1L & kj=2 & endif
 ;	}
 i3x3=simg[iA:iB,jA:jB]
 

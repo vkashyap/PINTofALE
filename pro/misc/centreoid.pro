@@ -110,10 +110,11 @@ if not keyword_set(xlim) or not keyword_set(ylim) then begin
   cdf=(cct-cbg)>0	;estimated source counts within DD
   ;	the >0 to avoid getting into numerical difficulties with voids near the centroid
   cdf=cdf/max(cdf) & o1=where(cdf eq 1) & cdf[o1[0]:*]=1.
-  if nlim eq 0 then dlim=interpol(dd,cdf,plim/100.) else begin
+  if nlim eq 0 then dlim=interpol(dd,cdf,plim/100.)>0 else begin
     if nlim lt 0 then mlim=(((nx-1L)-abs(pbound[0]))>0L)<(nx-1L) else mlim=((pbound[0])>0L)<(nx-1L)
     dlim=dd[mlim]
   endelse
+  if dlim eq 0 then dlim=stddev([xarr-xcen,yarr-ycen])
   if not keyword_set(xlim) then xlim=xcen+dlim*[-1,1]
   if not keyword_set(ylim) then ylim=ycen+dlim*[-1,1]
 endif
