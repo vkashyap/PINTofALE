@@ -32,6 +32,7 @@ function cstat_gof_k17,mval,obsstat,pval,C_e=C_e,S_nu=S_nu,C_nu=C_nu,zval=zval,v
 ;history
 ;	Vinay Kashyap (2018-jul-29)
 ;	bug fix (VK; 2018-aug-30)
+;	bug fix (h/t Long Xi, who found typos in the 0.2<mu<0.3 and 1<mu<2 cases)
 ;-
 
 ;	usage
@@ -88,10 +89,10 @@ if mo13 gt 0 then begin
 endif
 
 if mo14 gt 0 then c_nu[o14] = -262.*mval[o14]^4 + 195.*mval[o14]^3 - 51.24*mval[o14]^2 + 4.34*mval[o14] + 0.77005
-if mo15 gt 0 then c_nu[o15] = 4.23*mval[o15]^2 - 2.9254*mval[o15] + 1.12522
+if mo15 gt 0 then c_nu[o15] = 4.23*mval[o15]^2 - 2.8254*mval[o15] + 1.12522
 if mo16 gt 0 then c_nu[o16] = -3.7*mval[o16]^3 + 7.328*mval[o16]^2 - 3.6926*mval[o16] + 1.20641
 if mo17 gt 0 then c_nu[o17] = 1.28*mval[o17]^4 - 5.191*mval[o17]^3 + 7.666*mval[o17]^2 - 3.5446*mval[o17] + 1.15431
-if mo18 gt 0 then c_nu[o18] = 0.1125*mval[o18]^4 - 0.641^mval[o18]^3 + 0.859*mval[o18]^2 + 1.0914*mval[o18] - 0.05748
+if mo18 gt 0 then c_nu[o18] = 0.1125*mval[o18]^4 - 0.641*mval[o18]^3 + 0.859*mval[o18]^2 + 1.0914*mval[o18] - 0.05748
 if mo19 gt 0 then c_nu[o19] = 0.089*mval[o19]^3 - 0.872*mval[o19]^2 + 2.8422*mval[o19] - 0.67539
 if mo20 gt 0 then c_nu[o20] = 2.12336 + 0.012202*exp( (5.717-2.6*alog(mval[o20]))*(alog(mval[o20])) )
 if mo21 gt 0 then c_nu[o21] = 2.05159 + 0.331*exp( (1.343-alog(mval[o21]))*(alog(mval[o21])) )
