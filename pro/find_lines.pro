@@ -43,6 +43,12 @@ function find_lines,cts,wvl,hwhm=hwhm,effar=effar,wvlar=wvlar,ctb=ctb,bkgscal=bk
 ;	verbose	[INPUT; controls chatter]
 ;	_extra	[INPUT ONLY] pass defined keywords to subroutines
 ;
+;subroutines
+;	INICON
+;	HAARTRAN
+;	ROOFN
+;	KILROY
+;
 ;history
 ;	Vinay Kashyap (MMXIX.XI)
 ;-
