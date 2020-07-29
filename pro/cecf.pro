@@ -107,6 +107,7 @@ function cecf,wvlar,effar,wrange=wrange,chnrng=chnrng,NH=NH,$
 ;	dwvl for continuum forced to be +ve; APEC abundances are now
 ;	  removed before being added back on via ABUND (VK; MMXIII.I)
 ;	added more tests to catch ATOMDB (VK; MMXIV.XI)
+;	bugfix: was returning 0 count rates when NH=0 (VK; MMXX.VII)
 ;-
 
 ;	usage
@@ -288,7 +289,7 @@ lwvl=abs(lstr.WVL) & cwvl=cstr.midWVL & cww=cstr.WVL & dcw=abs(cww[1:*]-cww)
 nrgw=h*c*1e8/wmid & nrgl=h*c*1e8/lwvl & nrgc=h*c*1e8/cwvl	;[erg/ph]
 areal=(interpol(areff,arwvl,lwvl)>0)<(max(areff))
 areac=(interpol(areff,arwvl,cwvl)>0)<(max(areff))
-ltrans=0.*areal & ctrans=0.*areac
+ltrans=0.*areal+1. & ctrans=0.*areac+1.
 if NHcol gt 0 then begin
   ltau=ismtau(lwvl,NH=NHcol,verbose=vv,abund=abund, _extra=e)
   ctau=ismtau(cwvl,NH=NHcol,verbose=vv,abund=abund, _extra=e)
