@@ -44,6 +44,7 @@ pro chandra_deroll,skyx,skyy,roll,xout,yout,xcen=xcen,ycen=ycen,$
 ;	  (VK; MMXIII.VIII)
 ;	added HRC-I offset correction; allow XCEN and YCEN to be
 ;	  set to zero explicitly (VK; MMXVI.V)
+;	bug fix: y-axis was inverted (VK; MMXX.VIII)
 ;-
 
 ;usage
@@ -81,7 +82,7 @@ if vv gt 10 then message,'Rolling '+strtrim(roll[0],2)+' deg around (Xc,Yc)='+$
 ;	(this originally had +theta, and the + and - of second term interchanged)
 sinth=sin(-theta) & costh=cos(-theta)
 xout=(skyx-xc)*costh + (skyy-yc)*sinth
-yout=(skyx-xc)*sinth - (skyy-yc)*costh
+yout=-(skyx-xc)*sinth + (skyy-yc)*costh
 
 ;	plot if asked
 if vv gt 50 then begin
