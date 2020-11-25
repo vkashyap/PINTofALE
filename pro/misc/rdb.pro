@@ -1,5 +1,5 @@
 function rdb,rdbfil,cols=cols,comm=comm,fldsep=fldsep,rdbdir=rdbdir,$
-	verbose=verbose,_extra=e
+	forced=forced,verbose=verbose,_extra=e
 ;+
 ;function	rdb
 ;	return a structure containing the output of ascii table
@@ -21,7 +21,7 @@ function rdb,rdbfil,cols=cols,comm=comm,fldsep=fldsep,rdbdir=rdbdir,$
 ;
 ;syntax
 ;	tab=rdb(filename,cols=cols,comm=comm,fldsep=fldsep,rdbdir=rdbdir,$
-;	verbose=verbose)
+;	/forced,verbose=verbose)
 ;
 ;parameters
 ;	rdbfil	[INPUT; required] name of rdb file
@@ -45,6 +45,7 @@ function rdb,rdbfil,cols=cols,comm=comm,fldsep=fldsep,rdbdir=rdbdir,$
 ;	fldsep	[INPUT] field separator
 ;		* default is a <TAB>
 ;	rdbdir	[INPUT] if given, prepends RDBFIL with this pathname
+;	forceD	[INPUT] if set, forces all Numeric columns to be double precision
 ;	verbose	[INPUT] if set, blabbers incoherently along the way
 ;	_extra	[JUNK] here only to prevent crashing the program
 ;
@@ -66,6 +67,8 @@ function rdb,rdbfil,cols=cols,comm=comm,fldsep=fldsep,rdbdir=rdbdir,$
 ;	now looks at only the first character of format column field
 ;	  to decide type (VK; MMXIII.VIII)
 ;	now basically returns only long integer and doubles (VK; MMXIII.XII)
+;	added keyword FORCED (VK; MMXX.VII)
+;	now handles NaNs and Infs more gracefully (VK; MMXX.XI)
 ;-
 
 ;	usage
@@ -73,7 +76,7 @@ ok='ok' & szf=size(rdbfil) & nszf=n_elements(szf)
 if szf(nszf-2) ne 7 then ok='illegible filename' else $
  if szf(0) gt 0 then ok='cannot handle array of RDB files'
 if ok ne 'ok' then begin
-  print,'Usage: t=rdb(filename,cols=cols,fldsep=fldsep,rdbdir=rdbdir,verbose=verbose)'
+  print,'Usage: t=rdb(filename,cols=cols,fldsep=fldsep,rdbdir=rdbdir,/forced,verbose=verbose)'
   print,'  return structure containing tabulated values'
   if n_params() gt 0 then message,ok,/info
   return,{HEAD: ok}
@@ -255,7 +258,7 @@ while not eof(urdb) do begin	;{read from file
 	  ;		format code has a ">" sign,
 	  ;	then R8
 
-	  fmt='I4'	;default is I4
+	  if not keyword_set(forced) then fmt='I4' else fmt='R8'	;default is I4 unless FORCED is set
 	  idot=strpos(data[i],'.',0) & iexp=strpos(strlowcase(data[i]),'e',0)
 	  if idot ge 0 or iexp ge 0 then fmt='R8'	;default double
 	  if iexp ge 0 then begin
@@ -269,11 +272,31 @@ while not eof(urdb) do begin	;{read from file
 	  dlen=strlen(strtrim(data[i],2))
 	  if (dlen gt 4 or flen gt 4 or igt ge 0) and fmt eq 'I2' then fmt='I4'	;it is never I2
 	  if (dlen gt 8 or flen gt 8 or igt ge 0) and fmt eq 'R4' then fmt='R8'
+	  ;	check for NaNs and Infs
+	  iNaN=strpos(strlowcase(data[i]),'nan',0)
+	  iInf=strpos(strlowcase(data[i]),'inf',0)
+	  iInfty=strpos(strlowcase(data[i]),'infinity',0)
+	  if iNan ge 0 or iInf ge 0 then fmt='R4'
+	  if iInfty ge 0 then fmt='R8'
 
-	  if fmt eq 'I2' then val=(str_2_arr(strtrim(data[i],2)))[0]
-	  if fmt eq 'I4' then val=(str_2_arr(strtrim(data[i],2),/i4))[0]
-	  if fmt eq 'R4' then val=(str_2_arr(strtrim(data[i],2),/r4))[0]
-	  if fmt eq 'R8' then val=(str_2_arr(strtrim(data[i],2),/r8))[0]
+	  if keyword_set(forced) then begin
+	    fmt='R8'
+	    if forced[0] eq 4 then fmt='R4'	;undocumented 
+	    if forced[0] eq 2 then fmt='I4'	;undocumented 
+	  endif
+
+	  cc=strlowcase(strtrim(val,2))
+	  case cc of
+	    'nan': if fmt eq 'R8' then val=!values.D_NAN else val=!values.F_NAN
+	    'inf': if fmt eq 'R8' then val=!values.D_INFINITY else val=!values.F_INFINITY
+	    'infinity': if fmt eq 'R8' then val=!values.D_INFINITY else val=!values.F_INFINITY
+	    else: begin
+	      if fmt eq 'I2' then val=(str_2_arr(strtrim(data[i],2)))[0]
+	      if fmt eq 'I4' then val=(str_2_arr(strtrim(data[i],2),/i4))[0]
+	      if fmt eq 'R4' then val=(str_2_arr(strtrim(data[i],2),/r4))[0]
+	      if fmt eq 'R8' then val=(str_2_arr(strtrim(data[i],2),/r8))[0]
+	    end
+	  endcase
 
 	  fmtcode[i]=fmt
           if v ge 5 and i eq ncols-1L then begin
@@ -305,10 +328,22 @@ while not eof(urdb) do begin	;{read from file
     if icols[i] gt 0 then begin		;(read this column?
       val=data[i]
       
-      if fmtcode[i] eq 'I2' then val=(str_2_arr(strtrim(data[i],2)))[0]
-      if fmtcode[i] eq 'I4' then val=(str_2_arr(strtrim(data[i],2),/i4))[0]
-      if fmtcode[i] eq 'R4' then val=(str_2_arr(strtrim(data[i],2),/r4))[0]
-      if fmtcode[i] eq 'R8' then val=(str_2_arr(strtrim(data[i],2),/r8))[0]
+      cc=strlowcase(strtrim(val,2))
+      case cc of
+        'nan': if fmt eq 'R8' then val=!values.D_NAN else val=!values.F_NAN
+        'inf': if fmt eq 'R8' then val=!values.D_INFINITY else val=!values.F_INFINITY
+        'infinity': if fmt eq 'R8' then val=!values.D_INFINITY else val=!values.F_INFINITY
+        else: begin
+          if fmt eq 'I2' then val=(str_2_arr(strtrim(data[i],2)))[0]
+          if fmt eq 'I4' then val=(str_2_arr(strtrim(data[i],2),/i4))[0]
+          if fmt eq 'R4' then val=(str_2_arr(strtrim(data[i],2),/r4))[0]
+          if fmt eq 'R8' then val=(str_2_arr(strtrim(data[i],2),/r8))[0]
+        end
+      endcase
+      ;if fmtcode[i] eq 'I2' then val=(str_2_arr(strtrim(data[i],2)))[0]
+      ;if fmtcode[i] eq 'I4' then val=(str_2_arr(strtrim(data[i],2),/i4))[0]
+      ;if fmtcode[i] eq 'R4' then val=(str_2_arr(strtrim(data[i],2),/r4))[0]
+      ;if fmtcode[i] eq 'R8' then val=(str_2_arr(strtrim(data[i],2),/r8))[0]
 
       if rdbcol gt mcols then message,'BUG: RDBCOL >? MCOLS!!'
       rdbtab.(rdbcol-1L)(kline-1L)=val & rdbcol=rdbcol+1L
