@@ -84,6 +84,7 @@ function rd_ogip_rmf,rmfile,effar=effar,eqvar=eqvar,spcar=spcar,$
 ;       added ability to handle non-OGIP Astro-E2 XIS rmf file (LL/VK:Aug04)
 ;	tweaked to speed up calculation of effar (VK; Dec04)
 ;	added keyword RMFIMG (VK; May06)
+;	[BUG FIX] FIRSTCHAN was being set to a string for NuSTAR RMFs (h/t Claudia Vilega Rodriguez) (VK; Jun21)
 ;-
 
 ;	usage
@@ -134,7 +135,7 @@ if x1 eq 'EBOUNDS' then begin 	;x2=SPECRESP MATRIX/MATRIX
   N_CHAN=r2.N_CHAN		;number of channels in each group
   MATRIX=r2.MATRIX		;non-zero elements of response
   ;L5_MATRIX=r2.L5_MATRIX	;<what?>
-  FIRSTCHAN=sxpar(h2,'TLMIN'+strtrim(fcol,2))	;first channel index -- 0-based or 1-based
+  FIRSTCHAN=long(sxpar(h2,'TLMIN'+strtrim(fcol,2)))	;first channel index -- 0-based or 1-based
 endif else if x2 eq 'EBOUNDS' then begin	;x1=SPECRESP MATRIX/MATRIX
     CHANNEL=r2.CHANNEL		;channel index
     EMN=r2.E_MIN		;channel bin minimum energy
@@ -146,7 +147,7 @@ endif else if x2 eq 'EBOUNDS' then begin	;x1=SPECRESP MATRIX/MATRIX
     N_CHAN=r1.N_CHAN		;number of channels in each group
     MATRIX=r1.MATRIX		;non-zero elements of response
     ;L5_MATRIX=r1.L5_MATRIX	;number of non-zero elements of MATRIX in row
-    FIRSTCHAN=sxpar(h1,'TLMIN'+strtrim(fcol,2))	;first channel index -- 0-based or 1-based
+    FIRSTCHAN=long(sxpar(h1,'TLMIN'+strtrim(fcol,2)))	;first channel index -- 0-based or 1-based
   endif else begin
     message,'	cannot understand input file: '+rmfil,/info
     return,0.
@@ -190,7 +191,7 @@ endif
 rmstr=create_struct('NNRG',nnrg,'ELO',elo,'EHI',ehi,$
 	'NCHAN',nchan,'EMN',emn,'EMX',emx,$
 	'N_GRP',n_grp,'F_CHAN',f_chan,'N_CHAN',n_chan,$
-	'MATRIX',matrix,'FIRSTCHAN',firstchan)
+	'MATRIX',matrix,'FIRSTCHAN',long(firstchan))
 
 if keyword_set(shift1) then message,$
 	'assuming that input RMF is 1-based, not 0-based',/info
