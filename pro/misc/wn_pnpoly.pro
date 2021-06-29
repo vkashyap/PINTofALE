@@ -27,6 +27,7 @@ function wn_pnpoly,x0,y0,xp,yp,eps=eps, _extra=e
 ;
 ;history
 ;	Vinay Kashyap (2016.08)
+;	changed call from isLeft() to is_left() (VK; 2021.06)
 ;-
 
 ;	usage
@@ -69,8 +70,8 @@ for i=0L,nn-2L do begin	;{edge from P(i) to P(i+1)
 
   ;	figure out whether P0 is left or right of this edge
   PA=[xz[i],yz[i]] & PB=[xz[i+1L],yz[i+1L]]
-  pp=isLeft(PA,PB,P0)
-  	;note that P0 here is P2 inside of isLeft()
+  pp=is_left(PA,PB,P0)
+  	;note that P0 here is P2 inside of is_left()
 
   for j=0L,nx0-1L do begin	;{for each X0,Y0
 

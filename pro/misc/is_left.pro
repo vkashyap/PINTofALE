@@ -1,6 +1,6 @@
-function isLeft,P0,P1,P2
+function is_left,P0,P1,P2
 ;+
-;function	isLeft
+;function	is_left
 ;	tests if a point left, on, or right of a 2D line and returns
 ;	>0 if left, =0 if on, and <0 if right
 ;
@@ -8,7 +8,7 @@ function isLeft,P0,P1,P2
 ;	see http://geomalgorithms.com/a01-_area.html
 ;
 ;syntax
-;	pp=isLeft(P0,P1,P2)
+;	pp=is_left(P0,P1,P2)
 ;
 ;parameters	[ALL INPUT, ALL REQUIRED]
 ;	P0	2-element array defining one of the points on line
@@ -23,6 +23,7 @@ function isLeft,P0,P1,P2
 ;
 ;history
 ;	Vinay Kashyap (2016.08)
+;	changed name from isLeft to is_left because got tired of .comp'ing endlessly (VK; 2021.06)
 ;-
 
 ;	usage
@@ -39,7 +40,7 @@ if np lt 3 then ok='Insufficient parameters' else $
        if sz2[0] gt 2 then ok='P2 cannot be understood' else $
         if sz2[0] eq 2 and sz2[1] ne 2 then ok='P2 must be 2xN array of (x,y)'
 if ok ne 'ok' then begin
-  print,'Usage: pp=isLeft(P0,P1,P2)'
+  print,'Usage: pp=is_left(P0,P1,P2)'
   print,'  tests if P2 is left (>0), on (=0), or right (<0) of line P0-P1'
   if np ne 0 then message,ok,/informational
   return,-1L
