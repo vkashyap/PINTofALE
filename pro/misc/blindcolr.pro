@@ -69,16 +69,18 @@ pro blindcolr,white=white,verbose=verbose,help=help,$
 ;	6 = Sky Blue:   	 86,180,233	201.63,0.631,0.914
 ;	7 = Yellow:     	240,228, 66	 55.86,0.725,0.941
 ;	8 = Orange:     	230,159,  0	 41.48,1.0,  0.902
-;	9 = Black:       	  0,  0,  0	  0.0, 0.0,  0.0
+;	9 = Grey:       	128,128,128	  0.0, 0.0,  0.5
 ;
 ;	For a black background, each are rescaled such that X.val=1
 ;	also colors 4 and 7 are swapped
 ;
 ;	Each corresponding dex goes linearly from X0=X to
-;	whiteX9.val=blackX.val and blackX9.val=whiteX.val
+;	whiteX1.val=0.95 to whiteX9.val=whiteX.val-(1-whiteX.val)
+;	blackX1.val=whiteX.val-(1-whiteX.val) to blackX9.val=0.95
 ;
 ;	To obtain the complete set of color shades used, set the
-;	keyword HELP in conjunction with VERBOSE>5
+;	keyword HELP in conjunction with VERBOSE>5, or run with
+;	VERBOSE>9 to view on display
 ;	
 ;	color indices 100+ are not touched, but all else is
 ;	overwritten.
@@ -91,6 +93,7 @@ pro blindcolr,white=white,verbose=verbose,help=help,$
 ;	blindcolr,verbose=10
 ;	blindcolr,/help,charthick=3
 ;	!p.background=255 & blindcolr,verbose=10,/white,/help
+;	.run blindcolr
 ;
 ;history
 ;	vinay kashyap (Jul21; based on peasecolr.pro)
@@ -127,12 +130,15 @@ X=5-1 & hsvw[0,X,*]=326.75 & hsvw[1,X,*]=0.407 & hsvw[2,X,*]=0.800 & chsvw[X,0]=
 X=6-1 & hsvw[0,X,*]=201.63 & hsvw[1,X,*]=0.631 & hsvw[2,X,*]=0.914 & chsvw[X,0]='SKY BLUE'
 X=7-1 & hsvw[0,X,*]= 55.86 & hsvw[1,X,*]=0.725 & hsvw[2,X,*]=0.941 & chsvw[X,0]='YELLOW'
 X=8-1 & hsvw[0,X,*]= 41.48 & hsvw[1,X,*]=1.0   & hsvw[2,X,*]=0.902 & chsvw[X,0]='ORANGE'
-X=9-1 & hsvw[0,X,*]=  0.00 & hsvw[1,X,*]=0.0   & hsvw[2,X,*]=0.000 & chsvw[X,0]='BLACK'
-for k=1,9 do hsvw[2,*,k]=(1.-hsvw[2,*,0])*float(k)/9.+hsvw[2,*,0]
+X=9-1 & hsvw[0,X,*]=  0.00 & hsvw[1,X,*]=0.0   & hsvw[2,X,*]=0.500 & chsvw[X,0]='GREY'
+	;	for k=1,9 do hsvw[2,*,k]=(1.-hsvw[2,*,0])*float(k)/9.+hsvw[2,*,0]
+	;	vmin=fltarr(9) & for X=1,9 do vmin[k]=hsvw[2,X-1,0]-(1.-hsvw[2,X-1,0])
+vmin=reform(hsvw[2,*,0]-(1.-hsvw[2,*,0]))>0.
+for k=1,9 do hsvw[2,*,k]=(0.95-vmin[*])*float(k)/9. + vmin
 rXw=bytarr(9,10) & gXw=rXw & bXw=rXw
-hsvb=hsvw & chsvb=chsvw & chsvb[8,0]='WHITE' & rXb=rXw & gXb=rXb & bXb=rXb
+hsvb=hsvw & chsvb=chsvw & rXb=rXw & gXb=rXb & bXb=rXb
 for X=0,8 do begin
-  hsvb[2,X,*]=reverse(reform(hsvw[2,X,*]))
+  hsvb[2,X,*]=[hsvw[2,X,0],reverse(reform(hsvw[2,X,1:*]))]
   for k=0,9 do begin
     zw=hsv2rgb(hsvw[0,X,k],hsvw[1,X,k],hsvw[2,X,k]) & rXw[X,k]=zw[0] & gXw[X,k]=zw[1] & bXw[X,k]=zw[2]
     if k gt 0 then chsvw[X,k]=hexed(zw)
@@ -165,10 +171,10 @@ ncol=n_elements(cols) & mcol=max(icol)
 if ih eq 1 then begin
   print,'Usage: blindcolr,/white,verbose=verbose,/help,$'
   print,'       oldr=oldr,oldg=oldg,oldb=oldb, XYOUTS keywords'
-  print,'  set up a color table with some useful colors loaded in'
+  print,'  set up a color table with some colors useful to make color-blind friendly plots loaded in'
   if vv ge 5 then begin
     print,'INDEX','COLOR',form='(a5,a20)'
-    bgcol='Black' & if keyword_set(wbg) then bgcol='White'
+    bgcol='Grey'
     print,0,bgcol+' (background)',form='(i3,2x,a20)'
     for i=0,ncol-1 do print,icol[i],cols[i],form='(i3,2x,a20)'
   endif else begin
@@ -241,4 +247,19 @@ if vv ge 10 then begin
 endif
 
 return
+end
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;	example use case
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+blindcolr
+window,0,xsize=1200,ysize=1000
+blindcolr,verbose=10,charsize=2,charthick=2
+window,2,xsize=1200,ysize=1000
+!p.background=255
+blindcolr,/white,verbose=10,charsize=2,charthick=2
+!p.background=0
+blindcolr,/help,verbose=5
+blindcolr,/help
+
 end
