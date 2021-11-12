@@ -23,6 +23,9 @@ function mk_dem,type,logT=logT,pardem=pardem,indem=indem,$
 ;		'spline'	PARDEM = logT location of points
 ;		'varsmooth'	PARDEM = smoothing scales
 ;		'delta'		PARDEM = logT locations of EM components
+;		'AR'		PARDM -- none
+;		'QS'		PARDM -- none
+;		'drake'  	PARDEM = [logTmin,logTpeak,logTsh,alphaT,alphaLC,alphaUC,alphaHT], INDEM=DEM at logTmin
 ;	if a particular method requires an input DEM (e.g., 'interpolate'),
 ;	feed that in via the keyword parameter INDEM.
 ;	any parameters that the method requires go in via PARDEM (e.g., for
@@ -75,6 +78,7 @@ function mk_dem,type,logT=logT,pardem=pardem,indem=indem,$
 ;	button press status now stored in !MOUSE, not !ERR (VK; Apr09)
 ;	bug fix to look at only the necessary letters in TYPE; added
 ;	  Brosius DEM curves (VK; Dec18)
+;	added option DRAKE (VK; Oct21)
 ;-
 
 ;	usage
@@ -94,9 +98,11 @@ usage=[	'Usage: DEM=mk_dem(type,logT=logT,indem=indem,pardem=pardem,$',$
 	'  V*arsmooth:- variable scale smoothing; PARDEM=[SCALES]',$
 	'  L*oop:- loop-model DEMs from EMs; PARDEM=[LOGTmax],INDEM==EM[LOGTmax]',$
 	'         also uses keywords SLOOP, LOOPY, LCOMP',$
-	'  D*elta:- multiple EM components: PARDEM=[LOGT],INDEM=EM[LOGT]',$
+	'  DE*lta:- multiple EM components: PARDEM=[LOGT],INDEM=EM[LOGT]',$
 	'  AR:- Active Region DEM from Brosius et al. 1996',$
 	'  QS:- Quiet Sun DEM from Brosius et al. 1996',$
+	'  DR*ake:- realistic piecewise power-law, Drake et al. 2020',$
+	'  	PARDEM = [logTmin,logTpeak,logTsh,alphaT,alphaLC,alphaUC,alphaHT], INDEM=EMmin',$
 	'-----------------------------------------------']
 nu=n_elements(usage)
 
@@ -116,18 +122,21 @@ if strpos(strmid(todo,0,1),'s') eq 0 then code='s'		;Spline interpolation
 if strpos(strmid(todo,0,1),'v') eq 0 then code='v'		;Variable scale smoothing
 if strpos(strmid(todo,0,1),'r') eq 0 then code='r'		;Variable scale rebinning
 if strpos(strmid(todo,0,1),'l') eq 0 then code='l'		;loop-model DEM from EM(T)
-if strpos(strmid(todo,0,1),'d') eq 0 then code='d'		;multi EM components
+if strpos(strmid(todo,0,1),'de') eq 0 then code='de'		;multi EM components
 if strpos(strmid(todo,0,2),'ar') eq 0 then code='ar'		;Active Region DEM of Brosius et al. 1996
 if strpos(strmid(todo,0,2),'qs') eq 0 then code='qs'		;Quiet Sun DEM of Brosius et al. 1996
+if strpos(strmid(todo,0,2),'dr') eq 0 then code='drake'		;piecewise power-law of Drake et al. 2020
 
 idlvers=float(!VERSION.release) & if idlvers le 0 then idlvers=7
 
 ;	figure out what to do
 case code of
+
   'co': begin					;(constant
     if keyword_set(pardem) then dem0=pardem[0] else dem0=1.
     dem=dblarr(nT)+dem0
   end						;constant)
+
   'i': begin					;(interpolate
     mD=n_elements(indem) & mT=n_elements(pardem)
     if mT eq 0 then begin		;(make sure TLOG is set
@@ -154,6 +163,7 @@ case code of
       dT=min(abs(tlog-logT),iT) & dem=0*logT & dem[iT]=indem[0]/dlogT/alog(10.)
     endelse
   end						;interpolate)
+
   'ch': begin					;(chebyshev
     if np ge 2 then coeff=pardem else begin
       if nD lt 2 then coeff=[2.,0] else coeff=chebyshev(indem,-1)
@@ -163,6 +173,7 @@ case code of
     if ndem0 gt 2 then dem=spline(tpar,dem0,logT) else $
       dem=interpol(dem0,tpar,logt)
   end						;chebyshev)
+
   's': begin					;(spline
     if np ne 0 then tlog=pardem
     if nD ne 0 then dem0=indem
@@ -174,6 +185,7 @@ case code of
     if nD gt 2 then dem=spline(tlog,dem0,logT) else $
       dem=interpol(dem0,tlog,logt)
   end						;spline)
+
   'v': begin					;(varsmooth
     if np ne 0 then ss=pardem
     if nD ne 0 then dem0=indem
@@ -184,12 +196,14 @@ case code of
     ;
     dem=varsmooth(dem0,ss, _extra=e)
   end						;varsmooth)
+
   'r': begin					;(variable rebin
     if np ne 0 then ii=pardem
     if nD ne 0 then dem0=indem else dem0=0*logT+1
     dem=varsmooth(dem0,ii,/steps, _extra=e)
     ;message,'not implemented yet, sorry!',/info & dem=dem0
   end						;variable rebin)
+
   'cu': begin					;(cursor selection
     xr=[min(logT),max(logT)] & yr=[1e10,1e14]	;the default range
     if np eq 1 then yr=pardem[0]*[100.,0.01]
@@ -290,6 +304,7 @@ case code of
       xcur=xx & ycur=yy			;outputs
     endif
   end						;cursor select)
+
   'l': begin					;(loop DEM
     ok='ok' & mT=n_elements(pardem) & mD=n_elements(indem) & dem=dblarr(nT)
     if mT eq 0 then ok='set PARDEM to log(Tmax) for loops' else $
@@ -341,7 +356,8 @@ case code of
     endif
     dem=loopem(logTmax,EMs,logT=logT, _extra=e)
   end						;loop DEM)
-  'd': begin					;(multi EM components
+
+  'de': begin					;(multi EM components
     ;	INDEM are the emission measures
     ;	at logT[K] defined by PARDEM 
     ok='ok' & mT=n_elements(pardem) & mD=n_elements(indem) & dem=dblarr(nT)
@@ -358,18 +374,44 @@ case code of
       dem[j]=dem[j]+xEM[i]/(logtbound[i+1L]-logtbound[i])
     endfor
   end						;multi EM components)
+
   'ar': begin					;(Active Region DEM of Brosius et al. 1996
     brosdem=[22.0,20.7,20.4,20.5,21.1,21.5,21.1,21.3,19.7]
     broslgT=[5.0, 5.4, 5.6, 5.7, 6.0, 6.2, 6.4, 6.7, 7.0]
     bdem_AR=(spline(broslgT,brosdem,logT)>min(brosdem))<max(brosdem)
     DEM=10.D^(bdem_AR)
   end						;AR)
+
   'qs': begin					;(Quiet Sun DEM of Brosius et al. 1996
     brosdem=[22.1,21.6,19.9,19.6,20.3,20.7,19.5,19.0]
     broslgT=[ 4.8, 5.0, 5.5,5.75, 6.0,6.15, 6.5,6.625]
     bdem_QS=(spline(broslgT,brosdem,logT)>0.)<max(brosdem)
     DEM=10.D^(bdem_QS)
   end						;QS)
+
+  'drake': begin				;(DRAKE
+    par0=[5.5,6.5,7.25, -1.33,1.5,-0.67,-10.0]
+    if np gt 0 then begin
+      pars=par0
+      if np le 7 then pars[0:np-1]=pardem else pars[*]=pardem[0:6]
+    endif else pars=par0
+    if nD gt 0 then dem0=indem[0] else dem0=1d10
+    phi2=fltarr(81) & lTgrid=findgen(81)*0.05+4.
+    ;		PARDEM = [logTmin,logTpeak,logTsh,alphaT,alphaLC,alphaUC,alphaHT], INDEM=EMmin
+    zlTmin=pars[0] & zlTpeak=pars[1] & zlTsh=pars[2] & zatr=pars[3] & zalc=pars[4] & zauc=pars[5] & zaht=pars[6] & zEM0=dem0
+    otr=where(lTgrid ge 4 and lTgrid le zlTmin,motr) 		& phi2[otr]=zatr*(lTgrid[otr]-4)
+    otp=where(lTgrid gt zlTmin and lTgrid le zlTpeak,motp) 	& phi2[otp]=phi2[otr[motr-1L]]+zalc*(lTgrid[otp]-zlTmin)
+    ouc=where(lTgrid gt zlTpeak and lTgrid le zlTsh,mouc) 	& phi2[ouc]=phi2[otp[motp-1L]]+zauc*(lTgrid[ouc]-zlTpeak)
+    osh=where(lTgrid gt zlTsh and lTgrid le 8,mosh) 		& phi2[osh]=phi2[ouc[mouc-1L]]+zaht*(lTgrid[osh]-zlTsh)
+    zphi=10.D^(phi2)/total(10.D^(phi2),/nan)
+    normphi=dem0/zphi[otr[motr-1]]
+    zDEM=normphi*zphi
+    lzDEM=alog10(zDEM)
+    lDEM=interpol(lzDEM,lTgrid,logT)
+    DEM=10.D^(lDEM)
+    
+  end						;DRAKE)
+
   else: begin					;(help
     for i=0L,nu-1L do print,usage[i]
     dem=0*logT+1.
