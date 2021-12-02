@@ -79,6 +79,7 @@ function mk_dem,type,logT=logT,pardem=pardem,indem=indem,$
 ;	bug fix to look at only the necessary letters in TYPE; added
 ;	  Brosius DEM curves (VK; Dec18)
 ;	added option DRAKE (VK; Oct21)
+;	bug fix: DELTA was broken (VK; Dec21)
 ;-
 
 ;	usage
@@ -122,7 +123,7 @@ if strpos(strmid(todo,0,1),'s') eq 0 then code='s'		;Spline interpolation
 if strpos(strmid(todo,0,1),'v') eq 0 then code='v'		;Variable scale smoothing
 if strpos(strmid(todo,0,1),'r') eq 0 then code='r'		;Variable scale rebinning
 if strpos(strmid(todo,0,1),'l') eq 0 then code='l'		;loop-model DEM from EM(T)
-if strpos(strmid(todo,0,1),'de') eq 0 then code='de'		;multi EM components
+if strpos(strmid(todo,0,2),'de') eq 0 then code='de'		;multi EM components
 if strpos(strmid(todo,0,2),'ar') eq 0 then code='ar'		;Active Region DEM of Brosius et al. 1996
 if strpos(strmid(todo,0,2),'qs') eq 0 then code='qs'		;Quiet Sun DEM of Brosius et al. 1996
 if strpos(strmid(todo,0,2),'dr') eq 0 then code='drake'		;piecewise power-law of Drake et al. 2020
@@ -399,10 +400,10 @@ case code of
     phi2=fltarr(81) & lTgrid=findgen(81)*0.05+4.
     ;		PARDEM = [logTmin,logTpeak,logTsh,alphaT,alphaLC,alphaUC,alphaHT], INDEM=EMmin
     zlTmin=pars[0] & zlTpeak=pars[1] & zlTsh=pars[2] & zatr=pars[3] & zalc=pars[4] & zauc=pars[5] & zaht=pars[6] & zEM0=dem0
-    otr=where(lTgrid ge 4 and lTgrid le zlTmin,motr) 		& phi2[otr]=zatr*(lTgrid[otr]-4)
-    otp=where(lTgrid gt zlTmin and lTgrid le zlTpeak,motp) 	& phi2[otp]=phi2[otr[motr-1L]]+zalc*(lTgrid[otp]-zlTmin)
-    ouc=where(lTgrid gt zlTpeak and lTgrid le zlTsh,mouc) 	& phi2[ouc]=phi2[otp[motp-1L]]+zauc*(lTgrid[ouc]-zlTpeak)
-    osh=where(lTgrid gt zlTsh and lTgrid le 8,mosh) 		& phi2[osh]=phi2[ouc[mouc-1L]]+zaht*(lTgrid[osh]-zlTsh)
+    otr=where(lTgrid ge 4 and lTgrid le zlTmin,motr) 		& if motr gt 0 then phi2[otr]=zatr*(lTgrid[otr]-4) else begin & otr=[0] & motr=1 & endelse
+    otp=where(lTgrid gt zlTmin and lTgrid le zlTpeak,motp) 	& if motp gt 0 then phi2[otp]=phi2[otr[motr-1L]]+zalc*(lTgrid[otp]-zlTmin) else begin & otp=[max(otr)] & motp=1 & endelse
+    ouc=where(lTgrid gt zlTpeak and lTgrid le zlTsh,mouc) 	& if mouc gt 0 then phi2[ouc]=phi2[otp[motp-1L]]+zauc*(lTgrid[ouc]-zlTpeak) else begin & ouc=[max(otr)] & mouc=1 & endelse
+    osh=where(lTgrid gt zlTsh and lTgrid le 8,mosh) 		& if mosh gt 0 then phi2[osh]=phi2[ouc[mouc-1L]]+zaht*(lTgrid[osh]-zlTsh) else begin & osh=[max(ouc)] & mosh=1 & endelse
     zphi=10.D^(phi2)/total(10.D^(phi2),/nan)
     normphi=dem0/zphi[otr[motr-1]]
     zDEM=normphi*zphi
