@@ -30,6 +30,7 @@ function modalpoint,array,eps=eps,verbose=verbose, _extra=e
 ;	translated to IDL by Vinay Kashyap from C code written for BEHR
 ;	  by Taeyoung Park c.2003 (MarMMVI)
 ;	now correctly handles case when input is quantized (VK; SepMMVI)
+;	added edge case where if split is even, stops right there (VK; MayMMXXII)
 ;-
 
 ;	usage
@@ -66,6 +67,11 @@ while go_on do begin
     return,median(arr)
   endif
   if o1[0] gt narr/2 then tmparr=arr[0:o1[0]-1L] else tmparr=arr[o1]
+  if o1[0] eq narr/2 then begin
+    if vv gt 0 then message,'evenly split, might be multimodal; cannot deal',/informational
+    tmparr=arr
+    go_on=0	;quit at this stage
+  endif
   if vv gt 100 then print,narr/2,mo1,o1[0],min(tmparr),max(tmparr)
   arr=tmparr
   narr=n_elements(arr) & amax=max(arr,min=amin,/nan)

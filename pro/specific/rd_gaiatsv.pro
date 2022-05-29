@@ -165,5 +165,7 @@ ccstr="gaiastr=create_struct('header',header,"+strjoin("'"+cols+"',"+cols,',')+'
 header=[header,ccstr]
 jnk=execute(ccstr)
 
+if vv gt 1000 then stop,'halting; type .CON to continue'
+
 return,gaiastr
 end

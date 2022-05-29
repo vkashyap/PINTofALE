@@ -38,6 +38,7 @@ function hsv2rgb,hh,ss,vv, _extra=e
 ;	Vinay Kashyap (2015Oct)
 ;	allowed (H,S,V) to be arrays (VK; 2015Nov)
 ;	allow V to be >1, in which case it just gets rescaled (VK; 2015Dec)
+;	bug fix when V was input as an array (VK; 2017Feb)
 ;-
 
 ;	usage
@@ -61,7 +62,7 @@ zH = (1.0*hh) mod 360.
 zS = ((1.0*ss) > 0.) < 1.
 zV = 0.*zh+1.
 if nv gt 0 then zv[0L:(nv<nh)-1L]=vv[0L:(nv<nh)-1L]
-if nv gt 1 then if max(zv,/nan) gt 1 then zv=za/max(zv,/nan)
+if nv gt 1 then if max(zv,/nan) gt 1 then zv=zv/max(zv,/nan)
 
 ;	see http://en.wikipedia.org/wiki/HSL_and_HSV#Coverting_to_RGB
 zC = zV * zS

@@ -142,6 +142,7 @@ function colbehr,Ssrc,Msrc,Hsrc, Sbkg=Sbkg,Mbkg=Mbkg,Hbkg=Hbkg,$
 ;	bug correction with NaNs not being caught in some cases
 ;	  (VK; Mar07)
 ;	added keywords Stable,Mtable,Htable (VK; Feb08)
+;	bugfix: wasn't reading HTABLE (VK; Oct16)
 ;
 ;etymology
 ;	getting color-color diagrams using BEHR
@@ -411,7 +412,7 @@ for i=0L,ndat-1L do begin
 	' softscl='+strtrim(sc[i],2)+$
 	' hardscl='+strtrim(hc[i],2)
   if keyword_set(Stable) then cmd2=cmd2+' softtbl='+mtbl
-  if keyword_set(Mtable) then cmd2=cmd2+' hardtbl='+htbl
+  if keyword_set(Htable) then cmd2=cmd2+' hardtbl='+htbl
   cmd2=cmd2+$
 	' post='+soutPost[i]+$
 	' level='+strtrim(clev[i],2)+$

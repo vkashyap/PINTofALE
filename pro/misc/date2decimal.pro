@@ -22,6 +22,7 @@ function date2decimal,datestr,fod=fod,doy=doy,jday=jday,verbose=verbose, _extra=
 ;	vinay kashyap (2014nov)
 ;	bug fix: Feb was resetting doy counter (VK; 2015jun)
 ;	added keyword VERBOSE (VK; 2018jun)
+;	bug fix: day 1 was being counted as day past 1 (VK; 2020jun)
 ;-
 
 ;	usage
@@ -89,7 +90,7 @@ for i=0L,nd-1L do begin	;{I=0,ND-1
 
   ;	how many days so far?
   if zmon ge 2 then elapsed_days=total(daymon[0:zmon-2]) else elapsed_days=0
-  elapsed_days=elapsed_days+zday
+  elapsed_days=elapsed_days+(zday-1)
   doy[i]=elapsed_days
 
   ;	how much of the day so far?
@@ -99,6 +100,7 @@ for i=0L,nd-1L do begin	;{I=0,ND-1
 
   ;	and putting it together..
   date[i]=zyr+(doy[i]+fod[i])/total(daymon)
+  doy[i]=doy[i]+1	;day of year, just add back one to fully elapsed days
 
   ;	and the Julian Days too, for completeness
   jday[i]=julday(zmon,zday,zyr,zhr,zmin,zsec)

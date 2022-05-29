@@ -325,6 +325,7 @@ while not eof(urdb) do begin	;{read from file
   cold=str_sep(line,fsep) & ndata=n_elements(cold)
   if ndata le ncols then data[0]=cold else data=cold[0:ncols-1L]
   for i=0L,ncols-1L do begin		;{go through each column
+    fmt=fmtcode[i]
     if icols[i] gt 0 then begin		;(read this column?
       val=data[i]
       
@@ -360,6 +361,7 @@ close,urdb & free_lun,urdb	;close RDB file)
 if n_tags(rdbtab) eq 0 then rdbtab=create_struct('HEAD',header) else $
 	rdbtab=create_struct('HEAD',header,rdbtab)
 
+if v gt 1000 then stop,'HALTing; type .CON to continue'
 if v ge 4 then help,rdbtab,/str
 
 return,rdbtab

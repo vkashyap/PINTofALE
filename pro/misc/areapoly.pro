@@ -19,7 +19,7 @@ function areapoly,xpt,ypt,xcen=xcen,ycen=ycen,nosort=nosort,$
 ;		* if not given, *CEN are computed as mean(*PT) and returned on output
 ;		* this point _must_ be inside the polygon, otherwise the output
 ;		  will be meaningless
-;		* if set to 0 (I*4), will get recomputed and overwritten
+;		* if set to 0 (I*4, not 0L == I*8 or 0b ==  I*2), will get recomputed and overwritten
 ;	nosort	[INPUT] if set, does not reorder the points for increasing angular
 ;		coordinate
 ;	outx	[OUTPUT] the XPT in translated (and resorted) coordinates
