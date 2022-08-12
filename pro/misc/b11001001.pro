@@ -14,8 +14,20 @@ function b11001001,b,str=str,otto=otto
 ;		* overrides OTTO
 ;	otto	[INPUT] if set, returns an 8xN(B) byte array as output
 ;
+;note
+;	IDL has a simpler and more flexible built-in way to turn
+;	decimal to binary or octal representations.  Do, e.g.,
+;	  print,string(2L^indgen(4),'(b)')
+;	  print,string(8L^indgen(4),'(o)')
+;	To do the reverse conversion, from binary string to decimal, can do
+;	something like this:
+;	  cc='11111100100' & k=strlen(cc)
+;	  x=0L & for i=k-1L,0,-1 do begin & c1=fix(strmid(cc,i,1)) & x=x+c1*2L^(k-i-1L) & endfor & print,x
+;	will result in x=2020
+;
 ;history
 ;	vinay kashyap (Jul97)
+;	updated docs (VK; 11111100011-1100-11111)
 ;-
 
 ;	usage

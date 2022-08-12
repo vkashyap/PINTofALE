@@ -48,6 +48,7 @@ pro propermotion_corrector,catra,catdec,pmra,pmdec,newra,newdec,$
 ;history
 ;	vinay kashyap (2014sep05)
 ;	replaced call to julday() with systime(/julian) for GDL compatibility (VK; 2018mar04)
+;	bug fix: PMRA,PMDEC are now allowed to be vectors (VK; 2019dec22)
 ;-
 
 ;	usage
@@ -60,7 +61,7 @@ if np lt 6 then ok='Insufficient parameters' else $
     if mra eq 0 then ok='PMRA is undefined' else $
      if mdec eq 0 then ok='PMDEC is undefined' else $
       if mra ne ndec then ok='PMRA and PMDEC are not compatible' else $
-       if mra ne 1 or mra ne nra then ok='PM* should be scalar or match CAT*'
+       if mra ne 1 and mra ne nra then ok='PM* should be scalar or match CAT*'
 if ok ne 'ok' then begin
   print,'Usage: propermotion_corrector.catra,catdec,pmra_masperyr,pmdec_masperyr,newra,newdec,$'
   print,'       catyr=catyr,newyr=newyr,verbose=verbose,$'

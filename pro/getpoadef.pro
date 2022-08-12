@@ -53,6 +53,7 @@ function getpoadef,varname,force=force,poarc=poarc,verbose=verbose,_extra=e
 ;	  (VK; 2016nov)
 ;	fixed creash when using FORCE and !VERBOSE was already defined (VK; 2017nov)
 ;	makes it easier to pick up !TOPDIR in GDL (VK; 2018jan)
+;	sometimes help,/source produces only one column of output (h/t Jan-Uwe Ness; VK 2022jul)
 ;-
 
 ;	usage
@@ -117,10 +118,11 @@ if iPoA eq 1 then topdir=!TOPDIR else begin	;(iPoA=0
       ok=where(strpos(srcpaths,'getpoadef.pro') gt 0,mok)
       if mok gt 0 then begin
         cc=strsplit(srcpaths[ok[0]],' ',/extract)
-        ccc=cc[1] & itree=strpos(ccc,'/pro/getpoadef.pro')
+	;	IDL "feature" discovered by Jan-Uwe: sometims the output only contains the pathname
+	ncc=n_elements(cc) & ccc=cc[ncc-1] & itree=strpos(ccc,'/pro/getpoadef.pro')
         topdir=filepath('',root_dir=strmid(ccc,0,itree))
       endif else begin
-        message,'something went wrong'
+        message,'something went wrong; could not find compiled version of getpoadef.pro'
       endelse
     endif else begin
       print,'GDL does not support the OUTPUT keyword to HELP.'
