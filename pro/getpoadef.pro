@@ -170,7 +170,7 @@ for i=0L,nv-1L do begin		;{I=0,NV-1
       defsysv,'!PoA',exists=ivar
       if keyword_set(force) then ivar=0	;force override
       if ivar eq 1 then def[i]=!PoA else begin
-        def[i]='2.97 (2016nov24)'
+        def[i]='2.99202301'	;until we change to FITS inputs and do various other updates, version number will stay at 2.99YYYYMM
 	defsysv,'!PoA',def[i]
 	if vv gt 0 then message,'PINTofALE version '+def[i],/informational
       endelse		;VERSION)

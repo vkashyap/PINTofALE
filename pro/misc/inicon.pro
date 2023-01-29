@@ -53,6 +53,8 @@ pro inicon,atom=atom,aname=aname,amu=amu,fip=fip,fundae=fundae,roman=roman,$
 ;	new IAU definition for A.U. (VK; MMXII.IX)
 ;	added new Pluto and Charon measurements from New Horizons (VK; MMXV.VII)
 ;	updated h to match new SI definition (Cho 2018, Science 362, 625; VK MMXVII.XI)
+;	updated definition of parsec to conform to IAU definition in Resolution B2
+;	  [https://www.iau.org/static/resolutions/IAU2015_English.pdf] (thanks A.Maggio; VK MMXXIII.I)
 ;-
 
 ;	usage
@@ -359,11 +361,13 @@ if get_fun gt 0 then begin				;(FUNDAE
   s=create_struct(s,'day',day,'year',year,'yr',yr)
   SH=create_struct(SH,'day',day_h,'year',year_h,'yr',yr_h)
 
-  pc=3.26*c*yr    	& pc_h='1 parsec [cm]'
   ly=c*yr         	& ly_h='1 Light Year [cm]'
   ;AU=1.495985e13  	&
   AU=14959787070000.D	;new IAU definition
   AU_h='Astronomical Unit [cm]'
+  ;	pc=3.26*c*yr    	& pc_h='1 parsec [cm]'
+  pc=(648000.D/!dpi)*AU    	& pc_h='1 parsec [cm] = (648000/pi)*AU, IAU Resolution B2 (Note 4)'
+  	;	
   s=create_struct(s,'pc',pc,'ly',ly,'AU',AU)
   SH=create_struct(SH,'pc',pc_h,'ly',ly_h,'AU',AU_h)
 
