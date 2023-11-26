@@ -60,7 +60,7 @@ endif
 common cb_stample,vname,vhost,vPoA
 
 ;	initialize
-PoA_version=2.99202301'		;until we change to FITS inputs and various other updadtes, the version number will stay as 2.99YYYYMM
+PoA_version=2.99202311'		;until we change to FITS inputs and various other updadtes, the version number will stay as 2.99YYYYMM
 mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 if float(strmid(!version.RELEASE,0,3)) lt 5.3 then begin
   ;	this suggested by Antonio Maggio for back compatibility with

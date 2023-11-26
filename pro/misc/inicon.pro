@@ -55,6 +55,8 @@ pro inicon,atom=atom,aname=aname,amu=amu,fip=fip,fundae=fundae,roman=roman,$
 ;	updated h to match new SI definition (Cho 2018, Science 362, 625; VK MMXVII.XI)
 ;	updated definition of parsec to conform to IAU definition in Resolution B2
 ;	  [https://www.iau.org/static/resolutions/IAU2015_English.pdf] (thanks A.Maggio; VK MMXXIII.I)
+;	updated values of e and h to match NIST (grazie A.Maggio; VK MMXIII.XI)
+	  [e: (1.6021892 -> 1.602176634)e-19; h: (6.626027015 -> 6.62607015)e-27]
 ;-
 
 ;	usage
@@ -284,11 +286,12 @@ endif							;FIP)
 ;	physical and astronomical constants
 if get_fun gt 0 then begin				;(FUNDAE
 
-  c=2.99792458d10  	& c_h='Speed of light (defines SI meter) [cm/s]'
+  c=2.99792458d10  	& c_h='Speed of light (defines SI meter) [cm/s] (https://physics.nist.gov/cgi-bin/cuu/Value?c)'
   s=create_struct('c',c) & SH=create_struct('c',c_h)
 
-  h=6.626176d-27  	& h_h="Planck's constant [erg s]"
-  h=6.626207015d-27	& h_h="Planck's constant (defines SI kg) [erg s]"
+  ;h=6.626176d-27  	& h_h="Planck's constant [erg s]"
+  ;h=6.626207015d-27	& h_h="Planck's constant (defines SI kg) [erg s]"
+  h=6.626070155d-27	& h_h="Planck's constant (defines SI kg) [erg s] (https://physics.nist.gov/cgi-bin/cuu/Value?h)"
   s=create_struct(s,'h',h) & SH=create_struct(SH,'h',h_h)
 
   G=6.672e-8      	& G_h='Gravitational constant [cm^3/gm/s^2]'
@@ -301,7 +304,8 @@ if get_fun gt 0 then begin				;(FUNDAE
   s=create_struct(s,'Me',Me,'Mp',Mp,'Mn',Mn,'AMU',h_1)
   SH=create_struct(SH,'Me',Me_h,'Mp',Mp_h,'Mn',Mn_h,'AMU',h_1_h)
 
-  e=1.6021892d-19  	& e_h='electron charge [C]'
+  ;e=1.6021892d-19  	& e_h='electron charge [C]'
+  e=1.602176634d-19 	& e_h='electron charge [C] (https://physics.nist.gov/cgi-bin/cuu/Value?e)'
   esu=4.803d-10      	& esu_h='electron charge [ESU]'
   eps0=8.854187d-12	& eps0_h='permittivity of vacuum [F/m]'
   s=create_struct(s,'e',e,'esu',esu,'eps0',eps0)
