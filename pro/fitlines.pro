@@ -319,9 +319,9 @@ endif				;NCE .NE. NC)
 ;	this is the current model
 ncom=n_elements(pos)
 if ncom gt 0 then begin
-  plist=strarr(4L*ncom)+string(' ','(a100)') & list=intarr(4L*ncom) & k=-1L
+  plist=strarr(4L*ncom)+string(' ','(a100)') & qlist=intarr(4L*ncom) & k=-1L
 endif else begin
-  plist=[string(' ','(a100)')] & list=[0]
+  plist=[string(' ','(a100)')] & qlist=[0]
 endelse
 
 ;	initialze some global parameters
@@ -346,7 +346,7 @@ for i=0,ncom-1 do begin
     if j eq 2 then val=flx(i)
     plist(k)=plist(k)+string(val,'(g14.4)')+string(' ','(a30)')
     if thaw(jpar) ne 0 then begin
-      list(k)=1 & list(k0)=1
+      qlist[k]=1 & qlist[k0]=1
     endif
   endfor
 endfor
@@ -475,7 +475,7 @@ comp_sign=cw_field(pars_comp,/column,/string,/return_events,title='Label',$
 bgp_ids=1
 pars_list=cw_bgroup(base_pars,plist,/column,/nonexclusive,uvalue='pars_list',$
 	/return_index,/scroll,y_scroll_size=340,x_scroll_size=540,$
-	set_value=list,font='8x13',label_top=label_top,ids=list_ids)
+	set_value=qlist,font='8x13',label_top=label_top,ids=list_ids)
 
 b_pars = [base_pars,pars_list,pars_comp,comp_indx,comp_posv,comp_wdtv,$
 	comp_flxv,comp_type,comp_sign,list_ids]

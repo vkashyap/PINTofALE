@@ -1,28 +1,28 @@
-function eeradii,xx,yy,eelev,eemax=eemax,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
+function ecfradii,xx,yy,ecflev,ecfmax=ecfmax,erecf=erecf,bkgscal=bkgscal,bkgct=bkgct,$
 	cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose, _extra=e
 ;+
-;function	eeradii
+;function	ecfradii
 ;	computes the enclosed energy radii and corresponding error at the
 ;	specified levels for a list of events, accounting for background
 ;	contamination
 ;
 ;syntax
-;	ree=eeradii(xx,yy,eelev,eemax=eemax,eree=eree,nmin=nmin,bkgct=bkgct,bkgscal=bkgscal,$
+;	recf=ecfradii(xx,yy,ecflev,ecfmax=ecfmax,erecf=erecf,nmin=nmin,bkgct=bkgct,bkgscal=bkgscal,$
 ;	    cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose)
 ;
 ;parameters
 ;	xx	[INPUT; required] X positions of events
 ;	yy	[INPUT; required] Y positions of events
-;	eelev	[INPUT] enclosed energy levels at which to compute radii
-;		* if not given, computes the radii corresponding to EE=85%
+;	ecflev	[INPUT] enclosed energy levels at which to compute radii
+;		* if not given, computes the radii corresponding to ecf=85%
 ;
 ;keywords
-;	eemax	[INPUT] sometimes (xx,yy) does not cover the full set, and only a subset
+;	ecfmax	[INPUT] sometimes (xx,yy) does not cover the full set, and only a subset
 ;		is included.  If given, this factor corrects where the max of the cdf
 ;		falls.
 ;		* default (and hardcoded maximum) is 1
-;	eree	[OUTPUT] error bars on REE computed assuming a symmetric binomial error
-;		(will not work well for EELEV close to 0 or 1, and for small numbers of events)
+;	erecf	[OUTPUT] error bars on Recf computed assuming a symmetric binomial error
+;		(will not work well for ecfLEV close to 0 or 1, and for small numbers of events)
 ;	bkgct	[INPUT; default=0] number of counts in the background region
 ;	bkgscal	[INPUT; default=1] ratio of the background to source areas
 ;	cenX	[INPUT] if given overrides the central X location determined by centroiding
@@ -36,13 +36,11 @@ function eeradii,xx,yy,eelev,eemax=eemax,eree=eree,bkgscal=bkgscal,bkgct=bkgct,$
 ;	Vinay Kashyap (2018nov)
 ;	added keywords CENX,CENY (VK; 2019may)
 ;	added keyword EEMAX; changed hardcoded min for NMIN from 50 to 10 (VK; 2019oct)
-;	EOL (2024jul11)
+;	changed name from EERADII to ECFRADII, changed all instances of EE to ECF (VK; 2024jul)
 ;-
 
-message,'EERADII has been renamed ECFRADII.  This will continue to work but will not be updated.',/informational
-
 ;	usage
-ok='ok' & np=n_params() & nx=n_elements(xx) & ny=n_elements(yy) & nl=n_elements(eelev)
+ok='ok' & np=n_params() & nx=n_elements(xx) & ny=n_elements(yy) & nl=n_elements(ecflev)
 minph=100L & if keyword_set(nmin) then minph=long(nmin[0])>10L
 if np lt 2 then ok='Insufficient parameters' else $
  if nx eq 0 then ok='X positions of events are not given' else $
@@ -50,8 +48,8 @@ if np lt 2 then ok='Insufficient parameters' else $
    if nx ne ny then ok='X and Y positions are incompatible' else $
     if nx lt minph then ok='Too few events, reset NMIN (which cannot be <10)'
 if ok ne 'ok' then begin
-  print,'Usage: ree=eeradii(xx,yy,eelev,eemax=eemax,eree=eree,bkgct=bkgct,bkgscal=bkgscal,nmin=nmin,verbose=verbose)'
-  print,'  returns EE radii of list of events at specified EE levels, accounting for background'
+  print,'Usage: recf=ecfradii(xx,yy,ecflev,ecfmax=ecfmax,erecf=erecf,bkgct=bkgct,bkgscal=bkgscal,nmin=nmin,verbose=verbose)'
+  print,'  returns ecf radii of list of events at specified ecf levels, accounting for background'
   if np ne 0 then message,ok,/informational
   return,-1L
 endif
@@ -60,11 +58,11 @@ endif
 vv=0L & if keyword_set(verbose) then vv=long(verbose[0])>1L
 bgct=0L & if keyword_set(bkgct) then bgct=long(abs(bkgct[0]))>1L
 backscal=1.D & if keyword_set(bkgscal) then backscal=double(bkgscal[0])
-clev=0.85 & if nl gt 0 then clev=eelev[*] & nl=n_elements(clev)
-eecorr=1.0D & if n_elements(eemax) gt 0 then eecorr=abs(eemax[0])<1.0D
+clev=0.85 & if nl gt 0 then clev=ecflev[*] & nl=n_elements(clev)
+ecfcorr=1.0D & if n_elements(ecfmax) gt 0 then ecfcorr=abs(ecfmax[0])<1.0D
 
 ;	outputs
-ree=fltarr(nl) & eree=ree
+recf=fltarr(nl) & erecf=recf
 
 ;	compute
 xcen=mean(xx,/double) & ycen=mean(yy,/double)
@@ -98,18 +96,18 @@ cdf=dindgen(nx)
 cdfb=(cdf/(nx-1L))*(areas/maxarea)*(float(bgct)/backscal)
 
 cdfs=cdf-cdfb & cdfs=cdfs/max(cdfs)
-cdfs=cdfs*eecorr
+cdfs=cdfs*ecfcorr
 o1=where(cdfs ge 1,mo1) & cdfs[o1[0]:*]=1.
 
-ree=interpol(dd,cdfs,clev)
+recf=interpol(dd,cdfs,clev)
 cdfsig=sqrt(clev*(1.-clev)/(nx+bgct/backscal^2))
-uree=interpol(dd,cdfs,(clev+cdfsig)<1)
-lree=interpol(dd,cdfs,(clev-cdfsig)>0)
-eree=(uree-lree)/2.
+urecf=interpol(dd,cdfs,(clev+cdfsig)<1)
+lrecf=interpol(dd,cdfs,(clev-cdfsig)>0)
+erecf=(urecf-lrecf)/2.
 
 if vv gt 1000 then stop,'halting; type .CON to continue'
 
-return,ree
+return,recf
 end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -128,20 +126,20 @@ window,0,ysize=1000
 plot,xx,yy,psym=3,/xs,/ys,xr=[-6,6],yr=[-6,6] & oplot,xb,yb,psym=4,col=2
 plot,dd[os],dindgen(n_elements(dd))/float(nph-1L),/xs,/ys
 
-if not keyword_set(eelev) then eelev=[0.39,0.64,0.85,0.9]
+if not keyword_set(ecflev) then ecflev=[0.39,0.64,0.85,0.9]
 if not keyword_set(verbose) then verbose=1
-nl=n_elements(eelev)
+nl=n_elements(ecflev)
 
-ree=eeradii(xx,yy,eelev,eree=eree,bkgct=nbkg,bkgscal=1.,nmin=nmin,verbose=verbose)
+recf=ecfradii(xx,yy,ecflev,erecf=erecf,bkgct=nbkg,bkgscal=1.,nmin=nmin,verbose=verbose)
 
 for i=0L,nl-1L do begin
-  oplot,[!x.crange[0],ree[i]],eelev[i]*[1,1],col=1,line=1,thick=2
-  polyfill,ree[i]+eree[i]*[-1,1,1,-1,-1],eelev[i]*[0,0,1,1,0],col=3
+  oplot,[!x.crange[0],recf[i]],ecflev[i]*[1,1],col=1,line=1,thick=2
+  polyfill,recf[i]+erecf[i]*[-1,1,1,-1,-1],ecflev[i]*[0,0,1,1,0],col=3
 endfor
 ;	NOTE: the overshoot is because background is removed from the original cdf
 !p.multi=0
 
 snl=strtrim(nl,2)
-print,eelev,ree,eree,form='("EE ="'+snl+'(f5.2,3x),/,"rEE="'+snl+'(f6.3,2x),/," +- " '+snl+'(f7.4,1x))'
+print,ecflev,recf,erecf,form='("ecf ="'+snl+'(f5.2,3x),/,"recf="'+snl+'(f6.3,2x),/," +- " '+snl+'(f7.4,1x))'
 
 end
