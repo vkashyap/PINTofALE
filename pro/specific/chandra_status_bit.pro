@@ -40,6 +40,7 @@ function chandra_status_bit,inp,filter,bitstr=bitstr,stabit=stabit,$
 ;
 ;history
 ;	vinay kashyap (2014jul, inspired by CIAO's summarize_status_bits)
+;	fixed printout to conform to bit order of 32 to 0 from l. to r. (VLK 2025mar)
 ;-
 
 ;	usage
@@ -129,7 +130,7 @@ for i=0,31 do begin	;{step through each status bit
   cf=strmid(filt,i,1) & sarr=reform(stabit[i,*])
   o0=where(sarr eq 0,mo0,complement=o1,ncomplement=mo1)
   if mo0 ne nevt then $
-    print,string(strtrim(i+1,2),'(a2)')+' of 32: '+$
+    print,string(strtrim(32-(i+1),2),'(a2)')+' of 32: '+$
     	'0s - '+strtrim(mo0,2)+', 1s - '+strtrim(mo1,2)+' events'
   if mo0 ne nevt and arg_present(bitstr) then begin
     tmp=create_struct('flagged',mo1,'idx',o1,'zip',mo0,'ixnay',o0)
