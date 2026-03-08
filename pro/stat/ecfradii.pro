@@ -1,5 +1,5 @@
 function ecfradii,xx,yy,ecflev,ecfmax=ecfmax,erecf=erecf,bkgscal=bkgscal,bkgct=bkgct,$
-	cenX=cenX,cenY=cenY,nmin=nmin,verbose=verbose, _extra=e
+	cenX=cenX,cenY=cenY,nmin=nmin,ocdf=ocdf,verbose=verbose, _extra=e
 ;+
 ;function	ecfradii
 ;	computes the enclosed energy radii and corresponding error at the
@@ -29,6 +29,7 @@ function ecfradii,xx,yy,ecflev,ecfmax=ecfmax,erecf=erecf,bkgscal=bkgscal,bkgct=b
 ;	cenY	[INPUT] if given overrides the central Y location determined by centroiding
 ;	nmin	[INPUT; default=100] minimum number of events before any calculations are done
 ;		* hardcoded minimum is 10
+;	ocdf	[OUTPUT] computed background-corrected CDF
 ;	verbose	[INPUT] controls chatter
 ;	_extra	[JUNK] here only to prevent crashing the program
 ;
@@ -37,6 +38,7 @@ function ecfradii,xx,yy,ecflev,ecfmax=ecfmax,erecf=erecf,bkgscal=bkgscal,bkgct=b
 ;	added keywords CENX,CENY (VK; 2019may)
 ;	added keyword EEMAX; changed hardcoded min for NMIN from 50 to 10 (VK; 2019oct)
 ;	changed name from EERADII to ECFRADII, changed all instances of EE to ECF (VK; 2024jul)
+;	added keyword OCDF (VK; 2025jun)
 ;-
 
 ;	usage
@@ -95,9 +97,12 @@ maxarea=max(areas)
 cdf=dindgen(nx)
 cdfb=(cdf/(nx-1L))*(areas/maxarea)*(float(bgct)/backscal)
 
-cdfs=cdf-cdfb & cdfs=cdfs/max(cdfs)
+cdfs=cdf-cdfb
+;dcdf=cdfs[1:*]-cdfs & o0=where(dcdf lt 0,mo0) & if mo0 gt 0 then begin & tmpp=cdfs[1:*] & tmpp=tmpp>cdfs[0L:nx-1L] & cdfs[1:*]=tmpp & endif
+cdfs=cdfs/max(cdfs)
 cdfs=cdfs*ecfcorr
 o1=where(cdfs ge 1,mo1) & cdfs[o1[0]:*]=1.
+ocdf=cdfs
 
 recf=interpol(dd,cdfs,clev)
 cdfsig=sqrt(clev*(1.-clev)/(nx+bgct/backscal^2))
@@ -114,7 +119,7 @@ end
 ;	example case, a Gaussian sitting on a pedestal
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-peasecolr
+peasecolr & loadct,3 & blindcolr
 nsrc=10000L & nbkg=1000L
 xs=randomn(seed,nsrc) & ys=randomn(seed,nsrc) & osrc=where(abs(xs) lt 6 and abs(ys) lt 6,mosrc) & xs=xs[osrc] & ys=ys[osrc]
 xb=randomu(seed,nbkg)*12.-6. & yb=randomu(seed,nbkg)*12.-6.
@@ -124,16 +129,18 @@ nph=n_elements(dd)
 window,0,ysize=1000
 !p.multi=[0,1,2]
 plot,xx,yy,psym=3,/xs,/ys,xr=[-6,6],yr=[-6,6] & oplot,xb,yb,psym=4,col=2
+
 plot,dd[os],dindgen(n_elements(dd))/float(nph-1L),/xs,/ys
 
 if not keyword_set(ecflev) then ecflev=[0.39,0.64,0.85,0.9]
 if not keyword_set(verbose) then verbose=1
 nl=n_elements(ecflev)
 
-recf=ecfradii(xx,yy,ecflev,erecf=erecf,bkgct=nbkg,bkgscal=1.,nmin=nmin,verbose=verbose)
+recf=ecfradii(xx,yy,ecflev,erecf=erecf,bkgct=nbkg,bkgscal=1.,nmin=nmin,ocdf=ocdf,verbose=verbose)
+oplot,dd[os],ocdf,thick=2,col=4
 
 for i=0L,nl-1L do begin
-  oplot,[!x.crange[0],recf[i]],ecflev[i]*[1,1],col=1,line=1,thick=2
+  oplot,[!x.crange[0],recf[i]],ecflev[i]*[1,1],col=2,line=1,thick=2
   polyfill,recf[i]+erecf[i]*[-1,1,1,-1,-1],ecflev[i]*[0,0,1,1,0],col=3
 endfor
 ;	NOTE: the overshoot is because background is removed from the original cdf
