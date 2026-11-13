@@ -27,6 +27,7 @@ pro wcs_eqpos,skyx,skyy,header,ra,dec,CDELT=CDELT,CRPIX=CRPIX,CRVAL=CRVAL,verbos
 ;
 ;history
 ;	Vinay Kashyap (2026-aug-30)
+;	fixed RA projection which was missing the cos(dec) factor (2026-nov-10)
 ;-
 
 ok='ok' & np=n_params() & nx=n_elements(skyx) & ny=n_elements(skyy) & nh=n_elements(header)
@@ -81,8 +82,17 @@ if vv gt 10 then begin
   print,'Dec = '+strtrim(tcrvld,2)+' + tan('+strtrim(tcdltd,2)+') * (skyY - '+strtrim(tcrpxd,2)+')'
 endif
 
-ra  = tcrvlr + tan(tcdltr*!dpi/180.D)*(xx-tcrpxr)
-dec = tcrvld + tan(tcdltd*!dpi/180.D)*(yy-tcrpxd)
+;ra  = tcrvlr + tan(tcdltr*!dpi/180.D)*(xx-tcrpxr)
+;dec = tcrvld + tan(tcdltd*!dpi/180.D)*(yy-tcrpxd)
+dec = tcrvld + tan(tcdltd)*(yy-tcrpxd)
+cosdec=cos(tcrvld*!dpi/180.)
+if cosdec eq 0. then begin
+  cosdec=stddev(cos(dec*!pi/180.))
+  if vv gt 0 then message,'COS(DEC) is 0; substituting with stddev of cos(dec)',/informational
+endif
+ra  = tcrvlr + tan(tcdltr)*(xx-tcrpxr)/cosdec
+
+if vv gt 10000 then stop,'HALTing; type .CON to continue'
 
 return
 end
